@@ -5,8 +5,8 @@ Version 0.1
 	* Formatter
 		* formatter plug-in
 			* home-hand formatter
-				* string
-				* pretty number
+				* string (done)
+				* pretty number (done)
 
 Version 0.2
 
@@ -25,6 +25,8 @@ To plan
 	* clone i18n instance to allow scope modification
 
 	* Formatter
+		* number Hexa/binaire/Octal
+		* string: check that special characters are correctly upperCase
 		* pretty date
 		* pretty duration (1000s → 16min 40s)
 		* pretty conversion

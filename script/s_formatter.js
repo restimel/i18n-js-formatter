@@ -10,6 +10,21 @@
 			return statusVariable.currentLocale.formatRules;
 		}
 
+		function buildX0(nb) {
+			var result = [];
+			nb = +nb;
+
+			if (!nb) {
+				return '';
+			}
+
+			while (result.length < nb) {
+				result.push('0');
+			}
+
+			return result.join('');
+		}
+
 		function stringReplacement(value, variation) {
 			if (typeof value === 'undefined') {
 				value = 'undefined';
@@ -55,8 +70,21 @@
 
 					switch(code.charAt(0)) {
 						case '.':
-							if (status.decimal && status.decimal.length > nb) {
+							if (status.decimal && (status.decimal.length > nb || status.decimal.charAt(status.decimal.length-1) === '0')) {
 								status.decimal = (Math.round(('0.'+status.decimal) * Math.pow(10, nb)) / Math.pow(10, nb)).toString().slice(2);
+							}
+							break;
+						case 'p':
+							if (status.integer.length < nb) {
+								status.integer = buildX0(nb - status.integer.length) + status.integer;
+							}
+							break;
+						case 'd':
+							if (!status.decimal) {
+								status.decimal = '';
+							}
+							if (status.decimal.length < nb) {
+								status.decimal += buildX0(nb - status.decimal.length);
 							}
 							break;
 					}
@@ -111,7 +139,7 @@
 			} else if (variation.every(function(v) {
 				return v.indexOf('.') !== 0
 			})) {
-				variation.push('.3');
+				variation.unshift('.3');
 			}
 
 			/* special case: 0 should be display like single digit (as 1) */

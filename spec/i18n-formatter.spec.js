@@ -356,11 +356,15 @@ describe('i18n-formatter', function() {
 
 				value = 2456;
 				expect($$.parse('%{.1}D', value)).toBe('2.5k');
+
 				value = 2400;
 				expect($$.parse('%{.2}D', value)).toBe('2.4k');
+
+				value = 2456789;
+				expect($$.parse('%{.4}D', value)).toBe('2.4568M');
 			});
 
-			xit('should change decimal part with dN', function() {
+			it('should change decimal part with dN', function() {
 				var value;
 
 				value = 2.456;
@@ -377,13 +381,20 @@ describe('i18n-formatter', function() {
 				expect($$.parse('%{d2}i', value)).toBe('2');
 				expect($$.parse('%{d2}e', value)).toBe('2.40e+0');
 
+				value = 2;
+				expect($$.parse('%{d2}f', value)).toBe('2.00');
+				expect($$.parse('%{d2}d', value)).toBe('2.00');
+				expect($$.parse('%{d2}D', value)).toBe('2.00');
+				expect($$.parse('%{d2}i', value)).toBe('2');
+				expect($$.parse('%{d2}e', value)).toBe('2.00e+0');
+
 				value = 2456;
 				expect($$.parse('%{d1}D', value)).toBe('2.456k');
 				value = 2400;
 				expect($$.parse('%{d2}D', value)).toBe('2.40k');
 			});
 
-			xit('should change integer part with pN', function() {
+			it('should change integer part with pN', function() {
 				var value;
 
 				value = 2.4;
@@ -403,9 +414,10 @@ describe('i18n-formatter', function() {
 				value = 2400;
 				expect($$.parse('%{p2}D', value)).toBe('02.4k');
 				expect($$.parse('%{p5}d', value)).toBe('02,400');
+				expect($$.parse('%{p7}d', value)).toBe('0,002,400');
 			});
 
-			xit('should allow to combine variation', function() {
+			it('should allow to combine variation', function() {
 				var value;
 
 				value = 2400;
@@ -415,8 +427,15 @@ describe('i18n-formatter', function() {
 
 				value = 2.456;
 				expect($$.parse('%{d1,.1}f', value)).toBe('2.5');
-				expect($$.parse('%{d2,.1}f', value)).toBe('2.50');
-				expect($$.parse('%{d2,.2,p2}f', value)).toBe('02.46');
+				expect($$.parse('%{.1,d1}f', value)).toBe('2.5');
+				expect($$.parse('%{d2,.1}f', value)).toBe('2.5');
+				expect($$.parse('%{.1,d2}f', value)).toBe('2.50');
+				expect($$.parse('%{.5,d5}f', value)).toBe('2.45600');
+				expect($$.parse('%{d5,.5}f', value)).toBe('2.456');
+				expect($$.parse('%{.2,d2,p2}f', value)).toBe('02.46');
+
+				value = 42.1;
+				expect($$.parse('%{.2,d2,p2}f', value)).toBe('42.10');
 			});
 		});
 
