@@ -62,30 +62,13 @@
 	};
 
 	i18n.getLocale = function(options) {
-		var result, lastResult, x, nb;
-		options || (options = {key: true});
+		return _getLocale(currentLocale, options);
+	};
 
-		if (!currentLocale) {
-			return;
-		}
-
-		result = {};
-		nb = 0;
-		for (x in options) {
-			if (options.hasOwnProperty(x) && options[x]) {
-				lastResult = currentLocale[x];
-				result[x] = lastResult;
-				nb++;
-			}
-		}
-
-		if (nb === 1) {
-			result = lastResult;
-		} else if (nb === 0) {
-			result = currentLocale.key;
-		}
-
-		return result;
+	i18n.getLocales = function(options) {
+		return localeKeys.map(function(key) {
+			return _getLocale(locales[key], options);
+		});
 	};
 
 	/* private functions */
@@ -101,6 +84,33 @@
 		};
 
 		return locale;
+	}
+
+	function _getLocale(locale, options) {
+		var result, lastResult, x, nb;
+		options || (options = {key: true});
+
+		if (!locale) {
+			return;
+		}
+
+		result = {};
+		nb = 0;
+		for (x in options) {
+			if (options.hasOwnProperty(x) && options[x]) {
+				lastResult = locale[x];
+				result[x] = lastResult;
+				nb++;
+			}
+		}
+
+		if (nb === 1) {
+			result = lastResult;
+		} else if (nb === 0) {
+			result = locale.key;
+		}
+
+		return result;
 	}
 
 	function _formatLocaleKey(key) {

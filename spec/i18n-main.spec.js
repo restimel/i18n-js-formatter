@@ -88,12 +88,12 @@ describe('i18n', function() {
 			expect($$.getLocale()).toBe(locale);
 		});
 
-		xit('should get locales', function() {
+		it('should get locales', function() {
 			expect($$.getLocales()).toEqual(['en', 'fr', 'de', 'fr-be']);
 			expect($$.getLocales({key: true})).toEqual(['en', 'fr', 'de', 'fr-be']);
 		});
 
-		xit('should get locale names', function() {
+		it('should get locale names', function() {
 			expect($$.getLocales({
 				name: true
 			})).toEqual([
@@ -104,7 +104,7 @@ describe('i18n', function() {
 			]);
 		});
 
-		xit('should get locale names and keys', function() {
+		it('should get locale names and keys', function() {
 			expect($$.getLocales({
 				key: true,
 				name: true
