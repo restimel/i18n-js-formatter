@@ -305,7 +305,7 @@ describe('i18n-formatter', function() {
 				expect($$.parse('%e', 40)).toBe('4e+1');
 			});
 
-			xit('should convert to number the number wildcards', function() {
+			it('should convert to number the number wildcards', function() {
 				var obj;
 
 				obj = {};
@@ -337,7 +337,7 @@ describe('i18n-formatter', function() {
 				expect($$('%e cats', obj)).toBe((+obj).toExponential() + ' cats');
 			});
 
-			xit('should round decimal part with .N', function() {
+			it('should round decimal part with .N', function() {
 				var value;
 
 				value = 2.456;
@@ -352,7 +352,7 @@ describe('i18n-formatter', function() {
 				expect($$.parse('%{.2}d', value)).toBe('2.4');
 				expect($$.parse('%{.2}D', value)).toBe('2.4');
 				expect($$.parse('%{.2}i', value)).toBe('2');
-				expect($$.parse('%{.2}e', value)).toBe('2.e+0');
+				expect($$.parse('%{.2}e', value)).toBe('2.4e+0');
 
 				value = 2456;
 				expect($$.parse('%{.1}D', value)).toBe('2.5k');

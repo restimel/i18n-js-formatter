@@ -66,6 +66,17 @@
 			return status;
 		}
 
+		function rawNumber(origValue, variation) {
+			var status = getNumber(origValue, variation);
+			var result = [status.integer];
+
+			if (status.decimal) {
+				result.push('.', status.decimal);
+			}
+
+			return result.join('');
+		}
+
 		function prettyNumber(origValue, variation, isInteger) {
 			var status = getNumber(origValue, variation);
 			var integer = status.integer;
@@ -182,7 +193,7 @@
 				case 's':
 					return stringReplacement(value, variation);
 				case 'f':
-					return Number(value);
+					return rawNumber(value, variation);
 				case 'd':
 					return prettyNumber(value, variation);
 				case 'D':
