@@ -19,13 +19,21 @@
     "en": "context",
     "fr": "contexte"
   },
+  "Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t.": {
+    "en": "Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t.",
+    "fr": "Le client %(id)F: %(familyname){Case}s %(firstname){Case}s attend depuis %(waiting){min:min}t."
+  },
   "Do not translate the string": {
     "en": "Do not translate the string",
     "fr": "Ne pas traduire la chaîne"
   },
-  "info:": {
-    "en": "info:",
-    "fr": "info :"
+  "info: %s": {
+    "en": "info: %s",
+    "fr": "info : %s"
+  },
+  "Please enter a valid JS code. (string must be surrounded by ' or \")": {
+    "en": "Please enter a valid JS code. (string must be surrounded by ' or \")",
+    "fr": "Veuillez entrer du code JS valide. (les string doivent être entourées par ' ou \")"
   },
   "Preset example:": {
     "en": "Preset example:",
@@ -49,7 +57,7 @@
   },
   "These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view).": {
     "en": "These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view).",
-    "fr": "Ces données sont celles utilisées par cette application. Si vous les changez, vous pouvez observer l'impact sur les pages (changer ces donées ne rafraîchit pas la vue)."
+    "fr": "Ces données sont celles utilisées par cette application. Si vous les changez, vous pouvez observer directement l'impact sur ces pages (changer ces données ne rafraîchit pas la vue)."
   },
   "This content is still not done :(": {
     "en": "This content is still not done :(",
@@ -76,7 +84,7 @@
     },
     "Huge Number": {
       "en": "Huge Number",
-      "fr": "Très gors nombre"
+      "fr": "Très grand nombre"
     },
     "Duration": {
       "en": "Duration",
@@ -84,7 +92,7 @@
     },
     "Multiple arguments": {
       "en": "Multiple arguments",
-      "fr": "Arguments multiple"
+      "fr": "Arguments multiples"
     }
   }
 }

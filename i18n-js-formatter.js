@@ -488,6 +488,7 @@
 			localeKeys: [],
 			defaultKeyLocale: undefined,
 			currentLocale: null,
+			_currentLocale: null,
 			useDfltLocale: true,
 			storage: {
 				kind: 'none',

@@ -81,6 +81,7 @@ select {
 
 .input-error {
 	border: 1px solid red;
+	background-color: rgba(255,100,100,0.5);
 }
 
 .preset-formatter {

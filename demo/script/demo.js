@@ -57,44 +57,8 @@ i18n.configuration({
     }
 });
 
-var LIST_HEADER = [
-{
-    id: 'Formatting',
-    name: i18n.c('menu item', 'Formatting')
-// }, {
-//     id: 'Data',
-//     name: i18n.c('menu item', 'Data')
-}, {
-    id: 'Context',
-    name: i18n.c('menu item', 'Contextual')
-}, {
-    id: 'Translation',
-    name: i18n.c('menu item', 'Dictionary')
-}];
-
-var PRESET_FORMAT_TEST = [
-{
-    id: 'numberSuffix',
-    name: i18n.c('preset item', 'Number with suffix'),
-    pattern: '%{.2}D',
-    args: [12345]
-}, {
-    id: 'hugeNumber',
-    name: i18n.c('preset item', 'Huge Number'),
-    pattern: '%d',
-    args: ['123456789123456789']
-}, {
-    id: 'duration',
-    name: i18n.c('preset item', 'Duration'),
-    pattern: 'Time to load: %t', //i18n('Time to load: %t')
-    args: [100000000]
-}, {
-    id: 'multiArgs',
-    name: i18n.c('preset item', 'Multiple arguments'),
-    pattern: '%{CasE}s: %{esc:html}s | if you do not escape it you get "%(2){esc:raw}s".',
-    // i18n('%{CasE}s: %{esc:html}s | if you do not escape it you get "%(2){esc:raw}s".')
-    args: ['string in HTML', '<p>describe something</p>']
-}];
+var LIST_HEADER = [];
+var PRESET_FORMAT_TEST = [];
 
 function init() {
     LIST_HEADER = [
@@ -134,6 +98,12 @@ function init() {
         pattern: '%{CasE}s: %{esc:html}s | if you do not escape it you get "%(2){esc:raw}s".',
         // i18n('%{CasE}s: %{esc:html}s | if you do not escape it you get "%(2){esc:raw}s".')
         args: ['string in HTML', '<p>describe something</p>']
+    }, {
+        id: 'objArgs',
+        name: i18n.c('preset item', 'Argument is an object'),
+        pattern: 'Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t.',
+        // i18n('Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t.')
+        args: [{firstname: 'John', familyname: 'Doe', age: 42, waiting: 9752639, id: 1234}]
     }];
 }
 
@@ -380,23 +350,71 @@ var PresetFormatter = React.createClass({
 });
 
 var JsInput2 = React.createClass({
-    isValid: function() {
-        //TODO isValid
-        return true;
+    _oldValue: null,
+    getInitialState: function() {
+        this._oldValue = this.props.value;
+        return {
+            isValid: true,
+            value: this.stringify(this.props.value)
+        }
+    },
+    updateState: function() {
+        if (this.props.value !== this._oldValue) {
+            this._oldValue = this.props.value;
+            this.setState({
+                value: this.stringify(this.props.value),
+                isValid: true
+            })
+        }
+    },
+    stringify: function(value) {
+        if (typeof value === 'undefined') {
+            return '';
+        }
+
+        try {
+            value = JSON.stringify(value);
+        } catch(e) {
+            value = 'null';
+        }
+
+        return value;
+    },
+    parse: function(str) {
+        var value;
+        var isValid = true;
+
+        try {
+            value = JSON.parse(str);
+        } catch(e) {
+            value = null;
+            isValid = false;
+        }
+
+        this.setState({
+            isValid: isValid,
+            value: str
+        });
+
+        return [value, isValid];
     },
     onchange: function(evt) {
         var value = evt.currentTarget.value;
-        if (typeof this.props.onChange === 'function') {
+        var isValid;
+
+        [value, isValid] = this.parse(value);
+
+        if (isValid && typeof this.props.onChange === 'function') {
             this.props.onChange(value);
         }
     },
     render: function() {
-
+        this.updateState();
         return (
             <span className={this.props.className}>
-            <input value={this.props.value} onChange={this.onchange}
-                className={this.isValid() ? '' : 'input-error'}
-                title={this.isValid() ? this.props.title : i18n('please enter a valid JS code. (string must be surrounded by \' or "')} />
+            <input value={this.state.value} onChange={this.onchange}
+                className={this.state.isValid ? '' : 'input-error'}
+                title={this.state.isValid ? this.props.title : i18n('Please enter a valid JS code. (string must be surrounded by \' or ")')} />
             </span>
         );
     }
@@ -409,10 +427,10 @@ var I18nFormatter = React.createClass({
         propArgs: []
     },
     getInitialState: function() {
-        var args = this.props.args || [''];
+        var args = this.props.args || [undefined];
 
         if (!args.length) {
-            args.push('');
+            args.push(undefined);
         }
 
         this.updateState();
@@ -444,7 +462,7 @@ var I18nFormatter = React.createClass({
         }
     },
     addArg: function() {
-        var args = this.state.args.concat(['']);
+        var args = this.state.args.concat([undefined]);
         this.setState({args: args});
     },
     callOnChange: function(pattern, args) {
@@ -573,7 +591,7 @@ var Result = React.createClass({
                 <LocaleSelector className="locale-selector" selected={this.state.locale} onChange={this.onLocaleChange} title={i18n('Set result language')} />
                 <p className="output">{this.result(this.props.action)}</p>
                 <details className="logs">
-                    <summary>{i18n('info:')}{logs.summary()}</summary>
+                    <summary>{i18n('info: %s', logs.summary())}</summary>
                     {logs.messages.map(function(log) {
                         return (<div className={logClassName(log)}>({log.code}) {log.message}</div>);
                     })}
