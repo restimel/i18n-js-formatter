@@ -1,6 +1,7 @@
 (function() {
 	'use strict';
 	var i18n = 'i18n';
+	var has_i18n_config = typeof _i18n_config === 'object';
 
 	function s_formatter(text, values, statusVariable) {
 		var args = [text].concat(values);
@@ -239,10 +240,10 @@
 		return text;
 	}
 
-	if (_i18n_config && _i18n_config.doNotLoadFormatter) {
+	if ((!has_i18n_config && !self[i18n]) || (has_i18n_config && _i18n_config.doNotLoadFormatter)) {
 		self.s_formatter = s_formatter;
 	} else {
-		if (typeof _i18n_config === 'object' && _i18n_config.alias) {
+		if (has_i18n_config && _i18n_config.alias) {
 			i18n = _i18n_config.alias;
 		}
 
