@@ -4,12 +4,12 @@ A simple translation module with dynamic json storage which helps to format stri
 
 ## Install
 
-	TODO but it will be only some JS scripts to load
+TODO but it will be only some JS scripts to load
 
 ## Test
 
-	Jasmine tests are provided in folder `spec`.
-	Run tests with mainTest.html (located in the root folder): https://restimel.github.io/i18n-js-formatter/mainTest.html
+Jasmine tests are provided in folder `spec`.
+Run tests with mainTest.html (located in the root folder): https://restimel.github.io/i18n-js-formatter/mainTest.html
 
 ## Configure
 
@@ -17,7 +17,7 @@ TODO
 
 ### list of configuration options
 
-	TODO
+TODO
 
 
 ## API

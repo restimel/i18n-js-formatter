@@ -8,7 +8,7 @@ describe('i18n', function() {
 		expect($$).toEqual(i18n);
 	});
 
-	xdescribe('configuration', function() {
+	describe('configuration', function() {
 
 		beforeEach(function() {
 			$$.configuration({
@@ -24,17 +24,20 @@ describe('i18n', function() {
 			$$.setLocale('en');
 		});
 
-		xit('should get locale', function() {
+		it('should get locale', function() {
 			expect($$.getLocale()).toBe('en');
-			expect($$.getLocale({locale: true})).toBe('en');
+			expect($$.getLocale({key: true})).toBe('en');
+			expect($$.getLocale({key: true, name: false})).toBe('en');
+			expect($$.getLocale({})).toBe('en');
 		});
 
-		xit('should get locale name', function() {
+		it('should get locale name', function() {
 			expect($$.getLocale({name: true})).toBe('English');
+			expect($$.getLocale({key:false, name: true})).toBe('English');
 		});
 
-		xit('should get locale key and name', function() {
-			expect($$.getLocale({locale: true, name: true})).toEqual({locale: 'en', name: 'English'});
+		it('should get locale key and name', function() {
+			expect($$.getLocale({key: true, name: true})).toEqual({key: 'en', name: 'English'});
 		});
 
 		xdescribe('set locale', function() {
@@ -87,7 +90,7 @@ describe('i18n', function() {
 
 		xit('should get locales', function() {
 			expect($$.getLocales()).toEqual(['en', 'fr', 'de', 'fr-be']);
-			expect($$.getLocales({locale: true})).toEqual(['en', 'fr', 'de', 'fr-be']);
+			expect($$.getLocales({key: true})).toEqual(['en', 'fr', 'de', 'fr-be']);
 		});
 
 		xit('should get locale names', function() {
@@ -103,13 +106,13 @@ describe('i18n', function() {
 
 		xit('should get locale names and keys', function() {
 			expect($$.getLocales({
-				locale: true,
+				key: true,
 				name: true
 			})).toEqual([
-				{locale: 'en', name: 'English'},
-				{locale: 'fr', name: 'Français'},
-				{locale: 'de', name: 'Deutsh'},
-				{locale: 'fr-be', name: 'Belge'}
+				{key: 'en', name: 'English'},
+				{key: 'fr', name: 'Français'},
+				{key: 'de', name: 'Deutsh'},
+				{key: 'fr-be', name: 'Belge'}
 			]);
 		});
 
