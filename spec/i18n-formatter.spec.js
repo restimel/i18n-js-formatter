@@ -29,6 +29,10 @@ describe('i18n-formatter', function() {
 					en: '%i cats',
 					fr: '%i chats'
 				},
+				'%e cats': {
+					en: '%e cats',
+					fr: '%e chats'
+				},
 				'%d issues: %s': {
 					en: '%d issues: %s',
 					fr: '%d problèmes : %s'
@@ -282,7 +286,7 @@ describe('i18n-formatter', function() {
 				expect($$('%i cats', 1234.5)).toBe('1 234 chats');
 			});
 
-			xit('should replace the %e wildcard', function() {
+			it('should replace the %e wildcard', function() {
 				expect($$('%e cats', 4.2)).toBe('4.2e+0 cats');
 				expect($$('%e cats', 42.76)).toBe('4.276e+1 cats');
 				expect($$('%e cats', 1234.5)).toBe('1.2345e+3 cats');
@@ -297,6 +301,8 @@ describe('i18n-formatter', function() {
 				expect($$('%e cats', 42.76)).toBe('4.276e+1 chats');
 				expect($$('%e cats', 1234.5)).toBe('1.2345e+3 chats');
 				expect($$('%e cats', 0.01234)).toBe('1.234e-2 chats');
+
+				expect($$.parse('%e', 40)).toBe('4e+1');
 			});
 
 			xit('should convert to number the number wildcards', function() {

@@ -126,6 +126,29 @@
 			return prettyNumber(value, variation) + suffix[i].suffix;
 		}
 
+		function expNumber(origValue, variation) {
+			var value, splitValue, status, expSep, result;
+
+			value = Number(origValue).toExponential();
+			splitValue = value.split('e');
+			status = getNumber(splitValue[0], variation);
+
+			if (!isFinite(status.number)) {
+				return status.number;
+			}
+
+			expSep = getRules().number.exponentialSeparator;
+
+			result = [status.integer];
+
+			if (status.decimal) {
+				result.push('.', status.decimal);
+			}
+			result.push(expSep, splitValue[1]);
+
+			return result.join('');
+		}
+
 		function replacement(pattern, arg, variation, kind) {
 			var value;
 
@@ -167,8 +190,7 @@
 				case 'i':
 					return prettyNumber(value, variation, true);
 				case 'e':
-					return Number(value);
-					break;
+					return expNumber(value, variation);
 				case '%':
 					return '%';
 			}

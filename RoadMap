@@ -22,9 +22,13 @@ Version 0.3
 
 To plan
 	
-	* clone i18n instance to allow scope modificaltion
+	* clone i18n instance to allow scope modification
 
 	* Formatter
 		* pretty date
 		* pretty duration (1000s → 16min 40s)
-		* pretty conversion (1000 → 1k, 1000s → 16min)
+		* pretty conversion
+			* 1000 → 1k (done)
+			* 1000s → 16min
+		* custom format
+			* allow to use other chars like %J to display a complex format
