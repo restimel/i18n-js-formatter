@@ -40,7 +40,7 @@ describe('i18n', function() {
 			expect($$.getLocale({key: true, name: true})).toEqual({key: 'en', name: 'English'});
 		});
 
-		xdescribe('set locale', function() {
+		describe('set locale', function() {
 			[
 			/*  [input, expected result] */
 				['fr', 'fr'],
@@ -49,20 +49,20 @@ describe('i18n', function() {
 				['DE', 'de'],
 				['fr-BE', 'fr-be'],
 			].forEach(function(v) {
-				xit('should change to locale: ' + v[0], function() {
+				it('should change from "' + v[0] + '" to locale: ' + v[1], function() {
 					expect($$.setLocale(v[0])).toBeTruthy();
 					expect($$.getLocale()).toBe(v[1]);
 				});
 			});
 
-			xit('should not change twice', function() {
+			it('should not change twice', function() {
 				$$.setLocale('fr');
 				expect($$.setLocale('fr')).toBeFalsy();
 				expect($$.getLocale()).toBe('fr');
 			});
 		});
 
-		xit('should set default language', function() {
+		it('should set default language', function() {
 			$$.setLocale(navigator.language)
 			var locale = $$.getLocale();
 
@@ -70,7 +70,7 @@ describe('i18n', function() {
 			expect($$.getLocale()).toBe(locale);
 		});
 
-		xit('should not change locale to outscope locales', function() {
+		it('should not change locale to outscope locales', function() {
 			var locale = $$.getLocale();
 
 			[
@@ -81,7 +81,7 @@ describe('i18n', function() {
 				'fr_be',
 				'frbe',
 				'anyword'
-			].each(function(locale) {
+			].forEach(function(locale) {
 				expect($$.setLocale(locale)).toBeFalsy();
 			});
 

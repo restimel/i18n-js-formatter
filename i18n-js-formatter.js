@@ -30,6 +30,10 @@
 
 		if (options.locales instanceof Array) {
 			options.locales.forEach(function(key) {
+				if (typeof key !== 'string') {
+					return;
+				}
+
 				locale = _createLocale(key, options.localeName[key]);
 				key = locale.key;
 
@@ -46,9 +50,15 @@
 	};
 
 	i18n.setLocale = function(key) {
-		if (locales[key]) {
+		key = _formatLocaleKey(key);
+
+		if (key !== currentLocale.key && locales[key]) {
 			currentLocale = locales[key];
+		} else {
+			key = false;
 		}
+
+		return key;
 	};
 
 	i18n.getLocale = function(options) {
@@ -78,9 +88,11 @@
 		return result;
 	};
 
-	/* private methods */
+	/* private functions */
 	function _createLocale(key, name) {
 		var dflt, locale;
+
+		key = key.toLowerCase();
 
 		dflt = locales[key] || {};
 		locale = {
@@ -89,6 +101,17 @@
 		};
 
 		return locale;
+	}
+
+	function _formatLocaleKey(key) {
+		key = _default(key, '');
+		key = key.toLowerCase();
+
+		while (!locales[key] && key) {
+			key = key.replace(/(?:^|-)[^-]*$/, '');
+		}
+
+		return key;
 	}
 
 	function _default(value, dfltValue) {
