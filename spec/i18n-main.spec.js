@@ -1766,6 +1766,79 @@ describe('i18n', function() {
 		});
 	});
 
+	describe('context translations', function() {
+		beforeEach(function() {
+			this.logInfo = jasmine.createSpy('logInfo');
+			this.logWarn = jasmine.createSpy('logWarn');
+			this.logError = jasmine.createSpy('logError');
+
+			$$.configuration({
+				locales: ['en', 'fr', 'fr-be'],
+				dictionary: {
+					seventy: {
+						en: 'seventy',
+						fr: 'soixante-dix',
+						'fr-be': 'septante'
+					},
+					cat: {
+						en: 'cat',
+						fr: 'chat'
+					}
+				},
+				secondary: {
+					'fr-be': 'fr'
+				},
+				log: {
+					info: this.logInfo,
+					warn: this.logWarn,
+					error: this.logError
+				}
+			});
+			$$.setLocale('en');
+		});
+
+		afterEach(function() {
+			$$.clearData();
+		});
+
+		it('should translate the key', function() {
+			expect($$.context('number', 'seventy')).toBe('seventy');
+			expect($$.c('number', 'seventy')).toBe('seventy');
+			$$.setLocale('fr');
+			expect($$.context('number', 'seventy')).toBe('soixante-dix');
+			expect($$.c('number', 'seventy')).toBe('soixante-dix');
+			$$.setLocale('fr-be');
+			expect($$.context('number', 'seventy')).toBe('septante');
+			expect($$.c('number', 'seventy')).toBe('septante');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		it('should fallback the translation', function() {
+			$$.setLocale('fr-be');
+
+			expect($$.context('animal', 'cat')).toBe('chat');
+			expect($$.c('animal', 'cat')).toBe('chat');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			var string = 'unknown';
+			expect($$.context('animal', string)).toBe(string);
+			expect(this.logWarn).toHaveBeenCalled();
+			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
+
+			this.logWarn.calls.reset();
+			string = 'cat';
+			expect($$.c('unknown', string)).toBe(string);
+			expect(this.logWarn).toHaveBeenCalled();
+			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+	});
+
 	describe('basic formatter', function() {
 		beforeEach(function() {
 			this.logInfo = jasmine.createSpy('logInfo');

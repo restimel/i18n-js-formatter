@@ -38,8 +38,8 @@ Using strings which have to be translated
 
 To give a context to help the translation (this should be done in version 0.2)
 
-	i18n.context('computer key', 'give the correct key'); // should be translated in French 'Donnez la bonne touche'
-	i18n.context('door key', 'give the correct key'); // should be translated in French 'Donnez la bonne clef'
+	i18n.context('computer key', 'Give the correct key'); // should be translated in French 'Donnez la bonne touche'
+	i18n.context('door key', 'Give the correct key'); // should be translated in French 'Donnez la bonne clef'
 
 	i18n.context('time unit: minute', 'min');
 	i18n.context('abbreviation: minimum', 'min');
@@ -142,7 +142,7 @@ Translates a single expression. Returns translated parsed and substituted string
 		fr: 'Salut'
 	}); // Salut
 
-	// passing specific locale (needed?)
+	// passing specific locale (needed?) {currently not implemented}
 	i18n({str: 'Hello', locale: 'fr'}); // Salut
 
 ### i18n.parse()
@@ -151,20 +151,20 @@ It is possible to parse a single string in order to format it.
 Example:
 
 	i18n.parse('Hello %s', 'Restimel'); // Hello Restimel
-	i18n.parse('Hello {{name}}', { name: 'Restimel' }); // Hello Restimel
+	i18n.parse('Hello %(name)s', { name: 'Restimel' }); // Hello Restimel
 
 The formatters are also called on each translation string:
 
 	i18n.setLocale('fr');
 	i18n('Hello %s', 'Restimel'); // Salut Restimel
-	i18n('Hello {{name}}', { name: 'Restimel' }); // Salut Restimel
+	i18n('Hello %(name)s', { name: 'Restimel' }); // Salut Restimel
 
 Note: calling directly i18n.parse will not prompt warning log if the key string is not in data dictionary. So for short string where only formatting is expected i18n.parse() is better than i18n().
 
 WARNING:
 By default, no formatter are loaded. You must load a formatter (with i18n.loadFormatter()) in order to do the parsing.
 
-An inner formatter will be added soon.
+An inner formatter is provided but must be loaded.
 
 It is possible to add several formatter and they will be all called.
 
@@ -222,6 +222,27 @@ If _i18n_config.doNotLoadFormatter is set to true, the sprintf formatter is not 
 
 ### i18n.context() [version 0.2]
 
+Context allows to give more details to some strings and helps to translate it correctly.
+Some people also call it namespace.
+
+This is also very usefull for all abreviations.
+
+For example, if you use a string 'min', is it stand for 'minute' or 'minimum' or something else? It is not easy to translate this correctly when you see only the string. This is why the context is for.
+
+Usage:
+The first argument is the context (this one won't be translated) and the second argument is the string to be translated. All other arguments are for formatting.
+
+	i18n.context('computer key', 'Give the correct key'); // should be translated in French 'Donnez la bonne touche'
+	i18n.context('door key', 'Give the correct key'); // should be translated in French 'Donnez la bonne clef'
+
+	i18n.context('computer key', 'key %s', keyValue); // The result will be "key A" if keyValue is worth 'A'
+
+It is also possible to call it with method *c*. It's an alias of method context
+
+	i18n.c('minimum', 'min');
+
+The entry in dictionary are different from string without contextual.
+
 ### i18n.n() [version 0.3]
 
 Plurals translation of a single phrase. Singular and plural forms will get added to locales if unknown. Returns translated parsed and substituted string based on `count` parameter.
@@ -257,12 +278,24 @@ Define locale configuration at once
 		{
 			key: 'fr',
 			name: 'Français',
-			data: 'dictionary-fr.json'
+			data: 'dictionary-fr.json',
+			formatRules: {
+				number: {
+					thousandSeparator: ' ',
+					decimalSeparator: ','
+				}
+			}
 		},
 		{
 			key: 'fr-be',
 			name: 'Belge',
 			data: 'dictionary-be.json',
+			formatRules: {
+				number: {
+					thousandSeparator: ' ',
+					decimalSeparator: ','
+				}
+			}
 		}
 	]});
 

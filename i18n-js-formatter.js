@@ -330,7 +330,7 @@
 	};
 
 	/**
-	 * parse a string with 
+	 * parse a string without translating it
 	 *
 	 * @param text {String} the string to parse
 	 * @param [values] {Any...} The value to replace wildcards
