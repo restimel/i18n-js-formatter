@@ -31,6 +31,7 @@
 		4031: 'The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored.',
 		4100: 'The sentence "%s" is not translated for language "%s".',
 		4101: 'It is not possible to translate object (%s) to language "%s".',
+		4200: 'Parser "%s" has thrown an issue: %s',
 
 		/* errors */
 		7010: 'dictionary is in a wrong format (%s): %s',
@@ -41,34 +42,34 @@
 		7020: 'data recieved from "%s" is not in a valid JSON ("%s")',
 		7030: 'The secondaries fallback create a circular loop (%s).',
 		7100: 'Translation is not possible due to an unsupported type (%s): %s',
-		7401: 'Unauthorized request: %s',
-		7403: 'Request forbidden: %s',
-		7404: 'Page not found: %s',
-		7405: 'Method is not allowed: %s',
-		7407: 'Proxy authentication required: %s',
-		7408: 'Request timeout: %s',
-		7418: 'Sorry, I cannot brew your coffee: %s',
-		7500: 'Internal server error: %s',
-		7501: 'Not implemented (server error): %s',
-		7502: 'Bad Gateway: %s',
-		7503: 'Service on server is unavailable: %s',
-		7504: 'Gateway timeout: %s',
-		7505: 'HTTP version is not supported by server: %s'
+		7200: 'Parser %s can not be added because it is not a function.',
+		8401: 'Unauthorized request: %s',
+		8403: 'Request forbidden: %s',
+		8404: 'Page not found: %s',
+		8405: 'Method is not allowed: %s',
+		8407: 'Proxy authentication required: %s',
+		8408: 'Request timeout: %s',
+		8418: 'Sorry, I cannot brew your coffee: %s',
+		8500: 'Internal server error: %s',
+		8501: 'Not implemented (server error): %s',
+		8502: 'Bad Gateway: %s',
+		8503: 'Service on server is unavailable: %s',
+		8504: 'Gateway timeout: %s',
+		8505: 'HTTP version is not supported by server: %s'
 	};
 
 	/* status variables */
-	var locales, localeKeys, currentLocale,
-		defaultKeyLocale, useDfltLocale, storage,
-		syncLoading, lazyLoading,
-		onLocaleReady,
-		log,
-		data, loadingMethod, status;
+	var sv;
 	_reset();
 
 	/* API methods */
 
 	function i18n(sentence) {
-		return _translation(sentence);
+		var text = _translation(sentence);
+		var args = Array.prototype.slice.call(arguments, 1);
+
+		text = _parse.apply(this, [text].concat(args));
+		return text;
 	}
 
 	/**
@@ -115,19 +116,19 @@
 		}
 
 		if (typeof options.onLocaleReady !== 'undefined') {
-			onLocaleReady = options.onLocaleReady;
+			sv.onLocaleReady = options.onLocaleReady;
 		}
 
 		if (typeof options.syncLoading === 'boolean') {
-			syncLoading = options.syncLoading;
+			sv.syncLoading = options.syncLoading;
 		}
 
 		if (typeof options.lazyLoading === 'boolean') {
-			lazyLoading = options.lazyLoading;
+			sv.lazyLoading = options.lazyLoading;
 		}
 
 		if (needLoading) {
-			status.callLocaleLoaded = true;
+			sv.status.callLocaleLoaded = true;
 		}
 
 		if (typeof options.dictionary !== 'undefined') {
@@ -140,20 +141,20 @@
 
 		if (typeof options.storage !== 'undefined') {
 			_configureStorage(options.storage);
-			if (!useDfltLocale) {
-				_setStorage(currentLocale.key);
+			if (!sv.useDfltLocale) {
+				_setStorage(sv.currentLocale.key);
 			}
 		}
 
 		if (typeof options.defaultLocale !== 'undefined') {
-			defaultKeyLocale = options.defaultLocale;
+			sv.defaultKeyLocale = options.defaultLocale;
 		}
 
-		if (useDfltLocale && localeKeys.length) {
-			currentLocale = locales[_getDefaultKey()];
+		if (sv.useDfltLocale && sv.localeKeys.length) {
+			sv.currentLocale = sv.locales[_getDefaultKey()];
 		}
 
-		if (needLoading && lazyLoading) {
+		if (needLoading && sv.lazyLoading) {
 			_loadCurrentLocale();
 		}
 	};
@@ -176,20 +177,20 @@
 			key = _formatLocaleKey(key);
 		}
 
-		if (key === currentLocale.key) {
+		if (key === sv.currentLocale.key) {
 			key = false;
 		} else
-		if (!locales[key]) {
+		if (!sv.locales[key]) {
 			key = false;
 			saveChanged = false;
 		} else {
-			currentLocale = locales[key];
+			sv.currentLocale = sv.locales[key];
 			_loadCurrentLocale();
 		}
 
 		if (saveChanged) {
-			useDfltLocale = useDflt;
-			_setStorage(i18n.getLocale(), useDfltLocale);
+			sv.useDfltLocale = useDflt;
+			_setStorage(i18n.getLocale(), sv.useDfltLocale);
 		}
 
 		return key;
@@ -206,7 +207,7 @@
 	 *						   If several options are given, it return an object with the key/value of wanted options.
 	 */
 	i18n.getLocale = function(options) {
-		return _getLocale(currentLocale, options);
+		return _getLocale(sv.currentLocale, options);
 	};
 
 	/**
@@ -220,8 +221,8 @@
 	 *							   If several options are given, it return a list of object with the key/value of wanted options.
 	 */
 	i18n.getLocales = function(options) {
-		return localeKeys.map(function(key) {
-			return _getLocale(locales[key], options);
+		return sv.localeKeys.map(function(key) {
+			return _getLocale(sv.locales[key], options);
 		});
 	};
 
@@ -242,7 +243,7 @@
 		var dico;
 
 		key = _formatLocaleKey(key);
-		dico = data[key];
+		dico = sv.data[key];
 
 		if (format === 'dictionary') {
 			rslt = {};
@@ -252,9 +253,9 @@
 				if (dico && dico[sentence]) {
 					rslt[sentence][key] = dico[sentence];
 				} else {
-					localeKeys.forEach(function(key) {
-						if (data[key] && data[key][sentence]) {
-							rslt[sentence][key] = data[key][sentence];
+					sv.localeKeys.forEach(function(key) {
+						if (sv.data[key] && sv.data[key][sentence]) {
+							rslt[sentence][key] = sv.data[key][sentence];
 						}
 					});
 				}
@@ -263,7 +264,7 @@
 			if (key && typeof dico !== 'undefined') {
 				rslt = dico;
 			} else {
-				rslt = data;
+				rslt = sv.data;
 			}
 		}
 
@@ -281,17 +282,44 @@
 	};
 
 	/**
+	 * Add a parser to the parser list
+	 *
+	 * @param options.parser {Function} a parser to call on string to parse
+	 * @param [options.name] {String} the name of the parser (mainly useful for messages);
+	 * @param [options.weight] {Number} the importance of the parser. The heigher the weight is the first the parser will be called.
+	 */
+	i18n.loadParser = function(options) {
+		if (typeof options !== 'object') {
+			options = {parser: options};
+		}
+
+		var parser = options.parser;
+		var name = options.name || parser.name || '';
+		var weight = options.weight;
+
+		_addParser(parser, name, weight);
+	};
+
+	/**
+	 * parse a string with 
+	 *
+	 * @param text {String} the string to parse
+	 * @param [values] {Any...} The value to replace wildcards
+	 */
+	i18n.parse = _parse;
+
+	/**
 	 * Clear the data of the specified locale
 	 *
 	 * @param [key] {String} the locale's data to clear. If not defined all data are cleared.
 	 */
 	i18n.clearData = function(key) {
 		if (typeof key === 'undefined') {
-			data = {};
-			localeKeys.forEach(_resetDataKey);
+			sv.data = {};
+			sv.localeKeys.forEach(_resetDataKey);
 		} else {
 			key = _formatLocaleKey(key);
-			if (data[key]) {
+			if (sv.data[key]) {
 				_resetDataKey(key);
 			}
 		}
@@ -318,32 +346,35 @@
 	 */
 
 	function _reset() {
-		locales = {};
-		localeKeys = [];
-		defaultKeyLocale = undefined;
-		currentLocale = null;
-		useDfltLocale = true;
-		storage = {
-			kind: 'none',
-			name: ''
-		};
-		data = {};
-		loadingMethod = {};
-		syncLoading = false;
-		lazyLoading = true;
-		onLocaleReady = null;
-		status = {
-			callLocaleLoaded: false
-		};
-		log = {
-			info: null,
-			warn: null,
-			error: null
+		sv = {
+			locales: {},
+			localeKeys: [],
+			defaultKeyLocale: undefined,
+			currentLocale: null,
+			useDfltLocale: true,
+			storage: {
+				kind: 'none',
+				name: ''
+			},
+			data: {},
+			loadingMethod: {},
+			syncLoading: false,
+			lazyLoading: true,
+			onLocaleReady: null,
+			parser: [],
+			status: {
+				callLocaleLoaded: false
+			},
+			log: {
+				info: null,
+				warn: null,
+				error: null
+			}
 		};
 	}
 
 	function _resetDataKey(key) {
-		data[key] = null;
+		sv.data[key] = null;
 	}
 
 	function _createLocale(key, name) {
@@ -351,7 +382,7 @@
 
 		key = key.toLowerCase();
 
-		dflt = locales[key] || {};
+		dflt = sv.locales[key] || {};
 		locale = {
 			key: key,
 			name: _default(name, dflt.name),
@@ -364,7 +395,7 @@
 	function _configureLocales(options) {
 		var nextLocales = {};
 
-		localeKeys = [];
+		sv.localeKeys = [];
 
 		options.locales.forEach(function(key) {
 			var locale;
@@ -377,32 +408,32 @@
 			key = locale.key;
 
 			if (!nextLocales[key]) {
-				localeKeys.push(key);
+				sv.localeKeys.push(key);
 			}
 			nextLocales[key] = locale;
 		});
 
-		_each(data, function(value, key) {
-			if (localeKeys.indexOf(key) === -1) {
-				delete data[key];
+		_each(sv.data, function(value, key) {
+			if (sv.localeKeys.indexOf(key) === -1) {
+				delete sv.data[key];
 			}
 		});
 
-		localeKeys.forEach(function(key) {
-			if (!data[key]) {
+		sv.localeKeys.forEach(function(key) {
+			if (!sv.data[key]) {
 				_resetDataKey(key);
 			}
 		});
 
-		locales = nextLocales;
+		sv.locales = nextLocales;
 	}
 
 	function _configurelocaleNames(options) {
 		_each(options.localeName, function(value, key) {
 			key = _formatLocaleKey(key);
 
-			if (locales[key]) {
-				locales[key].name = value;
+			if (sv.locales[key]) {
+				sv.locales[key].name = value;
 			}
 		});
 	}
@@ -416,7 +447,7 @@
 			var value = origValue;
 			key = _formatLocaleKey(key);
 
-			if (locales[key]) {
+			if (sv.locales[key]) {
 				if (typeof value !== 'string') {
 					if (value === false || value === null) {
 						value = false;
@@ -447,7 +478,7 @@
 				value = preparationSecondaries[key];
 
 				if (typeof value === 'undefined') {
-					value = locales[key].secondary;
+					value = sv.locales[key].secondary;
 				}
 			}
 
@@ -463,12 +494,12 @@
 
 		/* copy secondaries */
 		_each(preparationSecondaries, function(value, key) {
-			locales[key].secondary = value;
+			sv.locales[key].secondary = value;
 		});
 	}
 
 	function _configureLog(optLog, kind) {
-		log[kind] = optLog;
+		sv.log[kind] = optLog;
 	}
 
 	function _configureStorage(options) {
@@ -497,24 +528,24 @@
 		}
 
 		type = type.split(':');
-		storage.kind = type[0];
-		storage.name = type[1];
+		sv.storage.kind = type[0];
+		sv.storage.name = type[1];
 	}
 
 	function _setStorage(value, reset) {
-		switch(storage.kind) {
+		switch(sv.storage.kind) {
 			case 'cookie':
 				if (reset) {
-					document.cookie = storage.name + '=';
+					document.cookie = sv.storage.name + '=';
 				} else {
-					document.cookie = storage.name + '=' + value;
+					document.cookie = sv.storage.name + '=' + value;
 				}
 				break;
 			case 'localStorage':
 				if (reset) {
-					self.localStorage.removeItem(storage.name);
+					self.localStorage.removeItem(sv.storage.name);
 				} else {
-					self.localStorage.setItem(storage.name, value);
+					self.localStorage.setItem(sv.storage.name, value);
 				}
 				break;
 		}
@@ -523,9 +554,9 @@
 	function _getStorage() {
 		var value, srch;
 
-		switch(storage.kind) {
+		switch(sv.storage.kind) {
 			case 'cookie':
-				srch = storage.name + '=';
+				srch = sv.storage.name + '=';
 				value = document.cookie.split(';').filter(function(str) {
 					return str.indexOf(srch) === 0;
 				})[0];
@@ -534,7 +565,7 @@
 				}
 				break;
 			case 'localStorage':
-				value = self.localStorage.getItem(storage.name);
+				value = self.localStorage.getItem(sv.storage.name);
 		}
 
 		return value;
@@ -554,7 +585,7 @@
 			if (value) {
 				switch (attribute) {
 					case 'data':
-						lastResult = data[locale.key] && data[locale.key][value];
+						lastResult = sv.data[locale.key] && sv.data[locale.key][value];
 						break;
 					default:
 						lastResult = locale[attribute];
@@ -576,8 +607,8 @@
 	function _getDefaultKey() {
 		var key = _getStorage();
 
-		if (!key && typeof defaultKeyLocale === 'string') {
-			key = _formatLocaleKey(defaultKeyLocale);
+		if (!key && typeof sv.defaultKeyLocale === 'string') {
+			key = _formatLocaleKey(sv.defaultKeyLocale);
 		}
 
 		if (!key) {
@@ -587,7 +618,7 @@
 			});
 
 			if (!key) {
-				key = localeKeys[0];
+				key = sv.localeKeys[0];
 			}
 		}
 
@@ -597,8 +628,8 @@
 	function _getCatalog() {
 		var catalog = [];
 
-		localeKeys.forEach(function(key) {
-			var dico = data[key];
+		sv.localeKeys.forEach(function(key) {
+			var dico = sv.data[key];
 			if (dico) {
 				_each(dico, function(v, sentence) {
 					if (catalog.indexOf(sentence) === -1) {
@@ -615,11 +646,53 @@
 		key = _default(key, '');
 		key = key.toLowerCase();
 
-		while (!locales[key] && key) {
+		while (!sv.locales[key] && key) {
 			key = key.replace(/(?:^|-)[^-]*$/, '');
 		}
 
 		return key;
+	}
+
+	function _addParser(parser, name, weight) {
+		if (typeof parser !== 'function') {
+			_error(7200, [name]);
+			return;
+		}
+
+		if (typeof weight === 'undefined') {
+			if (sv.parser.length) {
+				weight = sv.parser[sv.parser.length - 1].w - 10;
+			} else {
+				weight = 100;
+			}
+		}
+
+		sv.parser.push({
+			f: parser,
+			w: weight,
+			name: name
+		});
+
+		sv.parser.sort(function(a, b) {
+			return b.w - a.w;
+		});
+	}
+
+	function _parse(text) {
+		var txt, values;
+
+		values = Array.prototype.slice.call(arguments, 1);
+
+		txt = sv.parser.reduce(function (text, parser) {
+			try {
+				text = parser.f(text, values, sv);
+			} catch(e) {
+				_warning(4200, [parser.name, e.message]);
+			}
+			return text;
+		}, text);
+
+		return txt;
 	}
 
 	function _loadDictionary(dictionary) {
@@ -661,11 +734,11 @@
 	}
 
 	function _loadCurrentLocale() {
-		var key = currentLocale.key;
-		var method = loadingMethod[key];
-		var dictionary = data[key];
+		var key = sv.currentLocale.key;
+		var method = sv.loadingMethod[key];
+		var dictionary = sv.data[key];
 
-		status.callLocaleLoaded = true;
+		sv.status.callLocaleLoaded = true;
 
 		if (!dictionary || typeof dictionary !== 'object') {
 			switch(typeof method) {
@@ -693,7 +766,7 @@
 	}
 
 	function _addData(dictionary) {
-		var loadData = lazyLoading ? _saveData : _loadData;
+		var loadData = sv.lazyLoading ? _saveData : _loadData;
 
 		if (typeof dictionary !== 'object') {
 			_error(7012, [typeof dictionary, dictionary]);
@@ -702,7 +775,7 @@
 
 		_each(dictionary, loadData);
 
-		if (status.callLocaleLoaded === true) {
+		if (sv.status.callLocaleLoaded === true) {
 			_localeReady();
 		}
 	}
@@ -714,7 +787,7 @@
 
 		_addDataByKey(dico, key);
 
-		if (status.callLocaleLoaded === true) {
+		if (sv.status.callLocaleLoaded === true) {
 			_localeReady();
 		}
 	}
@@ -727,7 +800,7 @@
 		if (typeof dico === 'object') {
 			_addDataWithKey(dico, key);
 		} else {
-			loadingMethod[key] = dico;
+			sv.loadingMethod[key] = dico;
 		}
 	}
 
@@ -755,10 +828,10 @@
 		}
 
 		_each(values, function(value, key) {
-			var dico = data[key];
+			var dico = sv.data[key];
 
 			if (dico === null) {
-				dico = data[key] = {};
+				dico = sv.data[key] = {};
 			}
 
 			if (!dico) {
@@ -773,7 +846,7 @@
 		var xhr = new XMLHttpRequest();
 		var rslt;
 
-		if (syncLoading) {
+		if (sv.syncLoading) {
 			xhr.open('GET', url, false);
 			xhr.send(null);
 			if (xhr.status === 200 || xhr.status === 0) {
@@ -782,7 +855,7 @@
 					success(rslt, key);
 				}
 			} else {
-				_error(7000 + xhr.status, [url]);
+				_error(8000 + xhr.status, [url]);
 			}
 		} else {
 			xhr.onreadystatechange = function() {
@@ -793,7 +866,7 @@
 							success(rslt, key);
 						}
 					} else {
-						_error(7000 + xhr.status, [url]);
+						_error(8000 + xhr.status, [url]);
 					}
 	            }
 			};
@@ -815,18 +888,18 @@
 	}
 
 	function _localeReady() {
-		if (status.callLocaleLoaded === true
-		&&	typeof onLocaleReady === 'function'
-		&& _hasDataKey(currentLocale.key))
+		if (sv.status.callLocaleLoaded === true
+		&&	typeof sv.onLocaleReady === 'function'
+		&& _hasDataKey(sv.currentLocale.key))
 		{
-			status.callLocaleLoaded = false;
-			onLocaleReady(currentLocale.key);
+			sv.status.callLocaleLoaded = false;
+			sv.onLocaleReady(sv.currentLocale.key);
 		}
 	}
 
 	function _hasDataKey(key) {
-		var hasData = typeof data[key] === 'object' && data[key] !== null;
-		var secondary = locales[key].secondary;
+		var hasData = typeof sv.data[key] === 'object' && sv.data[key] !== null;
+		var secondary = sv.locales[key].secondary;
 
 		return hasData && (!secondary || secondary && _hasDataKey(secondary));
 	}
@@ -838,7 +911,7 @@
 	function _translation(sentenceKey, key, origKey) {
 		var sentence;
 
-		key = key || currentLocale.key;
+		key = key || sv.currentLocale.key;
 		origKey = origKey || key;
 
 		switch(typeof sentenceKey) {
@@ -859,8 +932,8 @@
 	function _translationString(sentenceKey, key, origKey) {
 		var ldata, sentence;
 
-		ldata = data[key];
-		sentence = ldata[sentenceKey];
+		ldata = sv.data[key];
+		sentence = ldata && ldata[sentenceKey];
 
 		sentence = _translationFallback(sentenceKey, key, origKey, sentence, _translationIssueString);
 
@@ -899,7 +972,7 @@
 		var secondary;
 
 		if (typeof sentence !== 'string') {
-			secondary = locales[key].secondary;
+			secondary = sv.locales[key].secondary;
 			if (secondary) {
 				sentence = _translation(sentenceKey, secondary, origKey);
 			} else {
@@ -917,8 +990,8 @@
 	function _info(code, details) {
 		var message = _getMessage(code, details);
 
-		if (typeof log.info === 'function') {
-			log.info(code, message, details);
+		if (typeof sv.log.info === 'function') {
+			sv.log.info(code, message, details);
 		} else {
 			console.info(message);
 		}
@@ -927,8 +1000,8 @@
 	function _warning(code, details) {
 		var message = _getMessage(code, details);
 
-		if (typeof log.warn === 'function') {
-			log.warn(code, message, details);
+		if (typeof sv.log.warn === 'function') {
+			sv.log.warn(code, message, details);
 		} else {
 			console.warn(message);
 		}
@@ -937,8 +1010,8 @@
 	function _error(code, details) {
 		var message = _getMessage(code, details);
 
-		if (typeof log.error === 'function') {
-			log.error(code, message, details);
+		if (typeof sv.log.error === 'function') {
+			sv.log.error(code, message, details);
 		} else {
 			console.error(message);
 		}

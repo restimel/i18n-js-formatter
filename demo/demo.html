@@ -72,7 +72,15 @@
 	<div id='commandContainer' style='border: 1px solid'></div>
 </section>
 
+<script>
+var _i18n_config = {
+	doNotLoadParser: true //because we also want to reload them after a _reset()
+};
+</script>
+<script src="lib/sprintf/src/sprintf.js"></script>
+
 <script src="../i18n-js-formatter.js"></script>
+<script src="../script/wrapperSprintf.js"></script>
 
 <script src="lib/complete.ly.1.0.1.min.js"></script>
 <script src="script/autoCompleteJS.js"></script>
@@ -90,7 +98,8 @@ var autoCompleteMap = {
 	configuration_log: ['warning', 'info', 'error'],
 	getLocale: ['key', 'name', 'secondary', 'data'],
 	getLocales: ['key', 'name', 'secondary', 'data'],
-	getData: ['key', 'locale', 'format']
+	getData: ['key', 'locale', 'format'],
+	loadParser: ['parser', 'name', 'weight']
 };
 
 function replaceSpecialChar(char) {

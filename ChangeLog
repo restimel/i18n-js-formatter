@@ -7,3 +7,5 @@ Version 0.1
 	* get data from specific locale or alll locales.
 	* load data from raw object, function, and ajax (synchronously & asynchrously)
 	* translate strings
+	* parser
+		* wrapper to sprintf

@@ -7,7 +7,6 @@ Version 0.1
 			* home-hand parser
 				* string
 				* pretty number
-			* sprintf (parser)
 
 Version 0.2
 

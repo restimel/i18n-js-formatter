@@ -1020,7 +1020,7 @@ describe('i18n', function() {
 				});
 
 				expect(jasmine.Ajax.requests.count()).toBe(1);
-				expect(this.logError).toHaveBeenCalledWith(7403, jasmine.any(String), [url]);
+				expect(this.logError).toHaveBeenCalledWith(8403, jasmine.any(String), [url]);
 				expect(spy).not.toHaveBeenCalled();
 
 				this.logError.calls.reset();
@@ -1030,7 +1030,7 @@ describe('i18n', function() {
 				});
 
 				expect(jasmine.Ajax.requests.count()).toBe(2);
-				expect(this.logError).toHaveBeenCalledWith(7404, jasmine.any(String), [url]);
+				expect(this.logError).toHaveBeenCalledWith(8404, jasmine.any(String), [url]);
 				expect(spy).not.toHaveBeenCalled();
 
 				this.logError.calls.reset();
@@ -1040,7 +1040,7 @@ describe('i18n', function() {
 				});
 
 				expect(jasmine.Ajax.requests.count()).toBe(3);
-				expect(this.logError).toHaveBeenCalledWith(7418, jasmine.any(String), [url]);
+				expect(this.logError).toHaveBeenCalledWith(8418, jasmine.any(String), [url]);
 				expect(spy).not.toHaveBeenCalled();
 				expect($$.getData()).toEqual(data);
 
@@ -1051,7 +1051,7 @@ describe('i18n', function() {
 				});
 
 				expect(jasmine.Ajax.requests.count()).toBe(4);
-				expect(this.logError).toHaveBeenCalledWith(7500, jasmine.any(String), [url]);
+				expect(this.logError).toHaveBeenCalledWith(8500, jasmine.any(String), [url]);
 				expect(spy).not.toHaveBeenCalled();
 				expect($$.getData()).toEqual(data);
 
@@ -1062,7 +1062,7 @@ describe('i18n', function() {
 				});
 
 				expect(jasmine.Ajax.requests.count()).toBe(5);
-				expect(this.logError).toHaveBeenCalledWith(7599, jasmine.any(String), [url]);
+				expect(this.logError).toHaveBeenCalledWith(8599, jasmine.any(String), [url]);
 				expect(spy).not.toHaveBeenCalled();
 				expect($$.getData()).toEqual(data);
 			});
@@ -1671,193 +1671,102 @@ describe('i18n', function() {
 				},
 				defaultLocale: 'en'
 			});
+
+			$$.setLocale('en');
 		});
 
 		afterEach(function() {
 			$$.clearData();
+			$$._reset();
 		});
 
-		xit('should remplace the %s wilcard', function() {
-			expect($$('Hello %s!', 'Restimel')).toBe('Hello Restimel!');
+		it('should not remplace the %s wilcard without parser', function() {
+			expect($$('Hello %s!', 'Restimel')).toBe('Hello %s!');
 			$$.setLocale('fr');
-			expect($$('Hello %s!', 'Restimel')).toBe('Salut Restimel !');
+			expect($$('Hello %s!', 'Restimel')).toBe('Salut %s !');
 			$$.setLocale('fr-be');
-			expect($$('Hello %s!', 'Restimel')).toBe('Salut Restimel !');
+			expect($$('Hello %s!', 'Restimel')).toBe('Salut %s !');
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should convert to string with %s wilcard', function() {
-			var obj;
+		it('should call parser', function() {
+			var parser = jasmine.createSpy('parser');
 
-			obj = {};
-			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+			$$.loadParser(parser);
 
-			obj = 42;
-			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+			$$('Hello %s!', 'Restimel');
+			expect(parser).toHaveBeenCalledWith('Hello %s!', ['Restimel'], jasmine.any(Object));
+			expect(parser.calls.count()).toEqual(1);
 
-			obj = function() {};
-			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+			parser.calls.reset();
+			$$.parse('Hello %s!', 'Restimel');
+			expect(parser).toHaveBeenCalledWith('Hello %s!', ['Restimel'], jasmine.any(Object));
+			expect(parser.calls.count()).toEqual(1);
+		});
 
-			obj = true;
-			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+		it('should parse unknown string', function() {
+			var response = 'parser response';
+			var parser = jasmine.createSpy('parser').and.returnValue(response);
+
+			$$.loadParser(parser);
+			expect($$.parse('%d %s', 42, 'cats')).toBe(response);
+			expect(parser).toHaveBeenCalledWith('%d %s', [42, 'cats'], jasmine.any(Object));
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should remplace the %d wildcard', function() {
-			expect($$('%d cats', 42)).toBe('42 cats');
-			expect($$('%d cats', 42.76)).toBe('42.76 cats');
-			$$.setLocale('fr');
-			expect($$('%d cats', 42)).toBe('42 chats');
-			expect($$('%d cats', 42.76)).toBe('42,76 chats');
-			$$.setLocale('fr-be');
-			expect($$('%d cats', 42)).toBe('42 chats');
-			expect($$('%d cats', 42.76)).toBe('42,76 chats');
+		it('should reject not function parser', function() {
+			var parser = function() {};
 
+			$$.loadParser(parser);
+			expect(this.logError).not.toHaveBeenCalled();
+
+			$$.loadParser({parser: parser});
+			expect(this.logError).not.toHaveBeenCalled();
+
+			$$.loadParser({parser: 42, name: 'toto'});
+			expect(this.logError).toHaveBeenCalledWith(7200, jasmine.any(String), ['toto']);
+
+			this.logError.calls.reset();
+			$$.loadParser(42);
+			expect(this.logError).toHaveBeenCalledWith(7200, jasmine.any(String), ['']);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+		});
+
+		it('should call parser in given order', function() {
+			var order = [];
+			var parser = function(value) {
+				return function(text) {
+					return text + ' ' + value;
+				};
+			};
+			var parser1 = parser('p1');
+			var parser2 = parser('p2');
+			var parser3 = parser('p3');
+			var parser4 = parser('p4');
+
+			$$.loadParser({parser: parser1, weight: 100});
+			$$.loadParser({parser: parser2});
+			expect($$.parse('text')).toBe('text p1 p2');
+
+			$$.loadParser({parser: parser3, weight: 200});
+			expect($$.parse('txt')).toBe('txt p3 p1 p2');
+
+			$$.loadParser({parser: parser4, weight: 95});
+			expect($$.parse('t')).toBe('t p3 p1 p4 p2');
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should convert to number the %d wildcard', function() {
-			var obj;
-
-			obj = {};
-			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
-
-			obj = "42";
-			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
-
-			obj = function() {};
-			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
-
-			obj = true;
-			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
-
-			expect(this.logInfo).not.toHaveBeenCalled();
-			expect(this.logWarn).not.toHaveBeenCalled();
-			expect(this.logError).not.toHaveBeenCalled();
-		});
-
-		xit('should remplace several wildcards', function() {
-			expect($$('%d issues: %s', 2, 'bug1, bug2')).toBe('2 issues: bug1, bug2');
-
-			expect(this.logInfo).not.toHaveBeenCalled();
-			expect(this.logWarn).not.toHaveBeenCalled();
-			expect(this.logError).not.toHaveBeenCalled();
-		});
-
-		xit('should parse unknown string', function() {
-			expect($$.parse('%d %s', 42, 'cats')).toBe('42 cats');
-
-			expect(this.logInfo).not.toHaveBeenCalled();
-			expect(this.logWarn).not.toHaveBeenCalled();
-			expect(this.logError).not.toHaveBeenCalled();
-		});
-	});
-
-	describe('detailed parser', function() {
-		describe('displays numbers', function() {
-			beforeEach(function() {
-				this.logInfo = jasmine.createSpy('logInfo');
-				this.logWarn = jasmine.createSpy('logWarn');
-				this.logError = jasmine.createSpy('logError');
-
-				$$.configuration({
-					locales: ['en', 'fr', 'fr-be'],
-					secondary: {
-						'fr-be': 'fr'
-					},
-					format: {
-						decimal: {
-							en: '.',
-							fr: ','
-						},
-						thousandSeparator: {
-							en: ',',
-							fr: ' '
-						}
-					},
-					log: {
-						info: this.logInfo,
-						warn: this.logWarn,
-						error: this.logError
-					},
-					defaultLocale: 'en'
-				});
-			});
-
-			afterEach(function() {
-				$$.clearData();
-			});
-
-			xit('should display large number', function() {
-				var number = 12345678;
-				expect($$.parse('%d', number)).toBe('12,345,678');
-
-				$$.setlocale('fr-be');
-				expect($$.parse('%d', number)).toBe('12 345 678');
-
-				expect(this.logInfo).not.toHaveBeenCalled();
-				expect(this.logWarn).not.toHaveBeenCalled();
-				expect(this.logError).not.toHaveBeenCalled();
-			});
-
-			xit('should display decimal number', function() {
-				var number = 12345.678;
-				expect($$.parse('%d', number)).toBe('12,345.678');
-
-				$$.setlocale('fr-be');
-				expect($$.parse('%d', number)).toBe('12 345,678');
-
-				expect(this.logInfo).not.toHaveBeenCalled();
-				expect(this.logWarn).not.toHaveBeenCalled();
-				expect(this.logError).not.toHaveBeenCalled();
-			});
-
-			xit('should display number in short format', function() {
-				var nb1 = 0.00000123;
-				var nb2 = 1.2345;
-				var nb3 = 123.45678;
-				var nb4 = 12345.678;
-				var nb5 = 12345678;
-				var nb6 = 9990000000000000;
-				var nb7 = 42;
-
-				expect($$.parse('%D', nb1)).toBe('1.23µ');
-				expect($$.parse('%D', nb2)).toBe('1.23');
-				expect($$.parse('%D', nb3)).toBe('123.46');
-				expect($$.parse('%D', nb4)).toBe('12.35k');
-				expect($$.parse('%D', nb5)).toBe('12.35M');
-				expect($$.parse('%D', nb6)).toBe('999T');
-				expect($$.parse('%D', nb7)).toBe('42');
-
-				$$.setlocale('fr-be');
-				$$.configuration({
-					format: {
-						shortPrecision: 1
-					}
-				});
-
-				expect($$.parse('%D', nb1)).toBe('1,2µ');
-				expect($$.parse('%D', nb2)).toBe('1,2');
-				expect($$.parse('%D', nb3)).toBe('123,5');
-				expect($$.parse('%D', nb4)).toBe('12,3k');
-				expect($$.parse('%D', nb5)).toBe('12,3M');
-				expect($$.parse('%D', nb6)).toBe('1,0P');
-				expect($$.parse('%D', nb7)).toBe('42');
-
-				expect(this.logInfo).not.toHaveBeenCalled();
-				expect(this.logWarn).not.toHaveBeenCalled();
-				expect(this.logError).not.toHaveBeenCalled();
-			});
-		});
 	});
 
 });
