@@ -8,7 +8,8 @@ A simple translation module with dynamic json storage which helps to format stri
 
 ## Test
 
-	Jasmine tests, located in /test/mainTest.html
+	Jasmine tests are provided in folder `spec`.
+	Run tests with mainTest.html (located in the root folder): https://restimel.github.io/i18n-js-formatter/mainTest.html
 
 ## Configure
 

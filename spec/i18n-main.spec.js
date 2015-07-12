@@ -1,10 +1,5 @@
 describe('i18n', function() {
 
-	// beforeEach(function() {
-	//   player = new Player();
-	//   song = new Song();
-	// });
-
 	it('should declare variables', function() {
 		expect(i18n).toBeDefined();
 		expect($$).toBeDefined();
@@ -13,7 +8,7 @@ describe('i18n', function() {
 		expect($$).toEqual(i18n);
 	});
 
-	describe('configuration', function() {
+	xdescribe('configuration', function() {
 
 		beforeEach(function() {
 			$$.configuration({
@@ -29,41 +24,42 @@ describe('i18n', function() {
 			$$.setLocale('en');
 		});
 
-		it('should get locale', function() {
+		xit('should get locale', function() {
 			expect($$.getLocale()).toBe('en');
 			expect($$.getLocale({locale: true})).toBe('en');
 		});
 
-		it('should get locale name', function() {
+		xit('should get locale name', function() {
 			expect($$.getLocale({name: true})).toBe('English');
 		});
 
-		it('should get locale key and name', function() {
+		xit('should get locale key and name', function() {
 			expect($$.getLocale({locale: true, name: true})).toEqual({locale: 'en', name: 'English'});
 		});
 
-		describe('set locale', function() {
+		xdescribe('set locale', function() {
 			[
+			/*  [input, expected result] */
 				['fr', 'fr'],
 				['fr-FR', 'fr'],
 				['de', 'de'],
 				['DE', 'de'],
 				['fr-BE', 'fr-be'],
 			].forEach(function(v) {
-				it('should change to locale: ' + v[0], function() {
+				xit('should change to locale: ' + v[0], function() {
 					expect($$.setLocale(v[0])).toBeTruthy();
 					expect($$.getLocale()).toBe(v[1]);
 				});
 			});
 
-			it('should not change twice', function() {
+			xit('should not change twice', function() {
 				$$.setLocale('fr');
 				expect($$.setLocale('fr')).toBeFalsy();
 				expect($$.getLocale()).toBe('fr');
 			});
 		});
 
-		it('should set default language', function() {
+		xit('should set default language', function() {
 			$$.setLocale(navigator.language)
 			var locale = $$.getLocale();
 
@@ -71,7 +67,9 @@ describe('i18n', function() {
 			expect($$.getLocale()).toBe(locale);
 		});
 
-		it('should not change locale to outscope locales', function() {
+		xit('should not change locale to outscope locales', function() {
+			var locale = $$.getLocale();
+
 			[
 				'jp',
 				'sp-en',
@@ -83,14 +81,16 @@ describe('i18n', function() {
 			].each(function(locale) {
 				expect($$.setLocale(locale)).toBeFalsy();
 			});
+
+			expect($$.getLocale()).toBe(locale);
 		});
 
-		it('should get locales', function() {
+		xit('should get locales', function() {
 			expect($$.getLocales()).toEqual(['en', 'fr', 'de', 'fr-be']);
 			expect($$.getLocales({locale: true})).toEqual(['en', 'fr', 'de', 'fr-be']);
 		});
 
-		it('should get locale names', function() {
+		xit('should get locale names', function() {
 			expect($$.getLocales({
 				name: true
 			})).toEqual([
@@ -101,7 +101,7 @@ describe('i18n', function() {
 			]);
 		});
 
-		it('should get locale names and keys', function() {
+		xit('should get locale names and keys', function() {
 			expect($$.getLocales({
 				locale: true,
 				name: true
@@ -113,7 +113,7 @@ describe('i18n', function() {
 			]);
 		});
 
-		it('should reset configuration for locales', function() {
+		xit('should reset configuration for locales', function() {
 			$$.configuration({locales: ['en', 'fr']});
 			expect($$.getLocales()).toEqual(['en', 'fr']);
 
@@ -121,7 +121,7 @@ describe('i18n', function() {
 			expect($$.getLocales()).toEqual(['jp', 'sp', 'fi']);
 		});
 
-		it('should change configuration for locale names', function() {
+		xit('should change configuration for locale names', function() {
 			$$.configuration({localeName: {'fr-be': 'Français (Belge)'}});
 			expect($$.getLocales({
 				name: true
@@ -133,7 +133,7 @@ describe('i18n', function() {
 			]);
 		});
 
-		it('should not change configuration for locale names with wrong locale', function() {
+		xit('should not change configuration for locale names with wrong locale', function() {
 			$$.configuration({localeName: {'fi': 'Suomi'}});
 			expect($$.getLocales({
 				name: true
@@ -146,7 +146,7 @@ describe('i18n', function() {
 		});
 	});
 
-	describe('basic translations', function() {
+	xdescribe('basic translations', function() {
 		//Loading data
 	});
   
