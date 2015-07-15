@@ -116,15 +116,16 @@ describe('i18n', function() {
 			]);
 		});
 
-		xit('should reset configuration for locales', function() {
+		it('should reset configuration for locales', function() {
 			$$.configuration({locales: ['en', 'fr']});
 			expect($$.getLocales()).toEqual(['en', 'fr']);
+			expect($$.getLocales({name: true})).toEqual(['English', 'Français']);
 
 			$$.configuration({locales: ['jp', 'sp', 'fi']});
 			expect($$.getLocales()).toEqual(['jp', 'sp', 'fi']);
 		});
 
-		xit('should change configuration for locale names', function() {
+		it('should change configuration for locale names', function() {
 			$$.configuration({localeName: {'fr-be': 'Français (Belge)'}});
 			expect($$.getLocales({
 				name: true
@@ -136,7 +137,7 @@ describe('i18n', function() {
 			]);
 		});
 
-		xit('should not change configuration for locale names with wrong locale', function() {
+		it('should not change configuration for locale names with wrong locale', function() {
 			$$.configuration({localeName: {'fi': 'Suomi'}});
 			expect($$.getLocales({
 				name: true

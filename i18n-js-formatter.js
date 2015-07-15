@@ -15,6 +15,8 @@
  **/
 
 (function() {
+	'use strict';
+
 	/* status variables */
 	var locales = {};
 	var localeKeys = [];
@@ -25,23 +27,13 @@
 	function i18n() {}
 
 	i18n.configuration = function(options) {
-		var locale;
 		options || (options = {});
 
 		if (options.locales instanceof Array) {
-			options.locales.forEach(function(key) {
-				if (typeof key !== 'string') {
-					return;
-				}
-
-				locale = _createLocale(key, options.localeName[key]);
-				key = locale.key;
-
-				if (!locales[key]) {
-					localeKeys.push(key);
-				}
-				locales[key] = locale;
-			});
+			_configureLocales(options);
+		} else
+		if (typeof options.localeName === 'object') {
+			_configurelocaleNames(options);
 		}
 
 		if (!currentLocale && localeKeys.length) {
@@ -71,7 +63,10 @@
 		});
 	};
 
-	/* private functions */
+	/*
+	 * private functions
+	 */
+
 	function _createLocale(key, name) {
 		var dflt, locale;
 
@@ -86,6 +81,40 @@
 		return locale;
 	}
 
+	function _configureLocales(options) {
+		var nextLocales = {};
+
+		localeKeys = [];
+
+		options.locales.forEach(function(key) {
+			var locale;
+
+			if (typeof key !== 'string') {
+				return;
+			}
+
+			locale = _createLocale(key, options.localeName && options.localeName[key]);
+			key = locale.key;
+
+			if (!nextLocales[key]) {
+				localeKeys.push(key);
+			}
+			nextLocales[key] = locale;
+		});
+
+		locales = nextLocales;
+	}
+
+	function _configurelocaleNames(options) {
+		_each(options.localeName, function(value, key) {
+			key = _formatLocaleKey(key);
+
+			if (locales[key]) {
+				locales[key].name = value;
+			}
+		});
+	}
+
 	function _getLocale(locale, options) {
 		var result, lastResult, x, nb;
 		options || (options = {key: true});
@@ -96,13 +125,13 @@
 
 		result = {};
 		nb = 0;
-		for (x in options) {
-			if (options.hasOwnProperty(x) && options[x]) {
-				lastResult = locale[x];
-				result[x] = lastResult;
+		_each(options, function(value, attribute) {
+			if (value) {
+				lastResult = locale[attribute];
+				result[attribute] = lastResult;
 				nb++;
 			}
-		}
+		});
 
 		if (nb === 1) {
 			result = lastResult;
@@ -124,8 +153,27 @@
 		return key;
 	}
 
+	/*
+	 * generic helper function
+	 */
+
 	function _default(value, dfltValue) {
 		return typeof value === 'undefined' ? dfltValue : value;
+	}
+
+	function _each(object, iteratee, context) {
+		var x, f;
+		if (typeof context === 'object') {
+			f = iteratee.bind(context);
+		} else {
+			f = iteratee;
+		}
+
+		for (x in object) {
+			if (object.hasOwnProperty(x)) {
+				f(object[x], x, object);
+			}
+		}
 	}
 
 	/* providing the API */
