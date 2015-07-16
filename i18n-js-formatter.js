@@ -26,6 +26,14 @@
 	
 	function i18n() {}
 
+	/**
+	 * Configure the i18n
+	 *
+	 * Each parameter is optional
+	 * @param [options.locales] {String[]} list of locale keys to manage. Other locales will be rejected. It reset previous configuration.
+	 * @param [options.localeName] {Object} list of key/value to give to locale a pretty name.
+	 * @param [options.alias] {string} attach the i18n function to the global variable described by alias.
+	 */
 	i18n.configuration = function(options) {
 		options || (options = {});
 
@@ -45,6 +53,14 @@
 		}
 	};
 
+	/**
+	 * change the current locale.
+	 * If the key is not in the available locales, it change to the closest key if any.
+	 * For example, if key is 'en-us' and this locale does not exist. It will change to 'en'.
+	 *
+	 * @param key {String} the locale key to use as current
+	 * @return {String|Boolean} the new key of the current locale. If the locale has not been changed, it returns false.
+	 */
 	i18n.setLocale = function(key) {
 		key = _formatLocaleKey(key);
 
@@ -57,10 +73,26 @@
 		return key;
 	};
 
+	/**
+	 * Retrieve the current locale
+	 *
+	 * @param [options.key] {Boolean} if true, the locale's key will be return
+	 * @param [options.name] {Boolean} if true, the locale's name will be return
+	 * @return [String|Object] If only one option is given, it return the value of this option
+	 *						   If several options are given, it return an object with the key/value of wanted options.
+	 */
 	i18n.getLocale = function(options) {
 		return _getLocale(currentLocale, options);
 	};
 
+	/**
+	 * Retrieve the informations of all locales
+	 *
+	 * @param [options.key] {Boolean} if true, the locales' key will be return
+	 * @param [options.name] {Boolean} if true, the locales' name will be return
+	 * @return [String[]|Object[]] If only one option is given, it return the value list of this option
+	 *							   If several options are given, it return a list of object with the key/value of wanted options.
+	 */
 	i18n.getLocales = function(options) {
 		return localeKeys.map(function(key) {
 			return _getLocale(locales[key], options);
