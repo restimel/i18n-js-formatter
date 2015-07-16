@@ -2,7 +2,7 @@ describe('i18n', function() {
 
 	it('should declare variables', function() {
 		expect(i18n).toBeDefined();
-		expect($$).toBeDefined();
+		expect($$).toBeDefined(); // '$$' has been added as an alias by _i18n_config
 
 		expect(typeof i18n).toBe('function');
 		expect($$).toEqual(i18n);
@@ -22,6 +22,13 @@ describe('i18n', function() {
 			});
 
 			$$.setLocale('en');
+		});
+
+		it('should add an alias', function() {
+			$$.configuration({alias: 'translations'});
+
+			expect(translations).toBeDefined();
+			expect(translations).toEqual(i18n);
 		});
 
 		it('should get locale', function() {

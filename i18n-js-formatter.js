@@ -36,6 +36,10 @@
 			_configurelocaleNames(options);
 		}
 
+		if (typeof options.alias === 'string') {
+			self[options.alias] = i18n;
+		}
+
 		if (!currentLocale && localeKeys.length) {
 			currentLocale = locales[localeKeys[0]];
 		}
@@ -177,5 +181,13 @@
 	}
 
 	/* providing the API */
-	self.i18n = self.$$ = i18n;
+	if (typeof _i18n_config === 'object') {
+		i18n.configuration(_i18n_config);
+
+		if (!_i18n_config.doNotAliasi18n) {
+			self.i18n = i18n;
+		}
+	} else {
+		self.i18n = i18n;
+	}
 })();
