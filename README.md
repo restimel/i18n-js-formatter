@@ -21,6 +21,19 @@ Keep tune for further update I am working on it.
 	i18n('hello'); //returns 'salut'
 	i18n('Hello %s!', 'Jim'); //returns 'Salut Jim!'
 
+To give a context to help the translation (this should be done in version 0.2)
+
+	i18n.context('computer key', 'give the correct key'); // should be translated in French 'Donnez la bonne touche'
+	i18n.context('door key', 'give the correct key'); // should be translated in French 'Donnez la bonne clef'
+
+	i18n.context('time unit: minute', 'min');
+	i18n.context('abbreviation: minimum', 'min');
+
+To give plural translations (this should be done in version 0.3)
+
+	i18n.n('a cat', '%s cats', 1); // in German: 'eine Katze'
+	i18n.n('a cat', '%s cats', 3); // in German: '3 Katzen'
+
 ## Installation
 
 You only have to insert the i18n-js-formatter.js file in your web page.
@@ -53,6 +66,31 @@ The second possibility is to use the configuration method available in the libra
 			example: i18n.configuration({locale: ['en', 'fr']}; // handle only english and french
 * **localeName**: {String{}} give a pretty name to locale.
 			example: i18n.configuration({localeName: {en: 'English', fr: 'Français'}});
+* **defaultLocale**: {String} the default local value (if no one are selected from storage). If the value is not a string the default value is the best from navigator.languages
+* **storage**:	{String|String[]} the ways to store the current locale on browser. If the value is an array, it uses the first accessible technology.
+				Possible values are (%s must be replaced by wanted name for storage):
+	* *cookie:%s*: to store the locale in cookie
+	* *localStorage:%s*: to store the locale in localstorage
+	* *none*: to not store the locale in browser.
+* **log**: {Object} to be notify when issues occurs. If not defined a message to console is sent.
+	* *info*: {Function} a function called when an info has to be prompted.
+	* *warn*: {Function} a function called when a warning issue has to be prompted (sentence where translation is missing).
+	* *error*: {Function} a function called when an error has to be prompted (wrong configuration).
+* **dictionary**: 	{Object|String|Function} load data in "dictionary" format (cf section Load Data vs Load Dictionary).
+					If the value is an object it is loaded as it is
+					If the value is a string, it should be an url to load data.
+					If the value is a function. This function will be called when data must be (re)loaded.
+* **data**: 		{Object|String|Function} load data in "data" format (cf section Load Data vs Load Dictionary).
+					If the value is an object it is loaded as it is
+					If the value is a string, it should be an url to load data.
+					If the value is a function. This function will be called when data must be (re)loaded.
+* **lazyLoading**:	{Boolean} If true, load json file only when locale is changed (it works only with data loading and not with dictionary loading).
+					[Default value: true]
+* **syncLoading**:	{Boolean} If true, the json file loading is done synchronously.
+* **localeSet**:	{Object} define all options at one for defined locales. It replaces locales defined with options "locales".
+	* *key*:	{String} [Required] the locale to define.
+	* *name*:	{String} the locale pretty name.
+	* *data*:	{Object|String|Function} the data of the locale.
 
 ## API
 
@@ -61,15 +99,15 @@ The second possibility is to use the configuration method available in the libra
 Translates a single expression. Returns translated parsed and substituted string. If the translation is not found it returns the expression given.
 
 	// (this.locale == 'fr')
-	$$('Hello'); // Salut
-	$$('Hello %s', 'Restimel'); // Salut Restimel
-	$$('Hello {{name}}', { name: 'Restimel' }); // Salut Restimel
+	i18n('Hello'); // Salut
+	i18n('Hello %s', 'Restimel'); // Salut Restimel
+	i18n('Hello {{name}}', { name: 'Restimel' }); // Salut Restimel
 
 	// give context (this.locale == 'fr')
-	$$({str: 'Hello', context: 'phone greating'}); // Allo
+	i18n({str: 'Hello', context: 'phone greating'}); // Allo
 
 	// passing specific locale (needed?)
-	$$({str: 'Hello', locale: 'fr'}); // Salut
+	i18n({str: 'Hello', locale: 'fr'}); // Salut
 
 #### sprintf support
 
@@ -77,48 +115,208 @@ Translates a single expression. Returns translated parsed and substituted string
 
 #### date support
 
-### $$.n()
+### i18n.context()
+
+### i18n.n()
 
 Plurals translation of a single phrase. Singular and plural forms will get added to locales if unknown. Returns translated parsed and substituted string based on `count` parameter.
 
 	// template and global (this.locale == 'de')
-	$$.n("%s cat", "%s cats", 1); // 1 Katze
-	$$.n("%s cat", "%s cats", 3); // 3 Katzen
+	i18n.n('%s cat', '%s cats', 1); // 1 Katze
+	i18n.n('%s cat', '%s cats', 3); // 3 Katzen
 
-### $$.configuration()
+### i18n.configuration()
 
 Change default configuration
 
-	$$.configuration({locales: ['en', 'fr', 'de']}); // accepted locales are only 'en', 'fr' and 'de'
-	$$.configuration({localeName: {'en': 'English', 'fr': 'Français'}}); // set name for locales (this could also been set when loading translated strings)
+Define locale to use
 
-### $$.setLocale()
+	i18n.configuration({locales: ['en', 'fr', 'de']}); // accepted locales are only 'en', 'fr' and 'de'
+	i18n.configuration({localeName: {'en': 'English', 'fr': 'Français'}}); // set name for locales
+
+Define locale configuration at once
+
+	i18n.configuration({localeSet: [
+		{
+			key: 'en',
+			name: 'English',
+			data: 'dictionary-en.json'
+		},
+		{
+			key: 'fr',
+			name: 'Français',
+			data: 'dictionary-fr.json'
+		},
+		{
+			key: 'fr-be',
+			name: 'Belge',
+			data: 'dictionary-be.json',
+
+		}
+	]});
+
+Change the way to use the library
+
+	i18n.configuration({alias: '_'}); // now it is possible to use _ instead of i18n
+	_.setLocale('fr');
+	_('cat'); // returns "chat"
+
+### i18n.setLocale()
 
 Set the current locale globally or in current scope.
 
 	// set locale to french
-	$$.setLocale('fr');
-	$$.setLocale('fr-FR');
+	i18n.setLocale('fr');
+	i18n.setLocale('fr-FR');
 
 	// set locale depending of browser context
-	$$.setLocale(); //equivalent to $$.setLocale(navigator.language);
+	i18n.setLocale(); //equivalent to i18n.setLocale(navigator.language);
 
 ### getLocale()
 
 Get the current locale from current scope or globally.
 
-	$$.setLocale('fr');
-	$$.getLocale(); // 'fr'
-	$$.getLocale({locale: true}); // 'fr'
-	$$.getLocale({name: true}); // 'French'
-	$$.getLocale({locale: true, name: true}); // {locale: 'fr', name: 'French'}
+	i18n.setLocale('fr');
+	i18n.getLocale(); // 'fr'
+	i18n.getLocale({locale: true}); // 'fr'
+	i18n.getLocale({name: true}); // 'French'
+	i18n.getLocale({locale: true, name: true}); // {locale: 'fr', name: 'French'}
 
 ### getLocales()
 
 Returns a whole catalog optionally based on current scope and locale.
-	$$.getLocales(); // ['en', 'fr', 'de']
-	$$.getLocales({locale: true}) // ['en', 'fr', 'de']
-	$$.getLocales({name: true}) // ['English', 'Français', 'Deutsh']
-	$$.getLocales({locale: true, name: true}) // [{locale: 'en', name: 'English'}, {locale: 'fr', name: 'Français'}, {locale: 'de', name: 'Deutsh'}]
 
-## Optionally manual attaching helpers for different template engines
+	i18n.getLocales(); // ['en', 'fr', 'de']
+	i18n.getLocales({locale: true}) // ['en', 'fr', 'de']
+	i18n.getLocales({name: true}) // ['English', 'Français', 'Deutsch']
+	i18n.getLocales({locale: true, name: true}) // [{locale: 'en', name: 'English'}, {locale: 'fr', name: 'Français'}, {locale: 'de', name: 'Deutsch'}]
+
+### clearData()
+
+Clear all dictionary data
+
+	i18n.clearData('fr'); // clear data of the french dictionary only
+	i18n.clearData(); // clear data of all dictionaries
+
+### Load Data vs Load Dictionary
+
+There are two possible formats to load the translations sentences.
+For both it is possible to load it in raw (by passing an object) or to load it via AJAX (with JSON format).
+
+#### Dictionary
+
+The dictionary format is an object containing the sentence key which contains all its translations:
+
+	dictionary: {
+		'a sentence to translate': {
+			en: 'the English version',
+			fr: 'the French version',
+			de: 'the German version'
+		},
+		'a second sentence to translate': {
+			en: 'its English version',
+			fr: 'its French version',
+			de: 'its German version'
+		}
+	}
+
+You can load it via configuration
+
+	i18n.configuration({
+		dictionary: {
+			'a': {
+				en: 'a',
+				fr: 'un'
+			}
+		}
+	});
+
+	// To load it from a JSON
+	i18n.configuration({
+		dictionary: 'path/dictionary.json'
+	});
+
+#### Data
+
+The data format is an object containning all locale keys which contains all the sentence and their translations.
+
+	data: {
+		en: {
+			'a sentence to translate': 'the English version',
+			'a second sentence to translate': 'its English version'
+		},
+		fr: {
+			'a sentence to translate': 'the French version',
+			'a second sentence to translate': 'its French version'
+		},
+		de: {
+			'a sentence to translate': 'the German version',
+			'a second sentence to translate': 'its German version'
+		}
+	}
+
+You can load it via configuration.
+You can load it globally (load all languages at once):
+
+	i18n.configuration({
+		data: {
+			en: {
+				'a': 'a'
+			},
+			fr: {
+				'a': 'un'
+			}
+		}
+	});
+
+	// To load it from a JSON
+	i18n.configuration({
+		data: 'path/dictionary.json'
+	});
+
+It is also possible to load it language by language.
+
+	i18n.configuration({
+		data: {
+			en: {
+				'a': 'a'
+			}
+		}
+	});
+	i18n.configuration({
+		data: {
+			fr: {
+				'a': 'un'
+			}
+		}
+	});
+
+	// To load them from JSON
+	i18n.configuration({
+		data: {
+			en: 'path/dictionary-en.json',
+			fr: 'path/dictionary-fr.json'
+		}
+	});
+
+### getData()
+
+It is possible to retrieve the current loaded data with getData.
+
+	i18n.getData(); // returns all data in data format
+	i18n.getData({format: 'dictionary'}); // returns all data in dictionary format
+	i18n.getData('en'); // returns all data of English language in data format
+	i18n.getData({locale: 'en', format: 'dictionary'}); // returns all data of English language in dictionary format
+
+### addItem()
+
+It is possible to add new entry in the data.
+
+	i18n.addItem('new sentence to add', {
+		en: 'the English version',
+		fr: 'the French version'
+	});
+
+## Add optional plug-in to enhance helpers or support different template engines
+
+TODO version 0.5

@@ -16,12 +16,10 @@ describe('i18n', function() {
 				localeName: {
 					'en': 'English',
 					'fr': 'Français',
-					'de': 'Deutsh',
+					'de': 'Deutsch',
 					'fr-be': 'Belge'
 				}
 			});
-
-			$$.setLocale('en');
 		});
 
 		it('should add an alias', function() {
@@ -32,6 +30,8 @@ describe('i18n', function() {
 		});
 
 		it('should get locale', function() {
+			expect($$.getLocale()).toEqual(jasmine.any(String));
+			$$.setLocale('en');
 			expect($$.getLocale()).toBe('en');
 			expect($$.getLocale({key: true})).toBe('en');
 			expect($$.getLocale({key: true, name: false})).toBe('en');
@@ -39,15 +39,42 @@ describe('i18n', function() {
 		});
 
 		it('should get locale name', function() {
+			$$.setLocale('en');
 			expect($$.getLocale({name: true})).toBe('English');
 			expect($$.getLocale({key:false, name: true})).toBe('English');
 		});
 
 		it('should get locale key and name', function() {
+			$$.setLocale('en');
 			expect($$.getLocale({key: true, name: true})).toEqual({key: 'en', name: 'English'});
 		});
 
+		xit('should configure a default locale', function() {
+			var locale = $$getLocale();
+			var list = $$.getLocales();
+
+			expect(locale).toEqual(jasmine.any(String));
+			expect(list.indexOf(locale) !== -1).toBeTruthy();
+
+			$$.configuration({defaultLocale: 'en'});
+			expect($$.getLocale()).toBe('en');
+
+			$$.configuration({defaultLocale: 'fr'});
+			expect($$.getLocale()).toBe('fr');
+		});
+
+		xit('should not change the locale', function() {
+			$$.setLocale('en');
+			$$.configuration({defaultLocale: 'fr'});
+
+			expect($$.getLocale()).toBe('en');
+		});
+
 		describe('set locale', function() {
+			beforeEach(function() {
+				$$.setLocale('en');
+			});
+
 			[
 			/*  [input, expected result] */
 				['fr', 'fr'],
@@ -69,15 +96,27 @@ describe('i18n', function() {
 			});
 		});
 
-		it('should set default language', function() {
-			$$.setLocale(navigator.language)
+		xit('should set default language', function() {
+			var language = $$.setLocale(navigator.language)
 			var locale = $$.getLocale();
 
+			if (language === 'fr') {
+				language = 'de';
+			} else {
+				language = 'fr';
+			}
+			$$.setLocale(language);
+
 			$$.setLocale();
-			expect($$.getLocale()).toBe(locale);
+			expect($$.getLocale()).toEqual(locale);
+
+			$$.configuration({defaultLocale: 'en'});
+			$$.setLocale();
+			expect($$.getLocale()).toBe('en');
 		});
 
 		it('should not change locale to outscope locales', function() {
+			$$.setLocale('en');
 			var locale = $$.getLocale();
 
 			[
@@ -92,7 +131,56 @@ describe('i18n', function() {
 				expect($$.setLocale(locale)).toBeFalsy();
 			});
 
-			expect($$.getLocale()).toBe(locale);
+			expect($$.getLocale()).toEqual(locale);
+		});
+
+		describe('navigator storage', function() {
+			afterEach(function() {
+				if (self.document && document.cookie) {
+					document.cookie = "test=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
+				}
+
+				if (self.localStorage) {
+					localStorage.removeItem('test');
+				}
+			});
+
+			xit('should store the locale in cookie', function() {
+				// document.cookie = "test=en";
+				$$.setLocale('en');
+				expect($$.configuration({
+					storage: 'cookie:test'
+				})).not.toThrow();
+
+				if (self.document && document.cookie) {
+					expect(document.cookie.indexOf('test=en') !== -1).toBeTruthy();
+				}
+			});
+
+			xit('should store the locale in localStorage', function() {
+				// localStorage.setItem('test', 'en');
+				$$.setLocale('en');
+				expect($$.configuration({
+					storage: 'localStorage:test'
+				})).not.toThrow();
+
+				if (self.localStorage) {
+					expect(localStorage.getItem('test')).toBe('en');
+				}
+			});
+
+			xit('should store the locale in the available storage', function() {
+				$$.setLocale('en');
+				expect($$.configuration({
+					storage: ['localStorage:test', 'cookie:test']
+				})).not.toThrow();
+
+				if (self.localStorage) {
+					expect(localStorage.getItem('test')).toBe('en');
+				} else if (self.document && document.cookie) {
+					expect(document.cookie.indexOf('test=en') !== -1).toBeTruthy();
+				}
+			});
 		});
 
 		it('should get locales', function() {
@@ -106,7 +194,7 @@ describe('i18n', function() {
 			})).toEqual([
 				'English',
 				'Français',
-				'Deutsh',
+				'Deutsch',
 				'Belge'
 			]);
 		});
@@ -118,7 +206,7 @@ describe('i18n', function() {
 			})).toEqual([
 				{key: 'en', name: 'English'},
 				{key: 'fr', name: 'Français'},
-				{key: 'de', name: 'Deutsh'},
+				{key: 'de', name: 'Deutsch'},
 				{key: 'fr-be', name: 'Belge'}
 			]);
 		});
@@ -139,7 +227,7 @@ describe('i18n', function() {
 			})).toEqual([
 				'English',
 				'Français',
-				'Deutsh',
+				'Deutsch',
 				'Français (Belge)'
 			]);
 		});
@@ -151,14 +239,897 @@ describe('i18n', function() {
 			})).toEqual([
 				'English',
 				'Français',
-				'Deutsh',
+				'Deutsch',
 				'Belge'
 			]);
+		});
+
+		describe('$$.getData()', function() {
+			beforeEach(function() {
+				$$.configuration({
+					dictionary: {
+						'seventy': {
+							en: 'seventy',
+							fr: 'soixante-dix',
+							de: 'siebzig',
+							'fr-be': 'septante'
+						},
+						'cat': {
+							en: 'cat',
+							fr: 'chat',
+							de: 'Katze',
+							'fr-be': 'chat'
+						},
+					}
+				});
+			});
+
+			afterEach(function() {
+				$$.clearData();
+			});
+
+			xit('should get data loaded', function() {
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy',
+						cat: 'cat'
+					},
+					fr: {
+						seventy: 'soixante-dix',
+						cat: 'chat'
+					},
+					de: {
+						seventy: 'siebzig',
+						cat: 'Katze'
+					},
+					'fr-be': {
+						seventy: 'septante',
+						cat: 'chat'
+					}
+				});
+			});
+
+			xit('should get data of a language only', function() {
+				expect($$.getData('de')).toEqual({
+					seventy: 'siebzig',
+					cat: 'Katze'
+				});
+
+				expect($$.getData({key: 'de'})).toEqual({
+					seventy: 'siebzig',
+					cat: 'Katze'
+				});
+
+				expect($$.getData({locale: 'de'})).toEqual({
+					seventy: 'siebzig',
+					cat: 'Katze'
+				});
+			});
+
+			xit('should get data loaded formatted as dictionary', function() {
+				expect($$.getData({format: 'dictionary'})).toEqual({
+						'seventy': {
+							en: 'seventy',
+							fr: 'soixante-dix',
+							de: 'siebzig',
+							'fr-be': 'septante'
+						},
+						'cat': {
+							en: 'cat',
+							fr: 'chat',
+							de: 'Katze',
+							'fr-be': 'chat'
+						},
+					});
+			});
+
+			xit('should get data by using all options', function() {
+				expect($$.getData({key: 'fr-be', format: 'dictionary'})).toEqual({
+					'seventy': {
+						'fr-be': 'septante'
+					},
+					'cat': {
+						'fr-be': 'chat'
+					}
+				});
+			});
+		});
+
+		describe('$$.clearData()', function() {
+			beforeEach(function() {
+				$$.configuration({
+					dictionary: {
+						'seventy': {
+							en: 'seventy',
+							fr: 'soixante-dix',
+							de: 'siebzig',
+							'fr-be': 'septante'
+						}
+					}
+				});
+			});
+
+			afterEach(function() {
+				$$.clearData();
+			});
+
+			xit('should clear all data', function() {
+				$$.clearData();
+
+				expect($$.getData()).toEqual({
+					en: null,
+					fr: null,
+					de: null,
+					'fr-be': null
+				});
+			});
+
+			xit('should clear data of a language', function() {
+				$$.clearData('fr');
+
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy'
+					},
+					fr: null,
+					de: {
+						seventy: 'siebzig'
+					},
+					'fr-be': {
+						seventy: 'soixante-dix'
+					}
+				});
+			});
+		});
+
+		describe('load raw dictionary', function() {
+			beforeEach(function() {
+				$$.configuration({
+					dictionary: {
+						'seventy': {
+							en: 'seventy',
+							fr: 'soixante-dix',
+							de: 'siebzig',
+							'fr-be': 'septante'
+						}
+					}
+				});
+			});
+
+			afterEach(function() {
+				$$.clearData();
+			});
+
+			xit('should load raw dictionary', function() {
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy'
+					},
+					fr: {
+						seventy: 'soixante-dix'
+					},
+					de: {
+						seventy: 'siebzig'
+					},
+					'fr-be': {
+						seventy: 'septante'
+					}
+				});
+				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+			});
+
+			xit('should not reset previous data on raw dictionary', function() {
+				$$.configuration({
+					dictionary: {
+						cat: {
+							en: 'cat',
+							fr: 'chat',
+							de: 'Katze',
+							'fr-be': 'chat',
+						}
+					}
+				});
+
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy',
+						cat: 'cat'
+					},
+					fr: {
+						seventy: 'soixante-dix',
+						cat: 'chat'
+					},
+					de: {
+						seventy: 'siebzig',
+						cat: 'Katze'
+					},
+					'fr-be': {
+						seventy: 'septante',
+						cat: 'chat'
+					}
+				});
+				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
+			});
+
+			xit('should load partial raw dictionary', function() {
+				$$.configuration({
+					dictionary: {
+						cat: {
+							en: 'cat',
+							fr: 'chat',
+							de: 'Katze'
+						}
+					}
+				});
+
+				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', undefined]);
+			});
+
+			xit('should reject outscope dictionary', function() {
+				var data = $$.getData();
+				$$.configuration({
+					dictionary: {
+						'cube': {
+							it: 'cubo',
+							gr: 'κύβος',
+							jp: 'キューブ',
+							fi: 'kuutio'
+						}
+					}
+				});
+
+				expect($$.getData()).toEqual(data);
+			});
+		});
+
+		describe('load raw data', function() {
+			beforeEach(function() {
+				$$.configuration({
+					data: {
+						en: {
+							seventy: 'seventy'
+						},
+						fr: {
+							seventy: 'soixante-dix'
+						},
+						de: {
+							seventy: 'siebzig'
+						},
+						'fr-be': {
+							seventy: 'septante'
+						}
+					}
+				});
+			});
+
+			afterEach(function() {
+				$$.clearData();
+			});
+
+			xit('should load raw data', function() {
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy'
+					},
+					fr: {
+						seventy: 'soixante-dix'
+					},
+					de: {
+						seventy: 'siebzig'
+					},
+					'fr-be': {
+						seventy: 'septante'
+					}
+				});
+				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+			});
+
+			xit('should not reset previous data on raw data', function() {
+				$$.configuration({
+					data: {
+						en: {
+							cat: 'cat'
+						},
+						fr: {
+							cat: 'chat'
+						},
+						de: {
+							cat: 'Katze'
+						},
+						'fr-be': {
+							cat: 'chat'
+						}
+					}
+				});
+
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy',
+						cat: 'cat'
+					},
+					fr: {
+						seventy: 'soixante-dix',
+						cat: 'chat'
+					},
+					de: {
+						seventy: 'siebzig',
+						cat: 'Katze'
+					},
+					'fr-be': {
+						seventy: 'septante',
+						cat: 'chat'
+					}
+				});
+				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
+			});
+
+			xit('should load partial raw data', function() {
+				$$.configuration({
+					data: {
+						en: {
+							cat: 'cat'
+						},
+						fr: {
+							cat: 'chat'
+						},
+						de: {
+							cat: 'Katze'
+						}
+					}
+				});
+
+				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', undefined]);
+			});
+
+			xit('should reject outscope data', function() {
+				var data = $$.getData();
+				$$.configuration({
+					data: {
+						it: {'cube': 'cubo'},
+						gr: {'cube': 'κύβος'},
+						jp: {'cube': 'キューブ'},
+						fi: {'cube': 'kuutio'}
+					}
+				});
+
+				expect($$.getData()).toEqual(data);
+			});
+		});
+
+		xdescribe('load dynamic dictionary', function() {
+			beforeEach(function() {
+				jasmine.Ajax.install();
+
+				var json = {
+					'seventy': {
+						en: 'seventy',
+						fr: 'soixante-dix',
+						de: 'siebzig',
+						'fr-be': 'septante'
+					}
+				};
+				json = JSON.stringify(json);
+
+				jasmine.Ajax.stubRequest('dictionary.json').andReturn({
+					"status": 200, 
+					"contentType": 'text/plain',
+					"responseText": json
+				});
+			});
+
+			afterEach(function() {
+				$$.clearData();
+				jasmine.Ajax.uninstall();
+			});
+
+			it('should retrieve the dictionary from json', function() {
+				var spy = jasmine.createSpy('spy');
+				$$.configuration({
+					dictionary: 'dictionary.json',
+					onLocaleReady: spy
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(1);
+				var request = jasmine.Ajax.requests.mostRecent();
+
+				expect(request.method).toBe('GET');
+				expect(request.url).toBe('dictionary.json');
+				expect(spy).toHaveBeenCalled();
+
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy'
+					},
+					fr: {
+						seventy: 'soixante-dix'
+					},
+					de: {
+						seventy: 'siebzig'
+					},
+					'fr-be': {
+						seventy: 'septante'
+					}
+				});
+			});
+
+			it('should retrieve the dictionary from function', function() {
+				var spy = jasmine.createSpy('spy');
+				var spyDico = jasmine.createSpy('spyDico');
+				$$.configuration({
+					dictionary: spyDico,
+					onLocaleReady: spy
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(0);
+				expect(spy).not.toHaveBeenCalled();
+				expect(spy).toHaveBeenCalled();
+			});
+		});
+
+		describe('load dynamic data', function() {
+			beforeEach(function() {
+				jasmine.Ajax.install();
+			});
+
+			afterEach(function() {
+				$$.clearData();
+				jasmine.Ajax.uninstall();
+			});
+
+			xdescribe('synchronously', function() {
+				beforeEach(function() {
+					var dico = JSON.stringify({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: {
+							seventy: 'soixante-dix'
+						},
+						de: {
+							seventy: 'siebzig'
+						},
+						'fr-be': {
+							seventy: 'septante'
+						}
+					});
+					var dico_en = JSON.stringify({
+						en: {'seventy': 'seventy'}
+					});
+					var dico_fr = JSON.stringify({
+						fr: {'seventy': 'soixante-dix'}
+					});
+					var dico_de = JSON.stringify({
+						de: {'seventy': 'siebzig'}
+					});
+					var dico_be = JSON.stringify({
+						'fr-be': {'seventy': 'septante'}
+					});
+
+					jasmine.Ajax.stubRequest('dictionary.json').andReturn({
+						"status": 200, 
+						"contentType": 'text/plain',
+						"responseText": dico
+					});
+					jasmine.Ajax.stubRequest('dictionary-en.json').andReturn({
+						"status": 200, 
+						"contentType": 'text/plain',
+						"responseText": dico_en
+					});
+					jasmine.Ajax.stubRequest('dictionary-fr.json').andReturn({
+						"status": 200, 
+						"contentType": 'text/plain',
+						"responseText": dico_fr
+					});
+					jasmine.Ajax.stubRequest('dictionary-de.json').andReturn({
+						"status": 200, 
+						"contentType": 'text/plain',
+						"responseText": dico_de
+					});
+					jasmine.Ajax.stubRequest('dictionary-be.json').andReturn({
+						"status": 200, 
+						"contentType": 'text/plain',
+						"responseText": dico_be
+					});
+				});
+
+				it('should retrieve the data from json in lazy mode', function() {
+					var spy = jasmine.createSpy('spy');
+					$$.configuration({
+						defaultLocale: 'en',
+						data: {
+							en: 'dictionary-en.json',
+							fr: 'dictionary-fr.json',
+							de: 'dictionary-de.json',
+							'fr-be': 'dictionary-be.json'
+						},
+						onLocaleReady: spy
+					});
+
+					expect(jasmine.Ajax.requests.count()).toBe(1);
+					var request = jasmine.Ajax.requests.mostRecent();
+
+					expect(request.method).toBe('GET');
+					expect(request.url).toBe('dictionary-en.json');
+					expect(spy).toHaveBeenCalled();
+
+					expect($$.getData()).toEqual({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: null,
+						de: null,
+						'fr-be': null
+					});
+
+					$$.setLocale('fr')
+					expect(spy.calls.count()).toEqual(2);
+					expect($$.getData()).toEqual({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: {
+							seventy: 'soixante-dix'
+						},
+						de: null,
+						'fr-be': null
+					});
+				});
+
+				it('should retrieve the data from json in non-lazy mode', function() {
+					var spy = jasmine.createSpy('spy');
+					$$.configuration({
+						defaultLocale: 'en',
+						data: {
+							en: 'dictionary-en.json',
+							fr: 'dictionary-fr.json',
+							de: 'dictionary-de.json',
+							'fr-be': 'dictionary-be.json'
+						},
+						onLocaleReady: spy,
+						lazyLoading: false
+					});
+
+					expect(jasmine.Ajax.requests.count()).toBe(4);
+					expect(spy).toHaveBeenCalled();
+					expect(spy.calls.count()).toEqual(1);
+
+					expect($$.getData()).toEqual({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: {
+							seventy: 'soixante-dix'
+						},
+						de: {
+							seventy: 'siebzig'
+						},
+						'fr-be': {
+							seventy: 'septante'
+						}
+					});
+
+					$$.setLocale('fr')
+					expect(jasmine.Ajax.requests.count()).toBe(4);
+					expect(spy.calls.count()).toEqual(2);
+					expect($$.getData()).toEqual({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: {
+							seventy: 'soixante-dix'
+						},
+						de: {
+							seventy: 'siebzig'
+						},
+						'fr-be': {
+							seventy: 'septante'
+						}
+					});
+				});
+
+				it('should retrieve the data from one json', function() {
+					var spy = jasmine.createSpy('spy');
+					$$.configuration({
+						defaultLocale: 'en',
+						data: 'dictionary.json',
+						onLocaleReady: spy,
+						lazyLoading: false
+					});
+
+					expect(jasmine.Ajax.requests.count()).toBe(1);
+					expect(spy).toHaveBeenCalled();
+					expect(spy.calls.count()).toEqual(1);
+
+					expect($$.getData()).toEqual({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: {
+							seventy: 'soixante-dix'
+						},
+						de: {
+							seventy: 'siebzig'
+						},
+						'fr-be': {
+							seventy: 'septante'
+						}
+					});
+
+					$$.setLocale('fr')
+					expect(jasmine.Ajax.requests.count()).toBe(1);
+					expect(spy.calls.count()).toEqual(2);
+					expect($$.getData()).toEqual({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: {
+							seventy: 'soixante-dix'
+						},
+						de: {
+							seventy: 'siebzig'
+						},
+						'fr-be': {
+							seventy: 'septante'
+						}
+					});
+				});
+
+				it('should retrieve the data from function in lazy mode', function() {
+					var spy = jasmine.createSpy('spy');
+					var spyEn = jasmine.createSpy('spyEn');
+					var spyFr = jasmine.createSpy('spyFr');
+					var spyDe = jasmine.createSpy('spyDe');
+					var spyBe = jasmine.createSpy('spyBe');
+					$$.configuration({
+						defaultLocale: 'en',
+						data: {
+							en: spyEn,
+							fr: spyFr,
+							de: spyDe,
+							'fr-be': spyBe
+						},
+						onLocaleReady: spy
+					});
+
+					expect(jasmine.Ajax.requests.count()).toBe(0);
+					expect(spy).not.toHaveBeenCalled();
+					expect(spyEn).toHaveBeenCalled();
+					expect(spyFr).not.toHaveBeenCalled();
+					expect(spyDe).not.toHaveBeenCalled();
+					expect(spyBe).not.toHaveBeenCalled();
+
+					$$.setLocale('fr')
+					expect(spy).not.toHaveBeenCalled();
+					expect(spyFr).toHaveBeenCalled();
+					expect(spyDe).not.toHaveBeenCalled();
+					expect(spyBe).not.toHaveBeenCalled();
+				});
+
+				it('should retrieve the data from function in non-lazy mode', function() {
+					var spy = jasmine.createSpy('spy');
+					var spyEn = jasmine.createSpy('spyEn');
+					var spyFr = jasmine.createSpy('spyFr');
+					var spyDe = jasmine.createSpy('spyDe');
+					var spyBe = jasmine.createSpy('spyBe');
+					$$.configuration({
+						defaultLocale: 'en',
+						data: {
+							en: spyEn,
+							fr: spyFr,
+							de: spyDe,
+							'fr-be': spyBe
+						},
+						onLocaleReady: spy
+					});
+
+					expect(jasmine.Ajax.requests.count()).toBe(0);
+					expect(spy).not.toHaveBeenCalled();
+					expect(spyEn).toHaveBeenCalled();
+					expect(spyFr).toHaveBeenCalled();
+					expect(spyDe).toHaveBeenCalled();
+					expect(spyBe).toHaveBeenCalled();
+				});
+
+				it('should retrieve all data from function', function() {
+					var spy = jasmine.createSpy('spy');
+					var spyDico = jasmine.createSpy('spyDico');
+					$$.configuration({
+						defaultLocale: 'en',
+						data: spyDico,
+						onLocaleReady: spy
+					});
+
+					expect(jasmine.Ajax.requests.count()).toBe(0);
+					expect(spy).not.toHaveBeenCalled();
+					expect(spyDico).toHaveBeenCalled();
+				});
+			});
+			
+			xdescribe('asynchronously', function() {
+			
+				it('should retrieve the data from json in asynchronous mode', function() {
+					var spy = jasmine.createSpy('spy');
+					$$.configuration({
+						defaultLocale: 'en',
+						syncLoading: false,
+						data: {
+							en: 'dictionary-en.json',
+							fr: 'dictionary-fr.json',
+							de: 'dictionary-de.json',
+							'fr-be': 'dictionary-be.json'
+						},
+						onLocaleReady: spy
+					});
+
+					expect(jasmine.Ajax.requests.count()).toBe(1);
+					var request = jasmine.Ajax.requests.mostRecent();
+
+					expect(request.method).toBe('GET');
+					expect(request.url).toBe('dictionary-en.json');
+					expect(spy).not.toHaveBeenCalled();
+
+					request.respondWith({
+						"status": 200, 
+						"contentType": 'text/plain',
+						"responseText": '{"seventy": "seventy"}'
+					});
+
+					expect(spy).toHaveBeenCalled();
+					expect($$.getData()).toEqual({
+						en: {
+							seventy: 'seventy'
+						},
+						fr: null,
+						de: null,
+						'fr-be': null
+					});
+				});
+			});
+		});
+		
+		xit('should configure all locales options at once', function() {
+			var spyEn = jasmine.createSpy('spyEn');
+			var spyFr = jasmine.createSpy('spyFr');
+
+			$$.configuration({
+				defaultLocale: 'en',
+				localeSet: [{
+					locale: 'en',
+					localeName: 'English',
+					data: spyEn
+				}, {
+					key: 'fr',
+					name: 'Français',
+					data: spyFr
+				}]
+			});
+
+			expect($$.getLocales({key: true, name: true})).toEqual([
+				{key: 'en', name: 'English'},
+				{key: 'fr', name:'Français'}
+			]);
+			expect(spyEn).toHaveBeenCalled();
+			expect(spyFr).not.toHaveBeenCalled();
+
+			$$.setLocale('fr');
+			expect(spyFr).toHaveBeenCalled();
+		});
+
+		xdescribe('addItem()', function() {
+			afterEach(function() {
+				$$.clearData();
+			});
+
+			xit('should add a new entry', function() {
+				$$.addItem('seventy', {
+					en: 'seventy',
+					fr: 'soixante-dix',
+					de: 'siebzig',
+					'fr-be': 'septante'
+				});
+
+				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+			});
+
+			xit('should replace a previous entry', function() {
+				$$.addItem('seventy', {
+					en: 'seventy',
+					fr: 'seventy',
+					de: 'seventy',
+					'fr-be': 'seventy'
+				});
+
+				$$.addItem('seventy', {
+					en: 'seventy',
+					fr: 'soixante-dix',
+					de: 'siebzig',
+					'fr-be': 'septante'
+				});
+
+				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+			});
 		});
 	});
 
 	xdescribe('basic translations', function() {
-		//Loading data
+		beforeEach(function() {
+			this.logInfo = jasmine.createSpy('logInfo');
+			this.logWarn = jasmine.createSpy('logWarn');
+			this.logError = jasmine.createSpy('logError');
+
+			$$.configuration({
+				locales: ['en', 'fr', 'fr-be'],
+				dictionary: {
+					seventy: {
+						en: 'seventy',
+						fr: 'soixante-dix',
+						'fr-be': 'septante'
+					},
+					cat: {
+						en: 'cat',
+						fr: 'chat'
+					}
+				},
+				log: {
+					info: this.logInfo,
+					warn: this.logWarn,
+					error: this.logError
+				}
+			});
+			$$.setLocale('en');
+		});
+
+		afterEach(function() {
+			$$.clearData();
+		});
+		
+		xit('should translate the key', function() {
+			expect($$('seventy')).toBe('seventy');
+			$$.setLocale('fr');
+			expect($$('seventy')).toBe('soixante-dix');
+			$$.setLocale('fr-be');
+			expect($$('seventy')).toBe('septante');
+		});
+
+		xit('should fallback the translation', function() {
+			$$.setLocale('fr-be');
+
+			expect($$('cat')).toBe('chat');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			expect($$('unknown')).toBe('unknown');
+			expect(this.logWarn).toHaveBeenCalled();
+		});
+
+		xit('should support object entry', function() {
+			expect($$({
+				en: 'Hi',
+				fr: 'Salut'
+			})).toBe('Hi');
+
+			$$.setLocale('fr');
+			expect($$({
+				en: 'Hi',
+				fr: 'Salut'
+			})).toBe('Salut');
+		});
+
+		xit('should fallback the translation with object entry', function() {
+			$$.setLocale('fr-be');
+			expect($$({
+				en: 'Hi',
+				fr: 'Salut'
+			})).toBe('Salut');
+
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			expect($$({
+				en: 'Hi'
+			})).toBe('');
+			expect(this.logWarn).toHaveBeenCalled();
+		});
 	});
   
 });
