@@ -18,9 +18,9 @@
 	'use strict';
 
 	/* status variables */
-	var locales = {};
-	var localeKeys = [];
-	var currentLocale;
+	var locales, localeKeys,
+		defaultKeyLocale, currentLocale, useDfltLocale;
+	_reset();
 
 	/* API methods */
 	
@@ -33,6 +33,7 @@
 	 * @param [options.locales] {String[]} list of locale keys to manage. Other locales will be rejected. It reset previous configuration.
 	 * @param [options.localeName] {Object} list of key/value to give to locale a pretty name.
 	 * @param [options.alias] {string} attach the i18n function to the global variable described by alias.
+	 * @param [options.defaultLocale] {string} the default locale key to use.
 	 */
 	i18n.configuration = function(options) {
 		options || (options = {});
@@ -48,8 +49,12 @@
 			self[options.alias] = i18n;
 		}
 
-		if (!currentLocale && localeKeys.length) {
-			currentLocale = locales[localeKeys[0]];
+		if (typeof options.defaultLocale !== 'undefined') {
+			defaultKeyLocale = options.defaultLocale;
+		}
+
+		if (useDfltLocale && localeKeys.length) {
+			currentLocale = locales[_getDefaultKey()];
 		}
 	};
 
@@ -62,12 +67,23 @@
 	 * @return {String|Boolean} the new key of the current locale. If the locale has not been changed, it returns false.
 	 */
 	i18n.setLocale = function(key) {
-		key = _formatLocaleKey(key);
+		var useDflt = typeof key === 'undefined';
 
-		if (key !== currentLocale.key && locales[key]) {
-			currentLocale = locales[key];
+		if (useDflt) {
+			key = _getDefaultKey();
 		} else {
+			key = _formatLocaleKey(key);
+		}
+
+		if (key === currentLocale.key) {
 			key = false;
+			useDfltLocale = useDflt;
+		} else
+		if (!locales[key]) {
+			key = false;
+		} else {
+			currentLocale = locales[key];
+			useDfltLocale = useDflt;
 		}
 
 		return key;
@@ -99,9 +115,20 @@
 		});
 	};
 
+	/** should be used for test only */
+	i18n._reset = _reset;
+
 	/*
 	 * private functions
 	 */
+
+	function _reset() {
+		locales = {};
+		localeKeys = [];
+		defaultKeyLocale = undefined;
+		currentLocale = undefined;
+		useDfltLocale = true;
+	}
 
 	function _createLocale(key, name) {
 		var dflt, locale;
@@ -176,6 +203,26 @@
 		}
 
 		return result;
+	}
+
+	function _getDefaultKey() {
+		var key;
+
+		if (typeof defaultKeyLocale === 'string') {
+			key = _formatLocaleKey(defaultKeyLocale);
+		}
+
+		if (!key) {
+			self.navigator.languages.some(function(lng) {
+				return key = _formatLocaleKey(lng);
+			});
+
+			if (!key) {
+				key = localeKeys[0];
+			}
+		}
+
+		return key;
 	}
 
 	function _formatLocaleKey(key) {

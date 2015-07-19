@@ -22,6 +22,10 @@ describe('i18n', function() {
 			});
 		});
 
+		afterEach(function() {
+			$$._reset();
+		});
+
 		it('should add an alias', function() {
 			$$.configuration({alias: 'translations'});
 
@@ -49,8 +53,8 @@ describe('i18n', function() {
 			expect($$.getLocale({key: true, name: true})).toEqual({key: 'en', name: 'English'});
 		});
 
-		xit('should configure a default locale', function() {
-			var locale = $$getLocale();
+		it('should configure a default locale', function() {
+			var locale = $$.getLocale();
 			var list = $$.getLocales();
 
 			expect(locale).toEqual(jasmine.any(String));
@@ -63,7 +67,7 @@ describe('i18n', function() {
 			expect($$.getLocale()).toBe('fr');
 		});
 
-		xit('should not change the locale', function() {
+		it('should not change the locale', function() {
 			$$.setLocale('en');
 			$$.configuration({defaultLocale: 'fr'});
 
@@ -96,7 +100,7 @@ describe('i18n', function() {
 			});
 		});
 
-		xit('should set default language', function() {
+		it('should set default language', function() {
 			var language = $$.setLocale(navigator.language)
 			var locale = $$.getLocale();
 
@@ -112,6 +116,7 @@ describe('i18n', function() {
 
 			$$.configuration({defaultLocale: 'en'});
 			$$.setLocale();
+
 			expect($$.getLocale()).toBe('en');
 		});
 
