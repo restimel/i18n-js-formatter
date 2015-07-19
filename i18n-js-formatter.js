@@ -18,9 +18,9 @@
 	'use strict';
 
 	/* status variables */
-	var locales, localeKeys,
-		defaultKeyLocale, currentLocale, useDfltLocale,
-		storage;
+	var locales, localeKeys, currentLocale,
+		defaultKeyLocale, useDfltLocale, storage,
+		data;
 	_reset();
 
 	/* API methods */
@@ -36,6 +36,8 @@
 	 * @param [options.alias] {string} attach the i18n function to the global variable described by alias.
 	 * @param [options.defaultLocale] {string} the default locale key to use.
 	 * @param [options.storage] {String|String[]} tell the way to store the locale for another session.
+	 * @param [options.dictionary] {Object|String|Function} add data to all language (formatted by sentences)
+	 * @param [options.data] {Object|String|Function} add data to all language (formatted by languages)
 	 */
 	i18n.configuration = function(options) {
 		options || (options = {});
@@ -49,6 +51,14 @@
 
 		if (typeof options.alias === 'string') {
 			self[options.alias] = i18n;
+		}
+
+		if (typeof options.dictionary !== 'undefined') {
+			_addDictionary(options.dictionary);
+		}
+
+		if (typeof options.data !== 'undefined') {
+			_addData(options.data);
 		}
 
 		if (typeof options.storage !== 'undefined') {
@@ -106,8 +116,9 @@
 	/**
 	 * Retrieve the current locale
 	 *
-	 * @param [options.key] {Boolean} if true, the locale's key will be return
-	 * @param [options.name] {Boolean} if true, the locale's name will be return
+	 * @param [options.key] {Boolean} if true, the locale's key will be returned
+	 * @param [options.name] {Boolean} if true, the locale's name will be returned
+	 * @param [options.data] {String} if defined, the locale's translation will be returned
 	 * @return [String|Object] If only one option is given, it return the value of this option
 	 *						   If several options are given, it return an object with the key/value of wanted options.
 	 */
@@ -118,8 +129,9 @@
 	/**
 	 * Retrieve the informations of all locales
 	 *
-	 * @param [options.key] {Boolean} if true, the locales' key will be return
-	 * @param [options.name] {Boolean} if true, the locales' name will be return
+	 * @param [options.key] {Boolean} if true, the locales' key will be returned
+	 * @param [options.name] {Boolean} if true, the locales' name will be returned
+	 * @param [options.data] {String} if defined, the locales' translation will be returned
 	 * @return [String[]|Object[]] If only one option is given, it return the value list of this option
 	 *							   If several options are given, it return a list of object with the key/value of wanted options.
 	 */
@@ -128,6 +140,78 @@
 			return _getLocale(locales[key], options);
 		});
 	};
+
+	/**
+	 * Get the data of the specified locale
+	 *
+	 * @param [options] {Object|String} options to retrieve data. If a string it defines key.
+	 * @param [options.key] {String} the locale's data to get. If not defined data of all locales are returned.
+	 * @param [options.format] {String} the result format. Value can be 'dictionary' or 'data' (default is 'data').
+	 * @return {Object} the data
+	 */
+	i18n.getData = function(options) {
+		console.log(options)
+		var opt = typeof options === 'object' ? options : {};
+		var key = (typeof options === 'string' ? options : opt.key || opt.locale) || '';
+		var format = opt.format || 'data';
+		var rslt;
+		var dico;
+
+		key = _formatLocaleKey(key);
+		dico = data[key];
+
+		if (format === 'dictionary') {
+			rslt = {};
+			_getCatalog().forEach(function(sentence) {
+				rslt[sentence] = {};
+
+				if (dico && dico[sentence]) {
+					rslt[sentence][key] = dico[sentence];
+				} else {
+					localeKeys.forEach(function(key) {
+						if (data[key] && data[key][sentence]) {
+							rslt[sentence][key] = data[key][sentence];
+						}
+					});
+				}
+			});
+		} else {
+			if (key && typeof dico !== 'undefined') {
+				rslt = dico;
+			} else {
+				rslt = data;
+			}
+		}
+
+		return rslt;
+	};
+
+	/**
+	 * Add an item to data
+	 *
+	 * @param sentenceKey {String} the sentence which need to be translated
+	 * @param values {String{}} the translation corresponding of each keys
+	 */
+	i18n.addItem = function(sentenceKey, values) {
+		_addItem(values, sentenceKey);
+	};
+
+	/**
+	 * Clear the data of the specified locale
+	 *
+	 * @param [key] {String} the locale's data to clear. If not defined all data are cleared.
+	 */
+	i18n.clearData = function(key) {
+		if (typeof key === 'undefined') {
+			data = {};
+			localeKeys.forEach(_resetDataKey);
+		} else {
+			key = _formatLocaleKey(key);
+			if (data[key]) {
+				_resetDataKey(key);
+			}
+		}
+	}
 
 	/** should be used for test only */
 	i18n._reset = _reset;
@@ -140,12 +224,17 @@
 		locales = {};
 		localeKeys = [];
 		defaultKeyLocale = undefined;
-		currentLocale = undefined;
+		currentLocale = null;
 		useDfltLocale = true;
 		storage = {
 			kind: 'none',
 			name: ''
 		};
+		data = {};
+	}
+
+	function _resetDataKey(key) {
+		data[key] = null;
 	}
 
 	function _createLocale(key, name) {
@@ -181,6 +270,18 @@
 				localeKeys.push(key);
 			}
 			nextLocales[key] = locale;
+		});
+
+		_each(data, function(value, key) {
+			if (localeKeys.indexOf(key) === -1) {
+				delete data[key];
+			}
+		});
+
+		localeKeys.forEach(function(key) {
+			if (!data[key]) {
+				_resetDataKey(key);
+			}
 		});
 
 		locales = nextLocales;
@@ -277,7 +378,13 @@
 		nb = 0;
 		_each(options, function(value, attribute) {
 			if (value) {
-				lastResult = locale[attribute];
+				switch (attribute) {
+					case 'data':
+						lastResult = data[locale.key] && data[locale.key][value];
+						break;
+					default:
+					lastResult = locale[attribute];
+				}
 				result[attribute] = lastResult;
 				nb++;
 			}
@@ -312,6 +419,23 @@
 		return key;
 	}
 
+	function _getCatalog() {
+		var catalog = [];
+
+		localeKeys.forEach(function(key) {
+			var dico = data[key];
+			if (dico) {
+				_each(dico, function(v, sentence) {
+					if (catalog.indexOf(sentence) === -1) {
+						catalog.push(sentence);
+					}
+				});
+			}
+		});
+
+		return catalog;
+	}
+
 	function _formatLocaleKey(key) {
 		key = _default(key, '');
 		key = key.toLowerCase();
@@ -321,6 +445,42 @@
 		}
 
 		return key;
+	}
+
+	function _addDictionary(dictionary) {
+		_each(dictionary, _addItem);
+	}
+
+	function _addData(dictionary) {
+		_each(dictionary, _addDataByKey);
+	}
+
+	function _addDataByKey(dico, key) {
+		if (typeof dico[key] === 'object') {
+			dico = dico[key];
+		}
+
+		_each(dico, function(value, sentenceKey) {
+			var obj = {};
+			obj[key] = value;
+			_addItem(obj, sentenceKey);
+		});
+	}
+
+	function _addItem(values, sentenceKey) {
+		_each(values, function(value, key) {
+			var dico = data[key];
+
+			if (dico === null) {
+				dico = data[key] = {};
+			}
+
+			if (!dico) {
+				return;
+			}
+
+			dico[sentenceKey] = value;
+		});
 	}
 
 	/*

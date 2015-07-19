@@ -284,7 +284,7 @@ describe('i18n', function() {
 				$$.clearData();
 			});
 
-			xit('should get data loaded', function() {
+			it('should get data loaded', function() {
 				expect($$.getData()).toEqual({
 					en: {
 						seventy: 'seventy',
@@ -305,7 +305,7 @@ describe('i18n', function() {
 				});
 			});
 
-			xit('should get data of a language only', function() {
+			it('should get data of a language only', function() {
 				expect($$.getData('de')).toEqual({
 					seventy: 'siebzig',
 					cat: 'Katze'
@@ -322,7 +322,7 @@ describe('i18n', function() {
 				});
 			});
 
-			xit('should get data loaded formatted as dictionary', function() {
+			it('should get data loaded formatted as dictionary', function() {
 				expect($$.getData({format: 'dictionary'})).toEqual({
 						'seventy': {
 							en: 'seventy',
@@ -339,7 +339,7 @@ describe('i18n', function() {
 					});
 			});
 
-			xit('should get data by using all options', function() {
+			it('should get data by using all options', function() {
 				expect($$.getData({key: 'fr-be', format: 'dictionary'})).toEqual({
 					'seventy': {
 						'fr-be': 'septante'
@@ -347,6 +347,25 @@ describe('i18n', function() {
 					'cat': {
 						'fr-be': 'chat'
 					}
+				});
+			});
+
+			it('should keep previous data when resetting locales', function() {
+				$$.configuration({locales: ['en', 'fr', 'de', 'fi']});
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy',
+						cat: 'cat'
+					},
+					fr: {
+						seventy: 'soixante-dix',
+						cat: 'chat'
+					},
+					de: {
+						seventy: 'siebzig',
+						cat: 'Katze'
+					},
+					fi: null
 				});
 			});
 		});
@@ -369,7 +388,7 @@ describe('i18n', function() {
 				$$.clearData();
 			});
 
-			xit('should clear all data', function() {
+			it('should clear all data', function() {
 				$$.clearData();
 
 				expect($$.getData()).toEqual({
@@ -380,7 +399,7 @@ describe('i18n', function() {
 				});
 			});
 
-			xit('should clear data of a language', function() {
+			it('should clear data of a language', function() {
 				$$.clearData('fr');
 
 				expect($$.getData()).toEqual({
@@ -392,7 +411,7 @@ describe('i18n', function() {
 						seventy: 'siebzig'
 					},
 					'fr-be': {
-						seventy: 'soixante-dix'
+						seventy: 'septante'
 					}
 				});
 			});
@@ -416,7 +435,7 @@ describe('i18n', function() {
 				$$.clearData();
 			});
 
-			xit('should load raw dictionary', function() {
+			it('should load raw dictionary', function() {
 				expect($$.getData()).toEqual({
 					en: {
 						seventy: 'seventy'
@@ -434,7 +453,7 @@ describe('i18n', function() {
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
 			});
 
-			xit('should not reset previous data on raw dictionary', function() {
+			it('should not reset previous data on raw dictionary', function() {
 				$$.configuration({
 					dictionary: {
 						cat: {
@@ -468,7 +487,7 @@ describe('i18n', function() {
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
 			});
 
-			xit('should load partial raw dictionary', function() {
+			it('should load partial raw dictionary', function() {
 				$$.configuration({
 					dictionary: {
 						cat: {
@@ -482,7 +501,7 @@ describe('i18n', function() {
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', undefined]);
 			});
 
-			xit('should reject outscope dictionary', function() {
+			it('should reject outscope dictionary', function() {
 				var data = $$.getData();
 				$$.configuration({
 					dictionary: {
@@ -523,7 +542,7 @@ describe('i18n', function() {
 				$$.clearData();
 			});
 
-			xit('should load raw data', function() {
+			it('should load raw data', function() {
 				expect($$.getData()).toEqual({
 					en: {
 						seventy: 'seventy'
@@ -541,7 +560,7 @@ describe('i18n', function() {
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
 			});
 
-			xit('should not reset previous data on raw data', function() {
+			it('should not reset previous data on raw data', function() {
 				$$.configuration({
 					data: {
 						en: {
@@ -581,7 +600,7 @@ describe('i18n', function() {
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
 			});
 
-			xit('should load partial raw data', function() {
+			it('should load partial raw data', function() {
 				$$.configuration({
 					data: {
 						en: {
@@ -599,7 +618,7 @@ describe('i18n', function() {
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', undefined]);
 			});
 
-			xit('should reject outscope data', function() {
+			it('should reject outscope data', function() {
 				var data = $$.getData();
 				$$.configuration({
 					data: {
@@ -1033,12 +1052,12 @@ describe('i18n', function() {
 			expect(spyFr).toHaveBeenCalled();
 		});
 
-		xdescribe('addItem()', function() {
+		describe('addItem()', function() {
 			afterEach(function() {
 				$$.clearData();
 			});
 
-			xit('should add a new entry', function() {
+			it('should add a new entry', function() {
 				$$.addItem('seventy', {
 					en: 'seventy',
 					fr: 'soixante-dix',
@@ -1049,7 +1068,7 @@ describe('i18n', function() {
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
 			});
 
-			xit('should replace a previous entry', function() {
+			it('should replace a previous entry', function() {
 				$$.addItem('seventy', {
 					en: 'seventy',
 					fr: 'seventy',
