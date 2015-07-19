@@ -141,6 +141,7 @@ describe('i18n', function() {
 
 		describe('navigator storage', function() {
 			afterEach(function() {
+				$$.setLocale();
 				if (self.document && document.cookie) {
 					document.cookie = "test=; expires=Thu, 01 Jan 1970 00:00:00 UTC";
 				}
@@ -150,35 +151,45 @@ describe('i18n', function() {
 				}
 			});
 
-			xit('should store the locale in cookie', function() {
-				// document.cookie = "test=en";
+			it('should store the locale in cookie', function() {
 				$$.setLocale('en');
-				expect($$.configuration({
-					storage: 'cookie:test'
-				})).not.toThrow();
+				expect(function() {
+					$$.configuration({
+						storage: 'cookie:test'
+					});
+				}).not.toThrow();
 
 				if (self.document && document.cookie) {
 					expect(document.cookie.indexOf('test=en') !== -1).toBeTruthy();
+
+					$$.setLocale('fr');
+					expect(document.cookie.indexOf('test=en') !== -1).toBeFalsy();
+					expect(document.cookie.indexOf('test=fr') !== -1).toBeTruthy();
 				}
 			});
 
-			xit('should store the locale in localStorage', function() {
-				// localStorage.setItem('test', 'en');
+			it('should store the locale in localStorage', function() {
 				$$.setLocale('en');
-				expect($$.configuration({
-					storage: 'localStorage:test'
-				})).not.toThrow();
+				expect(function() {
+					$$.configuration({
+						storage: 'localStorage:test'
+					});
+				}).not.toThrow();
 
 				if (self.localStorage) {
-					expect(localStorage.getItem('test')).toBe('en');
+					expect(self.localStorage.getItem('test')).toBe('en');
+					$$.setLocale('fr');
+					expect(self.localStorage.getItem('test')).toBe('fr');
 				}
 			});
 
-			xit('should store the locale in the available storage', function() {
+			it('should store the locale in the available storage', function() {
 				$$.setLocale('en');
-				expect($$.configuration({
-					storage: ['localStorage:test', 'cookie:test']
-				})).not.toThrow();
+				expect(function() {
+					$$.configuration({
+						storage: ['localStorage:test', 'cookie:test']
+					});
+				}).not.toThrow();
 
 				if (self.localStorage) {
 					expect(localStorage.getItem('test')).toBe('en');

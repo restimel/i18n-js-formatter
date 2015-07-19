@@ -19,7 +19,8 @@
 
 	/* status variables */
 	var locales, localeKeys,
-		defaultKeyLocale, currentLocale, useDfltLocale;
+		defaultKeyLocale, currentLocale, useDfltLocale,
+		storage;
 	_reset();
 
 	/* API methods */
@@ -34,6 +35,7 @@
 	 * @param [options.localeName] {Object} list of key/value to give to locale a pretty name.
 	 * @param [options.alias] {string} attach the i18n function to the global variable described by alias.
 	 * @param [options.defaultLocale] {string} the default locale key to use.
+	 * @param [options.storage] {String|String[]} tell the way to store the locale for another session.
 	 */
 	i18n.configuration = function(options) {
 		options || (options = {});
@@ -47,6 +49,13 @@
 
 		if (typeof options.alias === 'string') {
 			self[options.alias] = i18n;
+		}
+
+		if (typeof options.storage !== 'undefined') {
+			_configureStorage(options.storage);
+			if (!useDfltLocale) {
+				_setStorage(currentLocale.key);
+			}
 		}
 
 		if (typeof options.defaultLocale !== 'undefined') {
@@ -68,6 +77,7 @@
 	 */
 	i18n.setLocale = function(key) {
 		var useDflt = typeof key === 'undefined';
+		var saveChanged = true;
 
 		if (useDflt) {
 			key = _getDefaultKey();
@@ -77,13 +87,17 @@
 
 		if (key === currentLocale.key) {
 			key = false;
-			useDfltLocale = useDflt;
 		} else
 		if (!locales[key]) {
 			key = false;
+			saveChanged = false;
 		} else {
 			currentLocale = locales[key];
+		}
+
+		if (saveChanged) {
 			useDfltLocale = useDflt;
+			_setStorage($$.getLocale(), useDfltLocale);
 		}
 
 		return key;
@@ -128,6 +142,10 @@
 		defaultKeyLocale = undefined;
 		currentLocale = undefined;
 		useDfltLocale = true;
+		storage = {
+			kind: 'none',
+			name: ''
+		};
 	}
 
 	function _createLocale(key, name) {
@@ -178,6 +196,75 @@
 		});
 	}
 
+	function _configureStorage(options) {
+		var type = 'none';
+
+		if (options instanceof Array) {
+			options.some(function(opt) {
+				var o = opt.replace(/:.*$/, '');
+				switch (o) {
+					case 'cookie':
+						if (_mayUse.cookie()) {
+							type = opt;
+							return true;
+						}
+						break;
+					case 'localStorage':
+						if (_mayUse.localStorage()) {
+							type = opt;
+							return true;
+						}
+						break;
+				}
+			});
+		} else {
+			type = options;
+		}
+
+		type = type.split(':');
+		storage.kind = type[0];
+		storage.name = type[1];
+	}
+
+	function _setStorage(value, reset) {
+		switch(storage.kind) {
+			case 'cookie':
+				if (reset) {
+					document.cookie = storage.name + '=';
+				} else {
+					document.cookie = storage.name + '=' + value;
+				}
+				break;
+			case 'localStorage':
+				if (reset) {
+					self.localStorage.removeItem(storage.name);
+				} else {
+					self.localStorage.setItem(storage.name, value);
+				}
+				break;
+		}
+	}
+
+	function _getStorage() {
+		var value, srch;
+
+		switch(storage.kind) {
+			case 'cookie':
+				srch = storage.name + '=';
+				value = document.cookie.split(';').filter(function(str) {
+					return str.indexOf(srch) === 0;
+				})[0];
+				if (value) {
+					value = value.substr(srch.length + 1);
+				}
+				break;
+			case 'localStorage':
+				value = self.localStorage.getItem(storage.name);
+		}
+
+		return value;
+	}
+
 	function _getLocale(locale, options) {
 		var result, lastResult, x, nb;
 		options || (options = {key: true});
@@ -206,9 +293,9 @@
 	}
 
 	function _getDefaultKey() {
-		var key;
+		var key = _getStorage();
 
-		if (typeof defaultKeyLocale === 'string') {
+		if (!key && typeof defaultKeyLocale === 'string') {
 			key = _formatLocaleKey(defaultKeyLocale);
 		}
 
@@ -258,6 +345,15 @@
 			}
 		}
 	}
+
+	var _mayUse = {
+		cookie: function() {
+			return !!(self.document && document.cookie);
+		},
+		localStorage: function() {
+			return !!self.localStorage;
+		}
+	};
 
 	/* providing the API */
 	if (typeof _i18n_config === 'object') {
