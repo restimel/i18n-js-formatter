@@ -20,11 +20,13 @@
 	/* status variables */
 	var locales, localeKeys, currentLocale,
 		defaultKeyLocale, useDfltLocale, storage,
-		data;
+		syncLoading, lazyLoading,
+		onLocaleReady,
+		data, loadingMethod, status;
 	_reset();
 
 	/* API methods */
-	
+
 	function i18n() {}
 
 	/**
@@ -36,11 +38,15 @@
 	 * @param [options.alias] {string} attach the i18n function to the global variable described by alias.
 	 * @param [options.defaultLocale] {string} the default locale key to use.
 	 * @param [options.storage] {String|String[]} tell the way to store the locale for another session.
+	 * @param [options.syncLoading] {Boolean} If true Ajax call are done synchronously.
+	 * @param [options.lazyLoading] {Boolean} If true, Ajax and data function are called when needed.
+	 * @param [options.onLocaleReady] {Function} called each time the data for the current locale are ready to use
 	 * @param [options.dictionary] {Object|String|Function} add data to all language (formatted by sentences)
 	 * @param [options.data] {Object|String|Function} add data to all language (formatted by languages)
 	 */
 	i18n.configuration = function(options) {
 		options || (options = {});
+		var needLoading = typeof options.dictionary !== 'undefined' || typeof options.data !== 'undefined';
 
 		if (options.locales instanceof Array) {
 			_configureLocales(options);
@@ -53,12 +59,28 @@
 			self[options.alias] = i18n;
 		}
 
+		if (typeof options.onLocaleReady !== 'undefined') {
+			onLocaleReady = options.onLocaleReady;
+		}
+
+		if (typeof options.syncLoading === 'boolean') {
+			syncLoading = options.syncLoading;
+		}
+
+		if (typeof options.lazyLoading === 'boolean') {
+			lazyLoading = options.lazyLoading;
+		}
+
+		if (needLoading) {
+			status.callLocaleLoaded = true;
+		}
+
 		if (typeof options.dictionary !== 'undefined') {
-			_addDictionary(options.dictionary);
+			_loadDictionary(options.dictionary);
 		}
 
 		if (typeof options.data !== 'undefined') {
-			_addData(options.data);
+			_loadData(options.data);
 		}
 
 		if (typeof options.storage !== 'undefined') {
@@ -74,6 +96,10 @@
 
 		if (useDfltLocale && localeKeys.length) {
 			currentLocale = locales[_getDefaultKey()];
+		}
+
+		if (needLoading && lazyLoading) {
+			_loadCurrentLocale();
 		}
 	};
 
@@ -103,6 +129,7 @@
 			saveChanged = false;
 		} else {
 			currentLocale = locales[key];
+			_loadCurrentLocale();
 		}
 
 		if (saveChanged) {
@@ -150,7 +177,6 @@
 	 * @return {Object} the data
 	 */
 	i18n.getData = function(options) {
-		console.log(options)
 		var opt = typeof options === 'object' ? options : {};
 		var key = (typeof options === 'string' ? options : opt.key || opt.locale) || '';
 		var format = opt.format || 'data';
@@ -231,6 +257,13 @@
 			name: ''
 		};
 		data = {};
+		loadingMethod = {};
+		syncLoading = false;
+		lazyLoading = true;
+		onLocaleReady = null;
+		status = {
+			callLocaleLoaded: false
+		};
 	}
 
 	function _resetDataKey(key) {
@@ -447,17 +480,117 @@
 		return key;
 	}
 
+	function _loadDictionary(dictionary) {
+		switch(typeof dictionary) {
+			case 'object':
+				_addDictionary(dictionary);
+				break;
+			case 'function':
+				_addDictionary(dictionary());
+				break;
+			case 'string':
+				_ajax(dictionary, _addDictionary);
+				break;
+			default:
+				_error('%s is not a type supported for dictionary', typeof dictionary);
+		}
+	}
+
+	function _loadData(dictionary, key) {
+		var addData = key ? _addDataWithKey : _addData;
+
+		switch(typeof dictionary) {
+			case 'object':
+				addData(dictionary, key);
+				break;
+			case 'function':
+				addData(dictionary(key), key);
+				break;
+			case 'string':
+				_ajax(dictionary, addData, key);
+				break;
+			default:
+				_error('%s is not a type supported for data', typeof dictionary);
+		}
+	}
+
+	function _loadCurrentLocale() {
+		var key = currentLocale.key;
+		var method = loadingMethod[key];
+		var dictionary = data[key];
+		
+		status.callLocaleLoaded = true;
+
+		if (!dictionary || typeof dictionary !== 'object') {
+			switch(typeof method) {
+				case 'function':
+					_addDataWithKey(method(key), key);
+					break;
+				case 'string':
+					_ajax(method, _addDataWithKey, key);
+					break;
+				default:
+					_localeReady();
+			}
+		} else {
+			_localeReady();
+		}
+	}
+
 	function _addDictionary(dictionary) {
 		_each(dictionary, _addItem);
+		_localeReady();
 	}
 
 	function _addData(dictionary) {
-		_each(dictionary, _addDataByKey);
+		var loadData = lazyLoading ? _saveData : _loadData;
+
+		if (typeof dictionary !== 'object') {
+			warning('Data cannot be loaded because it is not in correct format (' + (typeof dictionary) + ')');
+			return;
+		}
+
+		_each(dictionary, loadData);
+
+		if (status.callLocaleLoaded === true) {
+			_localeReady();
+		}
+	}
+
+	function _addDataWithKey(dico, key) {
+		if (!dico) {
+			return;
+		}
+
+		_addDataByKey(dico, key);
+
+		if (status.callLocaleLoaded === true) {
+			_localeReady();
+		}
+	}
+
+	function _saveData(dico, key) {
+		if (!dico) {
+			return;
+		}
+
+		var dataKey = data[key];
+
+		if (typeof dico === 'object') {
+			_addDataWithKey(dico, key);
+		} else {
+			loadingMethod[key] = dico;
+		}
 	}
 
 	function _addDataByKey(dico, key) {
 		if (typeof dico[key] === 'object') {
 			dico = dico[key];
+		}
+
+		if (typeof dico !== 'object') {
+			warning('Data cannot be loaded in "' + key + '" because it is not in correct format (' + (typeof dico) + ')');
+			return;
 		}
 
 		_each(dico, function(value, sentenceKey) {
@@ -481,6 +614,74 @@
 
 			dico[sentenceKey] = value;
 		});
+	}
+
+	function _ajax(url, success, key) {
+		var xhr = new XMLHttpRequest();
+		var rslt;
+
+		if (syncLoading) {
+			xhr.open('GET', url, false);
+			xhr.send(null);
+			if (xhr.status === 200 || xhr.status === 0) {
+				if (rslt = _manageResponse(xhr.responseText)) {
+					success(rslt, key);
+				}
+			} else {
+				_error('Request "' + url + '" has return a code ' + xhr.status);
+			}
+		} else {
+			xhr.onreadystatechange = function() {
+				if (xhr.readyState === xhr.DONE) {
+					if (xhr.status === 200 || xhr.status === 0) {
+		                if (rslt = _manageResponse(xhr.responseText)) {
+							success(rslt, key);
+						}
+					} else {
+						_error('Request "' + url + '" has return a code ' + xhr.status);
+					}
+	            }
+			};
+			xhr.open('GET', url, true);
+			xhr.send(null);
+		}
+
+		function _manageResponse(response) {
+			var json;
+
+			try {
+				json = JSON.parse(response);
+			} catch (e) {
+				_error('response is not json valid');
+			}
+
+			return json;
+		}
+	}
+
+	function _localeReady() {
+		if (status.callLocaleLoaded === true
+		&&	typeof onLocaleReady === 'function'
+		&& _hasDataKey(currentLocale.key))
+		{
+			status.callLocaleLoaded = false;
+			onLocaleReady(currentLocale.key);
+		}
+	}
+
+	function _hasDataKey(key) {
+		var hasData = typeof data[key] === 'object' && data[key] !== null;
+		var secondary = locales[key].secondary;
+
+		return hasData && (!secondary || secondary && _hasDataKey(secondary));
+	}
+
+	function warning(message) {
+		console.warn(message);
+	}
+
+	function _error(message) {
+		console.error(message);
 	}
 
 	/*

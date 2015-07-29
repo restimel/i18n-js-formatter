@@ -72,6 +72,8 @@ The second possibility is to use the configuration method available in the libra
 	* *cookie:%s*: to store the locale in cookie
 	* *localStorage:%s*: to store the locale in localstorage
 	* *none*: to not store the locale in browser.
+* **onLocaleReady**: {Function} called each time the data for the current locale are ready to use. Arguments are:
+	* *key*: {String} the locale key which is ready.
 * **log**: {Object} to be notify when issues occurs. If not defined a message to console is sent.
 	* *info*: {Function} a function called when an info has to be prompted.
 	* *warn*: {Function} a function called when a warning issue has to be prompted (sentence where translation is missing).
@@ -91,6 +93,7 @@ The second possibility is to use the configuration method available in the libra
 	* *key*:	{String} [Required] the locale to define.
 	* *name*:	{String} the locale pretty name.
 	* *data*:	{Object|String|Function} the data of the locale.
+	* *secondary*: {String} the secondary language to use if the sentence is not translated
 
 ## API
 

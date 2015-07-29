@@ -633,11 +633,11 @@ describe('i18n', function() {
 			});
 		});
 
-		xdescribe('load dynamic dictionary', function() {
+		describe('load dynamic dictionary', function() {
 			beforeEach(function() {
 				jasmine.Ajax.install();
 
-				var json = {
+				this.json = {
 					'seventy': {
 						en: 'seventy',
 						fr: 'soixante-dix',
@@ -645,7 +645,7 @@ describe('i18n', function() {
 						'fr-be': 'septante'
 					}
 				};
-				json = JSON.stringify(json);
+				var json = JSON.stringify(this.json);
 
 				jasmine.Ajax.stubRequest('dictionary.json').andReturn({
 					"status": 200, 
@@ -657,10 +657,11 @@ describe('i18n', function() {
 			afterEach(function() {
 				$$.clearData();
 				jasmine.Ajax.uninstall();
+				this.json = null;
 			});
 
 			it('should retrieve the dictionary from json', function() {
-				var spy = jasmine.createSpy('spy');
+				var spy = jasmine.createSpy('onLocaleReady');
 				$$.configuration({
 					dictionary: 'dictionary.json',
 					onLocaleReady: spy
@@ -690,16 +691,31 @@ describe('i18n', function() {
 			});
 
 			it('should retrieve the dictionary from function', function() {
-				var spy = jasmine.createSpy('spy');
-				var spyDico = jasmine.createSpy('spyDico');
+				var spy = jasmine.createSpy('onLocaleReady');
+				var spyDico = jasmine.createSpy('dictionary').and.returnValue(this.json);
 				$$.configuration({
 					dictionary: spyDico,
 					onLocaleReady: spy
 				});
 
 				expect(jasmine.Ajax.requests.count()).toBe(0);
-				expect(spy).not.toHaveBeenCalled();
+				expect(spyDico).toHaveBeenCalled();
 				expect(spy).toHaveBeenCalled();
+
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy'
+					},
+					fr: {
+						seventy: 'soixante-dix'
+					},
+					de: {
+						seventy: 'siebzig'
+					},
+					'fr-be': {
+						seventy: 'septante'
+					}
+				});
 			});
 		});
 
@@ -713,7 +729,7 @@ describe('i18n', function() {
 				jasmine.Ajax.uninstall();
 			});
 
-			xdescribe('synchronously', function() {
+			describe('synchronously', function() {
 				beforeEach(function() {
 					var dico = JSON.stringify({
 						en: {
@@ -770,7 +786,7 @@ describe('i18n', function() {
 				});
 
 				it('should retrieve the data from json in lazy mode', function() {
-					var spy = jasmine.createSpy('spy');
+					var spy = jasmine.createSpy('onLocaleReady');
 					$$.configuration({
 						defaultLocale: 'en',
 						data: {
@@ -779,7 +795,8 @@ describe('i18n', function() {
 							de: 'dictionary-de.json',
 							'fr-be': 'dictionary-be.json'
 						},
-						onLocaleReady: spy
+						onLocaleReady: spy,
+						syncLoading: true
 					});
 
 					expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -813,7 +830,7 @@ describe('i18n', function() {
 				});
 
 				it('should retrieve the data from json in non-lazy mode', function() {
-					var spy = jasmine.createSpy('spy');
+					var spy = jasmine.createSpy('onLocaleReady');
 					$$.configuration({
 						defaultLocale: 'en',
 						data: {
@@ -823,7 +840,8 @@ describe('i18n', function() {
 							'fr-be': 'dictionary-be.json'
 						},
 						onLocaleReady: spy,
-						lazyLoading: false
+						lazyLoading: false,
+						syncLoading: true
 					});
 
 					expect(jasmine.Ajax.requests.count()).toBe(4);
@@ -865,12 +883,13 @@ describe('i18n', function() {
 				});
 
 				it('should retrieve the data from one json', function() {
-					var spy = jasmine.createSpy('spy');
+					var spy = jasmine.createSpy('onLocaleReady');
 					$$.configuration({
 						defaultLocale: 'en',
 						data: 'dictionary.json',
 						onLocaleReady: spy,
-						lazyLoading: false
+						lazyLoading: false,
+						syncLoading: true
 					});
 
 					expect(jasmine.Ajax.requests.count()).toBe(1);
@@ -912,11 +931,11 @@ describe('i18n', function() {
 				});
 
 				it('should retrieve the data from function in lazy mode', function() {
-					var spy = jasmine.createSpy('spy');
-					var spyEn = jasmine.createSpy('spyEn');
-					var spyFr = jasmine.createSpy('spyFr');
-					var spyDe = jasmine.createSpy('spyDe');
-					var spyBe = jasmine.createSpy('spyBe');
+					var spy = jasmine.createSpy('onLocaleReady');
+					var spyEn = jasmine.createSpy('dictionary_En');
+					var spyFr = jasmine.createSpy('dictionary_Fr');
+					var spyDe = jasmine.createSpy('dictionary_De');
+					var spyBe = jasmine.createSpy('dictionary_Be');
 					$$.configuration({
 						defaultLocale: 'en',
 						data: {
@@ -925,7 +944,8 @@ describe('i18n', function() {
 							de: spyDe,
 							'fr-be': spyBe
 						},
-						onLocaleReady: spy
+						onLocaleReady: spy,
+						syncLoading: true
 					});
 
 					expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -943,11 +963,11 @@ describe('i18n', function() {
 				});
 
 				it('should retrieve the data from function in non-lazy mode', function() {
-					var spy = jasmine.createSpy('spy');
-					var spyEn = jasmine.createSpy('spyEn');
-					var spyFr = jasmine.createSpy('spyFr');
-					var spyDe = jasmine.createSpy('spyDe');
-					var spyBe = jasmine.createSpy('spyBe');
+					var spy = jasmine.createSpy('onLocaleReady');
+					var spyEn = jasmine.createSpy('data_En');
+					var spyFr = jasmine.createSpy('data_Fr');
+					var spyDe = jasmine.createSpy('data_De');
+					var spyBe = jasmine.createSpy('data_Be');
 					$$.configuration({
 						defaultLocale: 'en',
 						data: {
@@ -956,7 +976,9 @@ describe('i18n', function() {
 							de: spyDe,
 							'fr-be': spyBe
 						},
-						onLocaleReady: spy
+						onLocaleReady: spy,
+						syncLoading: true,
+						lazyLoading: false
 					});
 
 					expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -968,12 +990,13 @@ describe('i18n', function() {
 				});
 
 				it('should retrieve all data from function', function() {
-					var spy = jasmine.createSpy('spy');
-					var spyDico = jasmine.createSpy('spyDico');
+					var spy = jasmine.createSpy('onLocaleReady');
+					var spyDico = jasmine.createSpy('data');
 					$$.configuration({
 						defaultLocale: 'en',
 						data: spyDico,
-						onLocaleReady: spy
+						onLocaleReady: spy,
+						syncLoading: true
 					});
 
 					expect(jasmine.Ajax.requests.count()).toBe(0);
@@ -982,10 +1005,9 @@ describe('i18n', function() {
 				});
 			});
 			
-			xdescribe('asynchronously', function() {
-			
+			describe('asynchronously', function() {
 				it('should retrieve the data from json in asynchronous mode', function() {
-					var spy = jasmine.createSpy('spy');
+					var spy = jasmine.createSpy('onLocaleReady');
 					$$.configuration({
 						defaultLocale: 'en',
 						syncLoading: false,
@@ -1025,8 +1047,8 @@ describe('i18n', function() {
 		});
 		
 		xit('should configure all locales options at once', function() {
-			var spyEn = jasmine.createSpy('spyEn');
-			var spyFr = jasmine.createSpy('spyFr');
+			var spyEn = jasmine.createSpy('data_En');
+			var spyFr = jasmine.createSpy('data_Fr');
 
 			$$.configuration({
 				defaultLocale: 'en',
@@ -1088,7 +1110,7 @@ describe('i18n', function() {
 		});
 	});
 
-	xdescribe('basic translations', function() {
+	describe('basic translations', function() {
 		beforeEach(function() {
 			this.logInfo = jasmine.createSpy('logInfo');
 			this.logWarn = jasmine.createSpy('logWarn');
