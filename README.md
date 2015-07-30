@@ -1,6 +1,8 @@
-# i18n formater
+# i18n JS formater
 
 A simple translation module with dynamic json storage which helps to format strings quickly and easily.
+
+Parser can be extended with your own parsers.
 
 ## Version 0.0.1
 
@@ -101,13 +103,20 @@ The second possibility is to use the configuration method available in the libra
 
 Translates a single expression. Returns translated parsed and substituted string. If the translation is not found it returns the expression given.
 
-	// (this.locale == 'fr')
+	// (locale == 'fr')
 	i18n('Hello'); // Salut
 	i18n('Hello %s', 'Restimel'); // Salut Restimel
 	i18n('Hello {{name}}', { name: 'Restimel' }); // Salut Restimel
 
-	// give context (this.locale == 'fr')
+	// give context (locale == 'fr')
+	i18n.context('phone greating', 'Hello'); // Allo
 	i18n({str: 'Hello', context: 'phone greating'}); // Allo
+
+	// give an object (locale == 'fr')
+	i18n({
+		en: 'Hello',
+		fr: 'Salut'
+	}); // Salut
 
 	// passing specific locale (needed?)
 	i18n({str: 'Hello', locale: 'fr'}); // Salut
@@ -127,6 +136,13 @@ Plurals translation of a single phrase. Singular and plural forms will get added
 	// template and global (this.locale == 'de')
 	i18n.n('%s cat', '%s cats', 1); // 1 Katze
 	i18n.n('%s cat', '%s cats', 3); // 3 Katzen
+
+	//using numeric values
+	i18n.n({
+		0: 'no cats',
+		1: 'a cat',
+		default: '%s cats'
+	}, quantity);
 
 ### i18n.configuration()
 
@@ -175,6 +191,8 @@ Set the current locale globally or in current scope.
 	// set locale depending of browser context
 	i18n.setLocale(); //equivalent to i18n.setLocale(navigator.language);
 
+Note: if you have put a storage system (cookie, localStorage), i18n.setLocale() will use the last locale used in the browser.
+
 ### getLocale()
 
 Get the current locale from current scope or globally.
@@ -184,6 +202,7 @@ Get the current locale from current scope or globally.
 	i18n.getLocale({locale: true}); // 'fr'
 	i18n.getLocale({name: true}); // 'French'
 	i18n.getLocale({locale: true, name: true}); // {locale: 'fr', name: 'French'}
+	i18n.getLocale({data: 'hello'}); // 'salut'
 
 ### getLocales()
 
@@ -192,7 +211,8 @@ Returns a whole catalog optionally based on current scope and locale.
 	i18n.getLocales(); // ['en', 'fr', 'de']
 	i18n.getLocales({locale: true}) // ['en', 'fr', 'de']
 	i18n.getLocales({name: true}) // ['English', 'Français', 'Deutsch']
-	i18n.getLocales({locale: true, name: true}) // [{locale: 'en', name: 'English'}, {locale: 'fr', name: 'Français'}, {locale: 'de', name: 'Deutsch'}]
+	i18n.getLocales({data: 'hello'}) // ['hello', 'salut', 'hallo']
+	i18n.getLocales({locale: true, name: true, data:'hello'}) // [{locale: 'en', name: 'English', data: 'hello'}, {locale: 'fr', name: 'Français', data: 'salut'}, {locale: 'de', name: 'Deutsch', data: 'hallo'}]
 
 ### clearData()
 
