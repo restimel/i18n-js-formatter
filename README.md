@@ -2,6 +2,8 @@
 
 A simple translation module with dynamic json storage which helps to format strings quickly and easily.
 
+It can be used in any JavaScript application (web, worker, NodeJS, ...).
+
 ## Version 0.0.1
 
 **This library is still under developement and is still not usable right now. I hope this can be done soon.**
@@ -67,6 +69,7 @@ The second possibility is to use the configuration method available in the libra
 * **localeName**: {String{}} give a pretty name to locale.
 			example: i18n.configuration({localeName: {en: 'English', fr: 'Français'}});
 * **defaultLocale**: {String} the default local value (if no one are selected from storage). If the value is not a string the default value is the best from navigator.languages
+* **secondary**: {String{}} set a fallback to another locale if the sentence is not translated in the current locale
 * **storage**:	{String|String[]} the ways to store the current locale on browser. If the value is an array, it uses the first accessible technology.
 				Possible values are (%s must be replaced by wanted name for storage):
 	* *cookie:%s*: to store the locale in cookie
@@ -93,7 +96,7 @@ The second possibility is to use the configuration method available in the libra
 	* *key*:	{String} [Required] the locale to define.
 	* *name*:	{String} the locale pretty name.
 	* *data*:	{Object|String|Function} the data of the locale.
-	* *secondary*: {String} the secondary language to use if the sentence is not translated
+	* *secondary*: {String} the secondary locale to use if the sentence is not translated in the current locale
 
 ## API
 

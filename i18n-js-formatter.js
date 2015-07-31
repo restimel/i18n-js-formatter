@@ -134,7 +134,7 @@
 
 		if (saveChanged) {
 			useDfltLocale = useDflt;
-			_setStorage($$.getLocale(), useDfltLocale);
+			_setStorage(i18n.getLocale(), useDfltLocale);
 		}
 
 		return key;
@@ -237,7 +237,7 @@
 				_resetDataKey(key);
 			}
 		}
-	}
+	};
 
 	/** should be used for test only */
 	i18n._reset = _reset;
@@ -400,7 +400,7 @@
 	}
 
 	function _getLocale(locale, options) {
-		var result, lastResult, x, nb;
+		var result, lastResult, nb;
 		options || (options = {key: true});
 
 		if (!locale) {
@@ -518,7 +518,7 @@
 		var key = currentLocale.key;
 		var method = loadingMethod[key];
 		var dictionary = data[key];
-		
+
 		status.callLocaleLoaded = true;
 
 		if (!dictionary || typeof dictionary !== 'object') {
@@ -573,8 +573,6 @@
 		if (!dico) {
 			return;
 		}
-
-		var dataKey = data[key];
 
 		if (typeof dico === 'object') {
 			_addDataWithKey(dico, key);
