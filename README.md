@@ -350,6 +350,38 @@ It is possible to add new entry in the data.
 		fr: 'the French version'
 	});
 
+## Managing Errors
+
+The API give several feed back when issues occurs. There are splitted in 3 kinds: info, warning and error.
+
+It is possible to listen on these messages with "log".
+
+	i18n.configuration({
+		log: {
+			info: function(code, message, details) {},
+			warn: function(code, message, details) {},
+			error: function(code, message, details) {}
+		}
+	});
+
+Arguments are:
+* **code** {Number}:. The goal of this "code" is to handle issues in a easy way.
+* **message** {String}: information message to express the issue. The message is in English.
+* **details** {Array}: some details depending of the issue. 
+
+Here are code details:
+* 0 → 999: reserved for future usage
+* 1000 → 3999: info
+* 4000 → 6999: warning
+	* 4100: The sentence "%s" is not translated for language "%s" (details: [sentence without translation, current locale])
+* 7000 → 9999: error
+	* 7010: dictionary is in a wrong format (%s): %s (details: [type of dictionary, the value received]) called if not possible to load dictionary.
+	* 7012: data is in a wrong format (%s): %s (details: [type of data, the value received]) called if not possible to load data.
+	* 7013: data with key "%s" is in a wrong format (%s): %s (details: [locale key, type of data, the value received])
+	* 7014: data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s (details: [locale key, type of data, the value received])
+	* 7020: data received from "%s" is not in a valid JSON ("%s") (details: [the url sent, the response])
+	* 7400 → 7599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'
+
 ## Add optional plug-in to enhance helpers or support different template engines
 
 TODO version 0.5

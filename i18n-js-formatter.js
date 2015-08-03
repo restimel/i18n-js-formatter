@@ -22,8 +22,39 @@
 		defaultKeyLocale, useDfltLocale, storage,
 		syncLoading, lazyLoading,
 		onLocaleReady,
+		log,
 		data, loadingMethod, status;
 	_reset();
+
+/*
+* 0 → 999: reserved for future usage
+* 1000 → 3999: info
+* 4000 → 6999: warning
+* 7000 → 9999: error
+*/
+	var _codeMessage = {
+		/* errors */
+		4100: 'The sentence "%s" is not translated for language "%s"',
+		7010: 'dictionary is in a wrong format (%s): %s',
+		7011: 'item is in a wrong format (%s while object is expected): %s',
+		7012: 'data is in a wrong format (%s): %s',
+		7013: 'data with key "%s" is in a wrong format (%s): %s',
+		7014: 'data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s',
+		7020: 'data recieved from "%s" is not in a valid JSON ("%s")',
+		7401: 'Unauthorized request: %s',
+		7403: 'Request forbidden: %s',
+		7404: 'Page not found: %s',
+		7405: 'Method is not allowed: %s',
+		7407: 'Proxy authentication required: %s',
+		7408: 'Request timeout: %s',
+		7418: 'Sorry, I cannot brew your coffee: %s',
+		7500: 'Internal server error: %s',
+		7501: 'Not implemented (server error): %s',
+		7502: 'Bad Gateway: %s',
+		7503: 'Service on server is unavailable: %s',
+		7504: 'Gateway timeout: %s',
+		7505: 'HTTP version is not supported by server: %s'
+	};
 
 	/* API methods */
 
@@ -43,10 +74,18 @@
 	 * @param [options.onLocaleReady] {Function} called each time the data for the current locale are ready to use
 	 * @param [options.dictionary] {Object|String|Function} add data to all language (formatted by sentences)
 	 * @param [options.data] {Object|String|Function} add data to all language (formatted by languages)
+	 * @param [options.log] {Function{}} functions to call when message have to be sent
+	 *								-	 info: called for info message
+	 *								-	 warn: called for warning message (missing translations, changing configuration but non blocking issue)
+	 *								-	 error: called for error message  (wrong data format, http request issues)
 	 */
 	i18n.configuration = function(options) {
 		options || (options = {});
 		var needLoading = typeof options.dictionary !== 'undefined' || typeof options.data !== 'undefined';
+
+		if (typeof options.log === 'object') {
+			_each(options.log, _configureLog);
+		}
 
 		if (options.locales instanceof Array) {
 			_configureLocales(options);
@@ -264,6 +303,11 @@
 		status = {
 			callLocaleLoaded: false
 		};
+		log = {
+			info: null,
+			warn: null,
+			error: null
+		};
 	}
 
 	function _resetDataKey(key) {
@@ -328,6 +372,10 @@
 				locales[key].name = value;
 			}
 		});
+	}
+
+	function _configureLog(optLog, kind) {
+		log[kind] = optLog;
 	}
 
 	function _configureStorage(options) {
@@ -492,7 +540,7 @@
 				_ajax(dictionary, _addDictionary);
 				break;
 			default:
-				_error('%s is not a type supported for dictionary', typeof dictionary);
+				_error(7010, [typeof dictionary, dictionary]);
 		}
 	}
 
@@ -510,7 +558,11 @@
 				_ajax(dictionary, addData, key);
 				break;
 			default:
-				_error('%s is not a type supported for data', typeof dictionary);
+				if (key) {
+					_error(7013, [key, typeof dictionary, dictionary]);
+				} else {
+					_error(7012, [typeof dictionary, dictionary]);
+				}
 		}
 	}
 
@@ -529,7 +581,11 @@
 				case 'string':
 					_ajax(method, _addDataWithKey, key);
 					break;
+				case 'undefined':
+					_localeReady();
+					break;
 				default:
+					_error(7013, [key, typeof method, method]);
 					_localeReady();
 			}
 		} else {
@@ -546,7 +602,7 @@
 		var loadData = lazyLoading ? _saveData : _loadData;
 
 		if (typeof dictionary !== 'object') {
-			warning('Data cannot be loaded because it is not in correct format (' + (typeof dictionary) + ')');
+			_error(7012, [typeof dictionary, dictionary]);
 			return;
 		}
 
@@ -587,7 +643,7 @@
 		}
 
 		if (typeof dico !== 'object') {
-			warning('Data cannot be loaded in "' + key + '" because it is not in correct format (' + (typeof dico) + ')');
+			_error(7014, [key, typeof dico, dico]);
 			return;
 		}
 
@@ -599,6 +655,11 @@
 	}
 
 	function _addItem(values, sentenceKey) {
+		if (typeof values !== 'object') {
+			_error(7011, [typeof values, values]);
+			return;
+		}
+
 		_each(values, function(value, key) {
 			var dico = data[key];
 
@@ -626,7 +687,7 @@
 					success(rslt, key);
 				}
 			} else {
-				_error('Request "' + url + '" has return a code ' + xhr.status);
+				_error(7000 + xhr.status, [url]);
 			}
 		} else {
 			xhr.onreadystatechange = function() {
@@ -636,7 +697,7 @@
 							success(rslt, key);
 						}
 					} else {
-						_error('Request "' + url + '" has return a code ' + xhr.status);
+						_error(7000 + xhr.status, [url]);
 					}
 	            }
 			};
@@ -650,7 +711,7 @@
 			try {
 				json = JSON.parse(response);
 			} catch (e) {
-				_error('response is not json valid');
+				_error(7020, [url, response]);
 			}
 
 			return json;
@@ -674,12 +735,48 @@
 		return hasData && (!secondary || secondary && _hasDataKey(secondary));
 	}
 
-	function warning(message) {
-		console.warn(message);
+	function _info(code, details) {
+		var message = _getMessage(code, details);
+
+		if (typeof log.info === 'function') {
+			log.info(code, message, details);
+		} else {
+			console.info(message);
+		}
 	}
 
-	function _error(message) {
-		console.error(message);
+	function _warning(code, details) {
+		var message = _getMessage(code, details);
+
+		if (typeof log.warn === 'function') {
+			log.warn(code, message, details);
+		} else {
+			console.warn(message);
+		}
+	}
+
+	function _error(code, details) {
+		var message = _getMessage(code, details);
+
+		if (typeof log.error === 'function') {
+			log.error(code, message, details);
+		} else {
+			console.error(message);
+		}
+	}
+
+	function _getMessage(code, details) {
+		var message = _codeMessage[code];
+
+		if (!message) {
+			message = 'unknown code (' + code + ') with details (' + details + ')';
+		} else {
+			details.forEach(function(detail) {
+				message = message.replace(/%s/, detail);
+			});
+		}
+
+		return message;
 	}
 
 	/*
