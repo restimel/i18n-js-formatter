@@ -1508,12 +1508,16 @@ describe('i18n', function() {
 			$$.clearData();
 		});
 
-		xit('should translate the key', function() {
+		it('should translate the key', function() {
 			expect($$('seventy')).toBe('seventy');
 			$$.setLocale('fr');
 			expect($$('seventy')).toBe('soixante-dix');
 			$$.setLocale('fr-be');
 			expect($$('seventy')).toBe('septante');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
 		xit('should fallback the translation', function() {
@@ -1524,6 +1528,10 @@ describe('i18n', function() {
 
 			expect($$('unknown')).toBe('unknown');
 			expect(this.logWarn).toHaveBeenCalled();
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
 		xit('should support object entry', function() {
@@ -1537,6 +1545,10 @@ describe('i18n', function() {
 				en: 'Hi',
 				fr: 'Salut'
 			})).toBe('Salut');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
 		xit('should fallback the translation with object entry', function() {
@@ -1552,6 +1564,9 @@ describe('i18n', function() {
 				en: 'Hi'
 			})).toBe('');
 			expect(this.logWarn).toHaveBeenCalled();
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 	});
 

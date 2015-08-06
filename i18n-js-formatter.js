@@ -58,7 +58,9 @@
 
 	/* API methods */
 
-	function i18n() {}
+	function i18n(sentence) {
+		return _translation(sentence);
+	}
 
 	/**
 	 * Configure the i18n
@@ -734,6 +736,35 @@
 
 		return hasData && (!secondary || secondary && _hasDataKey(secondary));
 	}
+
+	/*
+	 * Translations
+	 */
+
+	function _translation(sentenceKey, key, origKey) {
+		var ldata, secondary, sentence;
+
+		key = key || currentLocale.key;
+		origKey = origKey || key;
+		ldata = data[key];
+		sentence = ldata[sentenceKey];
+
+		if (typeof sentence !== 'string') {
+			secondary = locales[key].secondary;
+			if (secondary) {
+				sentence = _translation(sentenceKey, secondary, origKey);
+			} else {
+				sentence = sentenceKey;
+				_warning(4100, [sentenceKey, origKey]);
+			}
+		}
+
+		return sentence;
+	}
+
+	/*
+	 * Notifiction functions
+	 */
 
 	function _info(code, details) {
 		var message = _getMessage(code, details);
