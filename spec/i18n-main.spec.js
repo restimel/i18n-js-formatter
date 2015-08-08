@@ -1555,7 +1555,7 @@ describe('i18n', function() {
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should support object entry', function() {
+		it('should support object entry', function() {
 			expect($$({
 				en: 'Hi',
 				fr: 'Salut'
@@ -1572,22 +1572,57 @@ describe('i18n', function() {
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should fallback the translation with object entry', function() {
+		it('should fallback the translation with object entry', function() {
+			var obj;
+
 			$$.setLocale('fr-be');
-			expect($$({
+			obj = {
 				en: 'Hi',
 				fr: 'Salut'
-			})).toBe('Salut');
+			};
+			expect($$(obj)).toBe('Salut');
 
 			expect(this.logWarn).not.toHaveBeenCalled();
 
-			expect($$({
+			this.logWarn.calls.reset();
+			obj = {
 				en: 'Hi'
-			})).toBe('');
-			expect(this.logWarn).toHaveBeenCalled();
+			};
+			expect($$(obj)).toBe('');
+			expect(this.logWarn).toHaveBeenCalledWith(4101, jasmine.any(String), [JSON.stringify(obj), 'fr-be', obj]);
+
+			this.logWarn.calls.reset();
+			obj = {
+				en: 'Hi'
+			};
+			obj.fr = obj;
+			expect($$(obj)).toBe('');
+			expect(this.logWarn).toHaveBeenCalledWith(4101, jasmine.any(String), [obj.toString(), 'fr-be', obj]);
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		it('should sent an error for non-supported type of sentence key', function() {
+			var value;
+
+			this.logError.calls.reset();
+			value = 42;
+			expect($$(value)).toBe('');
+			expect(this.logError).toHaveBeenCalledWith(7100, jasmine.any(String), [typeof value, value]);
+
+			this.logError.calls.reset();
+			value = true;
+			expect($$(value)).toBe('');
+			expect(this.logError).toHaveBeenCalledWith(7100, jasmine.any(String), [typeof value, value]);
+
+			this.logError.calls.reset();
+			value = function() {};
+			expect($$(value)).toBe('');
+			expect(this.logError).toHaveBeenCalledWith(7100, jasmine.any(String), [typeof value, value]);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
 		});
 	});
 

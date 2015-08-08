@@ -37,6 +37,8 @@
 		4030: 'The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored.',
 		4031: 'The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored.',
 		4100: 'The sentence "%s" is not translated for language "%s".',
+		4101: 'It is not possible to translate object (%s) to language "%s".',
+
 		/* errors */
 		7010: 'dictionary is in a wrong format (%s): %s',
 		7011: 'item is in a wrong format (%s while object is expected): %s',
@@ -44,7 +46,8 @@
 		7013: 'data with key "%s" is in a wrong format (%s): %s',
 		7014: 'data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s',
 		7020: 'data recieved from "%s" is not in a valid JSON ("%s")',
-		7030: 'the secondaries fallback create a circular loop (%s)',
+		7030: 'The secondaries fallback create a circular loop (%s).',
+		7100: 'Translation is not possible due to an unsupported type (%s): %s',
 		7401: 'Unauthorized request: %s',
 		7403: 'Request forbidden: %s',
 		7404: 'Page not found: %s',
@@ -424,7 +427,7 @@
 				list.push(value);
 				key = value;
 				value = preparationSecondaries[key];
-				console.log(key, value);
+
 				if (typeof value === 'undefined') {
 					value = locales[key].secondary;
 				}
@@ -812,20 +815,73 @@
 	 */
 
 	function _translation(sentenceKey, key, origKey) {
-		var ldata, secondary, sentence;
+		var sentence;
 
 		key = key || currentLocale.key;
 		origKey = origKey || key;
+
+		switch(typeof sentenceKey) {
+			case 'string':
+				sentence = _translation_string(sentenceKey, key, origKey);
+				break;
+			case 'object':
+				sentence = _translation_object(sentenceKey, key, origKey);
+				break;
+			default:
+				sentence = '';
+				_error(7100, [typeof sentenceKey, sentenceKey]);
+		}
+
+		return sentence;
+	}
+
+	function _translation_string(sentenceKey, key, origKey) {
+		var ldata, sentence;
+
 		ldata = data[key];
 		sentence = ldata[sentenceKey];
+
+		sentence = _transation_fallback(sentenceKey, key, origKey, sentence, _translation_issue_string);
+
+		return sentence;
+	}
+
+	function _translation_issue_string(sentenceKey, origKey) {
+		_warning(4100, [sentenceKey, origKey]);
+		return sentenceKey;
+	}
+
+	function _translation_object(sentenceObject, key, origKey) {
+		var sentence;
+
+		sentence = sentenceObject[key];
+
+		sentence = _transation_fallback(sentenceObject, key, origKey, sentence, _translation_issue_object);
+
+		return sentence;
+	}
+
+	function _translation_issue_object(sentenceKey, origKey) {
+		var json;
+		try {
+			json = JSON.stringify(sentenceKey);
+		} catch(e) {
+			json = sentenceKey.toString();
+		}
+
+		_warning(4101, [json, origKey, sentenceKey]);
+		return '';
+	}
+
+	function _transation_fallback(sentenceKey, key, origKey, sentence, not_translated) {
+		var secondary;
 
 		if (typeof sentence !== 'string') {
 			secondary = locales[key].secondary;
 			if (secondary) {
 				sentence = _translation(sentenceKey, secondary, origKey);
 			} else {
-				sentence = sentenceKey;
-				_warning(4100, [sentenceKey, origKey]);
+				sentence = not_translated(sentenceKey, origKey);
 			}
 		}
 
