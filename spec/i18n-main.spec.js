@@ -839,7 +839,20 @@ describe('i18n', function() {
 					data: {
 						fr: value
 					},
-					lazyLoading: true
+					lazyLoading: true,
+					defaultLocale: 'fr'
+				});
+
+				expect(this.logError).toHaveBeenCalledWith(7013, jasmine.any(String), ['fr', typeof value, value]);
+
+				this.logError.calls.reset();
+				$$.clearData('fr');
+				$$.configuration({
+					data: {
+						fr: value
+					},
+					lazyLoading: true,
+					defaultLocale: 'en'
 				});
 
 				expect(this.logError).not.toHaveBeenCalled();

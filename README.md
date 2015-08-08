@@ -156,7 +156,7 @@ Plurals translation of a single phrase. Singular and plural forms will get added
 
 ### i18n.configuration()
 
-Change default configuration
+#### Change default configuration
 
 Define locale to use
 
@@ -180,7 +180,6 @@ Define locale configuration at once
 			key: 'fr-be',
 			name: 'Belge',
 			data: 'dictionary-be.json',
-
 		}
 	]});
 
@@ -376,6 +375,7 @@ Here are code details:
 	* 4030: The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored. (details: [locale key, the secondary given])
 	* 4031: The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored. (details: [locale key, typeof secondary given])
 	* 4100: The sentence "%s" is not translated for language "%s". (details: [sentence without translation, current locale])
+	* 4101: It is not possible to translate object (%s) to language "%s". (details: [object stringified, current locale, the object])
 * 7000 → 9999: error
 	* 7010: dictionary is in a wrong format (%s): %s (details: [type of dictionary, the value received]) called if not possible to load dictionary.
 	* 7011: item is in a wrong format (%s while object is expected): %s (details: [type of dictionary, the value received])
@@ -383,6 +383,7 @@ Here are code details:
 	* 7013: data with key "%s" is in a wrong format (%s): %s (details: [locale key, type of data, the value received])
 	* 7014: data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s (details: [locale key, type of data, the value received])
 	* 7020: data received from "%s" is not in a valid JSON ("%s") (details: [the url sent, the response])
+	* 7100: Translation is not possible due to an unsupported type (%s): %s (details: [typeof given argument, the argument])
 	* 7400 → 7599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'
 
 ## Add optional plug-in to enhance helpers or support different template engines
