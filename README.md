@@ -373,9 +373,12 @@ Here are code details:
 * 0 → 999: reserved for future usage
 * 1000 → 3999: info
 * 4000 → 6999: warning
-	* 4100: The sentence "%s" is not translated for language "%s" (details: [sentence without translation, current locale])
+	* 4030: The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored. (details: [locale key, the secondary given])
+	* 4031: The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored. (details: [locale key, typeof secondary given])
+	* 4100: The sentence "%s" is not translated for language "%s". (details: [sentence without translation, current locale])
 * 7000 → 9999: error
 	* 7010: dictionary is in a wrong format (%s): %s (details: [type of dictionary, the value received]) called if not possible to load dictionary.
+	* 7011: item is in a wrong format (%s while object is expected): %s (details: [type of dictionary, the value received])
 	* 7012: data is in a wrong format (%s): %s (details: [type of data, the value received]) called if not possible to load data.
 	* 7013: data with key "%s" is in a wrong format (%s): %s (details: [locale key, type of data, the value received])
 	* 7014: data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s (details: [locale key, type of data, the value received])

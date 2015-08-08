@@ -33,14 +33,18 @@
 * 7000 → 9999: error
 */
 	var _codeMessage = {
+		/* warning */
+		4030: 'The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored.',
+		4031: 'The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored.',
+		4100: 'The sentence "%s" is not translated for language "%s".',
 		/* errors */
-		4100: 'The sentence "%s" is not translated for language "%s"',
 		7010: 'dictionary is in a wrong format (%s): %s',
 		7011: 'item is in a wrong format (%s while object is expected): %s',
 		7012: 'data is in a wrong format (%s): %s',
 		7013: 'data with key "%s" is in a wrong format (%s): %s',
 		7014: 'data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s',
 		7020: 'data recieved from "%s" is not in a valid JSON ("%s")',
+		7030: 'the secondaries fallback create a circular loop (%s)',
 		7401: 'Unauthorized request: %s',
 		7403: 'Request forbidden: %s',
 		7404: 'Page not found: %s',
@@ -68,6 +72,7 @@
 	 * Each parameter is optional
 	 * @param [options.locales] {String[]} list of locale keys to manage. Other locales will be rejected. It reset previous configuration.
 	 * @param [options.localeName] {Object} list of key/value to give to locale a pretty name.
+	 * @param [options.secondary] {Object} list of secondary language to use if a sentence cannot be translated in the primary language.
 	 * @param [options.alias] {string} attach the i18n function to the global variable described by alias.
 	 * @param [options.defaultLocale] {string} the default locale key to use.
 	 * @param [options.storage] {String|String[]} tell the way to store the locale for another session.
@@ -94,6 +99,10 @@
 		} else
 		if (typeof options.localeName === 'object') {
 			_configurelocaleNames(options);
+		}
+
+		if (typeof options.secondary === 'object') {
+			_configureSecondaries(options.secondary);
 		}
 
 		if (typeof options.alias === 'string') {
@@ -324,7 +333,8 @@
 		dflt = locales[key] || {};
 		locale = {
 			key: key,
-			name: _default(name, dflt.name)
+			name: _default(name, dflt.name),
+			secondary: false
 		};
 
 		return locale;
@@ -373,6 +383,66 @@
 			if (locales[key]) {
 				locales[key].name = value;
 			}
+		});
+	}
+
+	function _configureSecondaries(secondaries) {
+		var preparationSecondaries = {};
+		var errors = false;
+
+		/* prepare the secondaries */
+		_each(secondaries, function(origValue, key) {
+			var value = origValue;
+			key = _formatLocaleKey(key);
+
+			if (locales[key]) {
+				if (typeof value !== 'string') {
+					if (value === false || value === null) {
+						value = false;
+					} else {
+						_warning(4031, [key, typeof value]);
+						return;
+					}
+				} else {
+					value = _formatLocaleKey(value);
+
+					if (!value) {
+						_warning(4030, [key, origValue]);
+						return;
+					}
+				}
+
+				preparationSecondaries[key] = value;
+			}
+		});
+
+		/* check that secondaries does not loop */
+		_each(preparationSecondaries, function(value, key) {
+			var list = [key];
+
+			while (value !== false && list.indexOf(value) === -1) {
+				list.push(value);
+				key = value;
+				value = preparationSecondaries[key];
+				console.log(key, value);
+				if (typeof value === 'undefined') {
+					value = locales[key].secondary;
+				}
+			}
+
+			if (value) {
+				errors = [7030, [list.join(', ')]];
+			}
+		});
+
+		if (errors) {
+			_error.apply(this, errors);
+			return;
+		}
+
+		/* copy secondaries */
+		_each(preparationSecondaries, function(value, key) {
+			locales[key].secondary = value;
 		});
 	}
 

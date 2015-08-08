@@ -61,7 +61,7 @@ describe('i18n', function() {
 			expect($$.getLocale({key:false, name: true})).toBe('English');
 		});
 
-		xit('should get locale secondary fallback', function() {
+		it('should get locale secondary fallback', function() {
 			$$.setLocale('en');
 			expect($$.getLocale({secondary: true})).toBeFalsy();
 
@@ -237,7 +237,7 @@ describe('i18n', function() {
 				]);
 			});
 
-			xit('should get locale secondary fallback', function() {
+			it('should get locale secondary fallback', function() {
 				expect($$.getLocales({
 					secondary: true
 				})).toEqual([
@@ -248,20 +248,7 @@ describe('i18n', function() {
 				]);
 			});
 
-			it('should get locale names and keys', function() {
-				expect($$.getLocales({
-					key: true,
-					name: true
-				})).toEqual([
-					{key: 'en', name: 'English'},
-					{key: 'fr', name: 'Français'},
-					{key: 'de', name: 'Deutsch'},
-					{key: 'fr-be', name: 'Belge'}
-				]);
-			});
-
-			// TODO remove previous test
-			xit('should get details of locales', function() {
+			it('should get details of locales', function() {
 				expect($$.getLocales({
 					key: true,
 					name: true,
@@ -275,7 +262,7 @@ describe('i18n', function() {
 			});
 		});
 
-		xit('should set secondary fallback', function() {
+		it('should set secondary fallback', function() {
 			$$.configuration({
 				secondary: {
 					en: false,
@@ -295,10 +282,12 @@ describe('i18n', function() {
 			});
 
 			expect($$.getLocales({secondary: true})).toEqual(['fr', false, 'fr', 'de']);
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should not set secondary circular fallback', function() {
+		it('should not set secondary circular fallback', function() {
 			$$.configuration({
 				secondary: {
 					en: 'fr-be',
@@ -311,7 +300,9 @@ describe('i18n', function() {
 			expect($$.getLocales({secondary: true})).toEqual([false, false, false, 'fr']);
 			expect(this.logError).toHaveBeenCalled();
 			expect(this.logError.calls.count()).toEqual(1);
+			expect(this.logError).toHaveBeenCalledWith(7030, jasmine.any(String), [jasmine.any(String)]);
 
+			this.logError.calls.reset();
 			$$.configuration({
 				secondary: {
 					fr: 'fr-be'
@@ -319,10 +310,25 @@ describe('i18n', function() {
 			});
 
 			expect($$.getLocales({secondary: true})).toEqual([false, false, false, 'fr']);
-			expect(this.logError.calls.count()).toEqual(2);
+			expect(this.logError.calls.count()).toEqual(1);
+			expect(this.logError).toHaveBeenCalledWith(7030, jasmine.any(String), [jasmine.any(String)]);
+
+			this.logError.calls.reset();
+			$$.configuration({
+				secondary: {
+					en: 'en-us'
+				}
+			});
+
+			expect($$.getLocales({secondary: true})).toEqual([false, false, false, 'fr']);
+			expect(this.logError.calls.count()).toEqual(1);
+			expect(this.logError).toHaveBeenCalledWith(7030, jasmine.any(String), ['en']);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
 		});
 
-		xit('should ignore unknown secondary fallback', function() {
+		it('should ignore unknown secondary fallback', function() {
 			$$.configuration({
 				secondary: {
 					en: 42,
@@ -335,6 +341,9 @@ describe('i18n', function() {
 			expect($$.getLocales({secondary: true})).toEqual([false, false, 'en', 'fr']);
 			expect(this.logWarn).toHaveBeenCalled();
 			expect(this.logWarn.calls.count()).toEqual(3);
+			expect(this.logWarn).toHaveBeenCalledWith(4030, jasmine.any(String), ['fr', 'it']);
+			expect(this.logWarn).toHaveBeenCalledWith(4031, jasmine.any(String), ['en', 'number']);
+			expect(this.logWarn).toHaveBeenCalledWith(4031, jasmine.any(String), ['fr-be', 'object']);
 		});
 
 		it('should reset configuration for locales', function() {
@@ -836,7 +845,6 @@ describe('i18n', function() {
 				expect(this.logError).not.toHaveBeenCalled();
 				$$.setLocale('fr');
 				expect(this.logError).toHaveBeenCalledWith(7013, jasmine.any(String), ['fr', typeof value, value]);
-
 
 				expect(this.logInfo).not.toHaveBeenCalled();
 				expect(this.logWarn).not.toHaveBeenCalled();
@@ -1435,6 +1443,10 @@ describe('i18n', function() {
 
 			$$.setLocale('fr');
 			expect(spyFr).toHaveBeenCalled();
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
 		describe('addItem()', function() {
@@ -1451,6 +1463,10 @@ describe('i18n', function() {
 				});
 
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should replace a previous entry', function() {
@@ -1469,6 +1485,10 @@ describe('i18n', function() {
 				});
 
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 		});
 	});
@@ -1520,17 +1540,18 @@ describe('i18n', function() {
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should fallback the translation', function() {
+		it('should fallback the translation', function() {
 			$$.setLocale('fr-be');
 
 			expect($$('cat')).toBe('chat');
 			expect(this.logWarn).not.toHaveBeenCalled();
 
-			expect($$('unknown')).toBe('unknown');
+			var string = 'unknown';
+			expect($$(string)).toBe(string);
 			expect(this.logWarn).toHaveBeenCalled();
+			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
 
 			expect(this.logInfo).not.toHaveBeenCalled();
-			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
