@@ -61,7 +61,7 @@ describe('i18n', function() {
 			expect($$.getLocale({key:false, name: true})).toBe('English');
 		});
 
-		xit('should get locale secondary fallback', function() {
+		it('should get locale secondary fallback', function() {
 			$$.setLocale('en');
 			expect($$.getLocale({secondary: true})).toBeFalsy();
 
@@ -237,7 +237,7 @@ describe('i18n', function() {
 				]);
 			});
 
-			xit('should get locale secondary fallback', function() {
+			it('should get locale secondary fallback', function() {
 				expect($$.getLocales({
 					secondary: true
 				})).toEqual([
@@ -248,20 +248,7 @@ describe('i18n', function() {
 				]);
 			});
 
-			it('should get locale names and keys', function() {
-				expect($$.getLocales({
-					key: true,
-					name: true
-				})).toEqual([
-					{key: 'en', name: 'English'},
-					{key: 'fr', name: 'Français'},
-					{key: 'de', name: 'Deutsch'},
-					{key: 'fr-be', name: 'Belge'}
-				]);
-			});
-
-			// TODO remove previous test
-			xit('should get details of locales', function() {
+			it('should get details of locales', function() {
 				expect($$.getLocales({
 					key: true,
 					name: true,
@@ -275,7 +262,7 @@ describe('i18n', function() {
 			});
 		});
 
-		xit('should set secondary fallback', function() {
+		it('should set secondary fallback', function() {
 			$$.configuration({
 				secondary: {
 					en: false,
@@ -295,10 +282,12 @@ describe('i18n', function() {
 			});
 
 			expect($$.getLocales({secondary: true})).toEqual(['fr', false, 'fr', 'de']);
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should not set secondary circular fallback', function() {
+		it('should not set secondary circular fallback', function() {
 			$$.configuration({
 				secondary: {
 					en: 'fr-be',
@@ -311,7 +300,9 @@ describe('i18n', function() {
 			expect($$.getLocales({secondary: true})).toEqual([false, false, false, 'fr']);
 			expect(this.logError).toHaveBeenCalled();
 			expect(this.logError.calls.count()).toEqual(1);
+			expect(this.logError).toHaveBeenCalledWith(7030, jasmine.any(String), [jasmine.any(String)]);
 
+			this.logError.calls.reset();
 			$$.configuration({
 				secondary: {
 					fr: 'fr-be'
@@ -319,10 +310,25 @@ describe('i18n', function() {
 			});
 
 			expect($$.getLocales({secondary: true})).toEqual([false, false, false, 'fr']);
-			expect(this.logError.calls.count()).toEqual(2);
+			expect(this.logError.calls.count()).toEqual(1);
+			expect(this.logError).toHaveBeenCalledWith(7030, jasmine.any(String), [jasmine.any(String)]);
+
+			this.logError.calls.reset();
+			$$.configuration({
+				secondary: {
+					en: 'en-us'
+				}
+			});
+
+			expect($$.getLocales({secondary: true})).toEqual([false, false, false, 'fr']);
+			expect(this.logError.calls.count()).toEqual(1);
+			expect(this.logError).toHaveBeenCalledWith(7030, jasmine.any(String), ['en']);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
 		});
 
-		xit('should ignore unknown secondary fallback', function() {
+		it('should ignore unknown secondary fallback', function() {
 			$$.configuration({
 				secondary: {
 					en: 42,
@@ -335,6 +341,9 @@ describe('i18n', function() {
 			expect($$.getLocales({secondary: true})).toEqual([false, false, 'en', 'fr']);
 			expect(this.logWarn).toHaveBeenCalled();
 			expect(this.logWarn.calls.count()).toEqual(3);
+			expect(this.logWarn).toHaveBeenCalledWith(4030, jasmine.any(String), ['fr', 'it']);
+			expect(this.logWarn).toHaveBeenCalledWith(4031, jasmine.any(String), ['en', 'number']);
+			expect(this.logWarn).toHaveBeenCalledWith(4031, jasmine.any(String), ['fr-be', 'object']);
 		});
 
 		it('should reset configuration for locales', function() {
@@ -507,6 +516,9 @@ describe('i18n', function() {
 					de: null,
 					'fr-be': null
 				});
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should clear data of a language', function() {
@@ -524,6 +536,9 @@ describe('i18n', function() {
 						seventy: 'septante'
 					}
 				});
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 		});
 
@@ -561,6 +576,10 @@ describe('i18n', function() {
 					}
 				});
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should not reset previous data on raw dictionary', function() {
@@ -595,6 +614,10 @@ describe('i18n', function() {
 				});
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should load partial raw dictionary', function() {
@@ -609,6 +632,10 @@ describe('i18n', function() {
 				});
 
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', undefined]);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should reject outscope dictionary', function() {
@@ -625,6 +652,34 @@ describe('i18n', function() {
 				});
 
 				expect($$.getData()).toEqual(data);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			it('should reject wrong dictionary format', function() {
+				var data = $$.getData();
+				var value = 42;
+				$$.configuration({
+					dictionary: {
+						'cube': value
+					}
+				});
+
+				expect(this.logError).toHaveBeenCalled();
+				expect(this.logError).toHaveBeenCalledWith(7011, jasmine.any(String), [typeof value, value]);
+
+				$$.configuration({
+					dictionary: value
+				});
+
+				expect(this.logError).toHaveBeenCalledWith(7010, jasmine.any(String), [typeof value, value]);
+
+				expect($$.getData()).toEqual(data);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
 			});
 		});
 
@@ -668,6 +723,10 @@ describe('i18n', function() {
 					}
 				});
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should not reset previous data on raw data', function() {
@@ -708,6 +767,10 @@ describe('i18n', function() {
 				});
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should load partial raw data', function() {
@@ -726,6 +789,10 @@ describe('i18n', function() {
 				});
 
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', undefined]);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should reject outscope data', function() {
@@ -739,6 +806,61 @@ describe('i18n', function() {
 					}
 				});
 
+				expect($$.getData()).toEqual(data);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			it('should reject wrong data format', function() {
+				var data = $$.getData();
+				var value = 42;
+
+				$$.configuration({
+					data: value
+				});
+
+				expect(this.logError).toHaveBeenCalledWith(7012, jasmine.any(String), [typeof value, value]);
+
+				this.logError.calls.reset();
+				$$.configuration({
+					data: {
+						en: value
+					},
+					lazyLoading: false
+				});
+
+				expect(this.logError).toHaveBeenCalledWith(7013, jasmine.any(String), ['en', typeof value, value]);
+
+				this.logError.calls.reset();
+				$$.clearData('fr');
+				$$.configuration({
+					data: {
+						fr: value
+					},
+					lazyLoading: true,
+					defaultLocale: 'fr'
+				});
+
+				expect(this.logError).toHaveBeenCalledWith(7013, jasmine.any(String), ['fr', typeof value, value]);
+
+				this.logError.calls.reset();
+				$$.clearData('fr');
+				$$.configuration({
+					data: {
+						fr: value
+					},
+					lazyLoading: true,
+					defaultLocale: 'en'
+				});
+
+				expect(this.logError).not.toHaveBeenCalled();
+				$$.setLocale('fr');
+				expect(this.logError).toHaveBeenCalledWith(7013, jasmine.any(String), ['fr', typeof value, value]);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
 				expect($$.getData()).toEqual(data);
 			});
 		});
@@ -761,6 +883,42 @@ describe('i18n', function() {
 					'status': 200,
 					'contentType': 'text/plain',
 					'responseText': json
+				});
+
+				jasmine.Ajax.stubRequest('wrongJSON.json').andReturn({
+					'status': 200,
+					'contentType': 'text/plain',
+					'responseText': '{"toto": {en: false}'
+				});
+
+				jasmine.Ajax.stubRequest('req403.json').andReturn({
+					'status': 403,
+					'contentType': 'text/plain',
+					'responseText': '{"error": {"en": "wrong request"}}'
+				});
+
+				jasmine.Ajax.stubRequest('req404.json').andReturn({
+					'status': 404,
+					'contentType': 'text/plain',
+					'responseText': '{"error": {"en": "wrong request"}}'
+				});
+
+				jasmine.Ajax.stubRequest('req418.json').andReturn({
+					'status': 418,
+					'contentType': 'text/plain',
+					'responseText': '{"error": {"en": "wrong request"}}'
+				});
+
+				jasmine.Ajax.stubRequest('req500.json').andReturn({
+					'status': 500,
+					'contentType': 'text/plain',
+					'responseText': '{"error": {"en": "wrong request"}}'
+				});
+
+				jasmine.Ajax.stubRequest('req599.json').andReturn({
+					'status': 599,
+					'contentType': 'text/plain',
+					'responseText': '{"error": {"en": "wrong request"}}'
 				});
 			});
 
@@ -798,6 +956,10 @@ describe('i18n', function() {
 						seventy: 'septante'
 					}
 				});
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should retrieve the dictionary from function', function() {
@@ -826,6 +988,83 @@ describe('i18n', function() {
 						seventy: 'septante'
 					}
 				});
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			it('should handle bad json dictionary', function() {
+				var data = $$.getData();
+				var spy = jasmine.createSpy('onLocaleReady');
+				var url = 'wrongJSON.json';
+				$$.configuration({
+					dictionary: url,
+					onLocaleReady: spy
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(1);
+				expect(this.logError).toHaveBeenCalledWith(7020, jasmine.any(String), [url, jasmine.any(String)]);
+				expect(spy).not.toHaveBeenCalled();
+
+				expect($$.getData()).toEqual(data);
+			});
+
+			it('should handle request issue', function() {
+				var data = $$.getData();
+				var spy = jasmine.createSpy('onLocaleReady');
+				var url = 'req403.json';
+				$$.configuration({
+					dictionary: url,
+					onLocaleReady: spy
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(1);
+				expect(this.logError).toHaveBeenCalledWith(7403, jasmine.any(String), [url]);
+				expect(spy).not.toHaveBeenCalled();
+
+				this.logError.calls.reset();
+				url = 'req404.json';
+				$$.configuration({
+					dictionary: url
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(2);
+				expect(this.logError).toHaveBeenCalledWith(7404, jasmine.any(String), [url]);
+				expect(spy).not.toHaveBeenCalled();
+
+				this.logError.calls.reset();
+				url = 'req418.json';
+				$$.configuration({
+					dictionary: url
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(3);
+				expect(this.logError).toHaveBeenCalledWith(7418, jasmine.any(String), [url]);
+				expect(spy).not.toHaveBeenCalled();
+				expect($$.getData()).toEqual(data);
+
+				this.logError.calls.reset();
+				url = 'req500.json';
+				$$.configuration({
+					dictionary: url
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(4);
+				expect(this.logError).toHaveBeenCalledWith(7500, jasmine.any(String), [url]);
+				expect(spy).not.toHaveBeenCalled();
+				expect($$.getData()).toEqual(data);
+
+				this.logError.calls.reset();
+				url = 'req599.json';
+				$$.configuration({
+					dictionary: url
+				});
+
+				expect(jasmine.Ajax.requests.count()).toBe(5);
+				expect(this.logError).toHaveBeenCalledWith(7599, jasmine.any(String), [url]);
+				expect(spy).not.toHaveBeenCalled();
+				expect($$.getData()).toEqual(data);
 			});
 		});
 
@@ -937,6 +1176,10 @@ describe('i18n', function() {
 						de: null,
 						'fr-be': null
 					});
+
+					expect(this.logInfo).not.toHaveBeenCalled();
+					expect(this.logWarn).not.toHaveBeenCalled();
+					expect(this.logError).not.toHaveBeenCalled();
 				});
 
 				it('should retrieve the data from json in non-lazy mode', function() {
@@ -990,6 +1233,10 @@ describe('i18n', function() {
 							seventy: 'septante'
 						}
 					});
+
+					expect(this.logInfo).not.toHaveBeenCalled();
+					expect(this.logWarn).not.toHaveBeenCalled();
+					expect(this.logError).not.toHaveBeenCalled();
 				});
 
 				it('should retrieve the data from one json', function() {
@@ -1038,6 +1285,10 @@ describe('i18n', function() {
 							seventy: 'septante'
 						}
 					});
+
+					expect(this.logInfo).not.toHaveBeenCalled();
+					expect(this.logWarn).not.toHaveBeenCalled();
+					expect(this.logError).not.toHaveBeenCalled();
 				});
 
 				it('should retrieve the data from function in lazy mode', function() {
@@ -1070,6 +1321,10 @@ describe('i18n', function() {
 					expect(spyFr).toHaveBeenCalled();
 					expect(spyDe).not.toHaveBeenCalled();
 					expect(spyBe).not.toHaveBeenCalled();
+
+					expect(this.logInfo).not.toHaveBeenCalled();
+					expect(this.logWarn).not.toHaveBeenCalled();
+					expect(this.logError).not.toHaveBeenCalled();
 				});
 
 				it('should retrieve the data from function in non-lazy mode', function() {
@@ -1097,11 +1352,20 @@ describe('i18n', function() {
 					expect(spyFr).toHaveBeenCalled();
 					expect(spyDe).toHaveBeenCalled();
 					expect(spyBe).toHaveBeenCalled();
+
+					expect(this.logInfo).not.toHaveBeenCalled();
+					expect(this.logWarn).not.toHaveBeenCalled();
+					expect(this.logError).not.toHaveBeenCalled();
 				});
 
 				it('should retrieve all data from function', function() {
 					var spy = jasmine.createSpy('onLocaleReady');
-					var spyDico = jasmine.createSpy('data');
+					var spyDico = jasmine.createSpy('data').and.returnValue({
+						en: {'seventy': 'seventy'},
+						fr: {'seventy': 'soixante-dix'},
+						de: {'seventy': 'siebzig'},
+						'fr-be': {'seventy': 'septante'}
+					});
 					$$.configuration({
 						defaultLocale: 'en',
 						data: spyDico,
@@ -1110,8 +1374,12 @@ describe('i18n', function() {
 					});
 
 					expect(jasmine.Ajax.requests.count()).toBe(0);
-					expect(spy).not.toHaveBeenCalled();
+					expect(spy).toHaveBeenCalled();
 					expect(spyDico).toHaveBeenCalled();
+
+					expect(this.logInfo).not.toHaveBeenCalled();
+					expect(this.logWarn).not.toHaveBeenCalled();
+					expect(this.logError).not.toHaveBeenCalled();
 				});
 			});
 
@@ -1152,6 +1420,10 @@ describe('i18n', function() {
 						de: null,
 						'fr-be': null
 					});
+
+					expect(this.logInfo).not.toHaveBeenCalled();
+					expect(this.logWarn).not.toHaveBeenCalled();
+					expect(this.logError).not.toHaveBeenCalled();
 				});
 			});
 		});
@@ -1184,6 +1456,10 @@ describe('i18n', function() {
 
 			$$.setLocale('fr');
 			expect(spyFr).toHaveBeenCalled();
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
 		describe('addItem()', function() {
@@ -1200,6 +1476,10 @@ describe('i18n', function() {
 				});
 
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 
 			it('should replace a previous entry', function() {
@@ -1218,6 +1498,10 @@ describe('i18n', function() {
 				});
 
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
 			});
 		});
 	});
@@ -1257,25 +1541,34 @@ describe('i18n', function() {
 			$$.clearData();
 		});
 
-		xit('should translate the key', function() {
+		it('should translate the key', function() {
 			expect($$('seventy')).toBe('seventy');
 			$$.setLocale('fr');
 			expect($$('seventy')).toBe('soixante-dix');
 			$$.setLocale('fr-be');
 			expect($$('seventy')).toBe('septante');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should fallback the translation', function() {
+		it('should fallback the translation', function() {
 			$$.setLocale('fr-be');
 
 			expect($$('cat')).toBe('chat');
 			expect(this.logWarn).not.toHaveBeenCalled();
 
-			expect($$('unknown')).toBe('unknown');
+			var string = 'unknown';
+			expect($$(string)).toBe(string);
 			expect(this.logWarn).toHaveBeenCalled();
+			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should support object entry', function() {
+		it('should support object entry', function() {
 			expect($$({
 				en: 'Hi',
 				fr: 'Salut'
@@ -1286,21 +1579,63 @@ describe('i18n', function() {
 				en: 'Hi',
 				fr: 'Salut'
 			})).toBe('Salut');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should fallback the translation with object entry', function() {
+		it('should fallback the translation with object entry', function() {
+			var obj;
+
 			$$.setLocale('fr-be');
-			expect($$({
+			obj = {
 				en: 'Hi',
 				fr: 'Salut'
-			})).toBe('Salut');
+			};
+			expect($$(obj)).toBe('Salut');
 
 			expect(this.logWarn).not.toHaveBeenCalled();
 
-			expect($$({
+			this.logWarn.calls.reset();
+			obj = {
 				en: 'Hi'
-			})).toBe('');
-			expect(this.logWarn).toHaveBeenCalled();
+			};
+			expect($$(obj)).toBe('');
+			expect(this.logWarn).toHaveBeenCalledWith(4101, jasmine.any(String), [JSON.stringify(obj), 'fr-be', obj]);
+
+			this.logWarn.calls.reset();
+			obj = {
+				en: 'Hi'
+			};
+			obj.fr = obj;
+			expect($$(obj)).toBe('');
+			expect(this.logWarn).toHaveBeenCalledWith(4101, jasmine.any(String), [obj.toString(), 'fr-be', obj]);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		it('should sent an error for non-supported type of sentence key', function() {
+			var value;
+
+			this.logError.calls.reset();
+			value = 42;
+			expect($$(value)).toBe('');
+			expect(this.logError).toHaveBeenCalledWith(7100, jasmine.any(String), [typeof value, value]);
+
+			this.logError.calls.reset();
+			value = true;
+			expect($$(value)).toBe('');
+			expect(this.logError).toHaveBeenCalledWith(7100, jasmine.any(String), [typeof value, value]);
+
+			this.logError.calls.reset();
+			value = function() {};
+			expect($$(value)).toBe('');
+			expect(this.logError).toHaveBeenCalledWith(7100, jasmine.any(String), [typeof value, value]);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
 		});
 	});
 

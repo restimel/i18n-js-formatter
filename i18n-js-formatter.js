@@ -22,12 +22,52 @@
 		defaultKeyLocale, useDfltLocale, storage,
 		syncLoading, lazyLoading,
 		onLocaleReady,
+		log,
 		data, loadingMethod, status;
 	_reset();
 
+/*
+* 0 → 999: reserved for future usage
+* 1000 → 3999: info
+* 4000 → 6999: warning
+* 7000 → 9999: error
+*/
+	var _codeMessage = {
+		/* warning */
+		4030: 'The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored.',
+		4031: 'The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored.',
+		4100: 'The sentence "%s" is not translated for language "%s".',
+		4101: 'It is not possible to translate object (%s) to language "%s".',
+
+		/* errors */
+		7010: 'dictionary is in a wrong format (%s): %s',
+		7011: 'item is in a wrong format (%s while object is expected): %s',
+		7012: 'data is in a wrong format (%s): %s',
+		7013: 'data with key "%s" is in a wrong format (%s): %s',
+		7014: 'data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s',
+		7020: 'data recieved from "%s" is not in a valid JSON ("%s")',
+		7030: 'The secondaries fallback create a circular loop (%s).',
+		7100: 'Translation is not possible due to an unsupported type (%s): %s',
+		7401: 'Unauthorized request: %s',
+		7403: 'Request forbidden: %s',
+		7404: 'Page not found: %s',
+		7405: 'Method is not allowed: %s',
+		7407: 'Proxy authentication required: %s',
+		7408: 'Request timeout: %s',
+		7418: 'Sorry, I cannot brew your coffee: %s',
+		7500: 'Internal server error: %s',
+		7501: 'Not implemented (server error): %s',
+		7502: 'Bad Gateway: %s',
+		7503: 'Service on server is unavailable: %s',
+		7504: 'Gateway timeout: %s',
+		7505: 'HTTP version is not supported by server: %s'
+	};
+
 	/* API methods */
 
-	function i18n() {}
+	function i18n(sentence) {
+		return _translation(sentence);
+	}
 
 	/**
 	 * Configure the i18n
@@ -35,6 +75,7 @@
 	 * Each parameter is optional
 	 * @param [options.locales] {String[]} list of locale keys to manage. Other locales will be rejected. It reset previous configuration.
 	 * @param [options.localeName] {Object} list of key/value to give to locale a pretty name.
+	 * @param [options.secondary] {Object} list of secondary language to use if a sentence cannot be translated in the primary language.
 	 * @param [options.alias] {string} attach the i18n function to the global variable described by alias.
 	 * @param [options.defaultLocale] {string} the default locale key to use.
 	 * @param [options.storage] {String|String[]} tell the way to store the locale for another session.
@@ -43,16 +84,28 @@
 	 * @param [options.onLocaleReady] {Function} called each time the data for the current locale are ready to use
 	 * @param [options.dictionary] {Object|String|Function} add data to all language (formatted by sentences)
 	 * @param [options.data] {Object|String|Function} add data to all language (formatted by languages)
+	 * @param [options.log] {Function{}} functions to call when message have to be sent
+	 *								-	 info: called for info message
+	 *								-	 warn: called for warning message (missing translations, changing configuration but non blocking issue)
+	 *								-	 error: called for error message  (wrong data format, http request issues)
 	 */
 	i18n.configuration = function(options) {
 		options || (options = {});
 		var needLoading = typeof options.dictionary !== 'undefined' || typeof options.data !== 'undefined';
+
+		if (typeof options.log === 'object') {
+			_each(options.log, _configureLog);
+		}
 
 		if (options.locales instanceof Array) {
 			_configureLocales(options);
 		} else
 		if (typeof options.localeName === 'object') {
 			_configurelocaleNames(options);
+		}
+
+		if (typeof options.secondary === 'object') {
+			_configureSecondaries(options.secondary);
 		}
 
 		if (typeof options.alias === 'string') {
@@ -264,6 +317,11 @@
 		status = {
 			callLocaleLoaded: false
 		};
+		log = {
+			info: null,
+			warn: null,
+			error: null
+		};
 	}
 
 	function _resetDataKey(key) {
@@ -278,7 +336,8 @@
 		dflt = locales[key] || {};
 		locale = {
 			key: key,
-			name: _default(name, dflt.name)
+			name: _default(name, dflt.name),
+			secondary: false
 		};
 
 		return locale;
@@ -328,6 +387,70 @@
 				locales[key].name = value;
 			}
 		});
+	}
+
+	function _configureSecondaries(secondaries) {
+		var preparationSecondaries = {};
+		var errors = false;
+
+		/* prepare the secondaries */
+		_each(secondaries, function(origValue, key) {
+			var value = origValue;
+			key = _formatLocaleKey(key);
+
+			if (locales[key]) {
+				if (typeof value !== 'string') {
+					if (value === false || value === null) {
+						value = false;
+					} else {
+						_warning(4031, [key, typeof value]);
+						return;
+					}
+				} else {
+					value = _formatLocaleKey(value);
+
+					if (!value) {
+						_warning(4030, [key, origValue]);
+						return;
+					}
+				}
+
+				preparationSecondaries[key] = value;
+			}
+		});
+
+		/* check that secondaries does not loop */
+		_each(preparationSecondaries, function(value, key) {
+			var list = [key];
+
+			while (value !== false && list.indexOf(value) === -1) {
+				list.push(value);
+				key = value;
+				value = preparationSecondaries[key];
+
+				if (typeof value === 'undefined') {
+					value = locales[key].secondary;
+				}
+			}
+
+			if (value) {
+				errors = [7030, [list.join(', ')]];
+			}
+		});
+
+		if (errors) {
+			_error.apply(this, errors);
+			return;
+		}
+
+		/* copy secondaries */
+		_each(preparationSecondaries, function(value, key) {
+			locales[key].secondary = value;
+		});
+	}
+
+	function _configureLog(optLog, kind) {
+		log[kind] = optLog;
 	}
 
 	function _configureStorage(options) {
@@ -492,7 +615,7 @@
 				_ajax(dictionary, _addDictionary);
 				break;
 			default:
-				_error('%s is not a type supported for dictionary', typeof dictionary);
+				_error(7010, [typeof dictionary, dictionary]);
 		}
 	}
 
@@ -510,7 +633,11 @@
 				_ajax(dictionary, addData, key);
 				break;
 			default:
-				_error('%s is not a type supported for data', typeof dictionary);
+				if (key) {
+					_error(7013, [key, typeof dictionary, dictionary]);
+				} else {
+					_error(7012, [typeof dictionary, dictionary]);
+				}
 		}
 	}
 
@@ -529,7 +656,11 @@
 				case 'string':
 					_ajax(method, _addDataWithKey, key);
 					break;
+				case 'undefined':
+					_localeReady();
+					break;
 				default:
+					_error(7013, [key, typeof method, method]);
 					_localeReady();
 			}
 		} else {
@@ -546,7 +677,7 @@
 		var loadData = lazyLoading ? _saveData : _loadData;
 
 		if (typeof dictionary !== 'object') {
-			warning('Data cannot be loaded because it is not in correct format (' + (typeof dictionary) + ')');
+			_error(7012, [typeof dictionary, dictionary]);
 			return;
 		}
 
@@ -587,7 +718,7 @@
 		}
 
 		if (typeof dico !== 'object') {
-			warning('Data cannot be loaded in "' + key + '" because it is not in correct format (' + (typeof dico) + ')');
+			_error(7014, [key, typeof dico, dico]);
 			return;
 		}
 
@@ -599,6 +730,11 @@
 	}
 
 	function _addItem(values, sentenceKey) {
+		if (typeof values !== 'object') {
+			_error(7011, [typeof values, values]);
+			return;
+		}
+
 		_each(values, function(value, key) {
 			var dico = data[key];
 
@@ -626,7 +762,7 @@
 					success(rslt, key);
 				}
 			} else {
-				_error('Request "' + url + '" has return a code ' + xhr.status);
+				_error(7000 + xhr.status, [url]);
 			}
 		} else {
 			xhr.onreadystatechange = function() {
@@ -636,7 +772,7 @@
 							success(rslt, key);
 						}
 					} else {
-						_error('Request "' + url + '" has return a code ' + xhr.status);
+						_error(7000 + xhr.status, [url]);
 					}
 	            }
 			};
@@ -650,7 +786,7 @@
 			try {
 				json = JSON.parse(response);
 			} catch (e) {
-				_error('response is not json valid');
+				_error(7020, [url, response]);
 			}
 
 			return json;
@@ -674,12 +810,130 @@
 		return hasData && (!secondary || secondary && _hasDataKey(secondary));
 	}
 
-	function warning(message) {
-		console.warn(message);
+	/*
+	 * Translations
+	 */
+
+	function _translation(sentenceKey, key, origKey) {
+		var sentence;
+
+		key = key || currentLocale.key;
+		origKey = origKey || key;
+
+		switch(typeof sentenceKey) {
+			case 'string':
+				sentence = _translation_string(sentenceKey, key, origKey);
+				break;
+			case 'object':
+				sentence = _translation_object(sentenceKey, key, origKey);
+				break;
+			default:
+				sentence = '';
+				_error(7100, [typeof sentenceKey, sentenceKey]);
+		}
+
+		return sentence;
 	}
 
-	function _error(message) {
-		console.error(message);
+	function _translation_string(sentenceKey, key, origKey) {
+		var ldata, sentence;
+
+		ldata = data[key];
+		sentence = ldata[sentenceKey];
+
+		sentence = _transation_fallback(sentenceKey, key, origKey, sentence, _translation_issue_string);
+
+		return sentence;
+	}
+
+	function _translation_issue_string(sentenceKey, origKey) {
+		_warning(4100, [sentenceKey, origKey]);
+		return sentenceKey;
+	}
+
+	function _translation_object(sentenceObject, key, origKey) {
+		var sentence;
+
+		sentence = sentenceObject[key];
+
+		sentence = _transation_fallback(sentenceObject, key, origKey, sentence, _translation_issue_object);
+
+		return sentence;
+	}
+
+	function _translation_issue_object(sentenceKey, origKey) {
+		var json;
+		try {
+			json = JSON.stringify(sentenceKey);
+		} catch(e) {
+			json = sentenceKey.toString();
+		}
+
+		_warning(4101, [json, origKey, sentenceKey]);
+		return '';
+	}
+
+	function _transation_fallback(sentenceKey, key, origKey, sentence, not_translated) {
+		var secondary;
+
+		if (typeof sentence !== 'string') {
+			secondary = locales[key].secondary;
+			if (secondary) {
+				sentence = _translation(sentenceKey, secondary, origKey);
+			} else {
+				sentence = not_translated(sentenceKey, origKey);
+			}
+		}
+
+		return sentence;
+	}
+
+	/*
+	 * Notifiction functions
+	 */
+
+	function _info(code, details) {
+		var message = _getMessage(code, details);
+
+		if (typeof log.info === 'function') {
+			log.info(code, message, details);
+		} else {
+			console.info(message);
+		}
+	}
+
+	function _warning(code, details) {
+		var message = _getMessage(code, details);
+
+		if (typeof log.warn === 'function') {
+			log.warn(code, message, details);
+		} else {
+			console.warn(message);
+		}
+	}
+
+	function _error(code, details) {
+		var message = _getMessage(code, details);
+
+		if (typeof log.error === 'function') {
+			log.error(code, message, details);
+		} else {
+			console.error(message);
+		}
+	}
+
+	function _getMessage(code, details) {
+		var message = _codeMessage[code];
+
+		if (!message) {
+			message = 'unknown code (' + code + ') with details (' + details + ')';
+		} else {
+			details.forEach(function(detail) {
+				message = message.replace(/%s/, detail);
+			});
+		}
+
+		return message;
 	}
 
 	/*

@@ -1,6 +1,8 @@
-# i18n formater
+# i18n JS formater
 
 A simple translation module with dynamic json storage which helps to format strings quickly and easily.
+
+Parser can be extended with your own parsers.
 
 It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
@@ -18,11 +20,18 @@ i18n-js-formater's mission is to provide to the end-user the best output (transl
 
 ## quick usage example
 
+configuration:
+
 	i18n.configure({
 		locales: ['en', 'fr'],
 		dictonary: 'dictionary.json'
 	});
+
+Changing locale:
+
 	i18n.setLocale('fr');
+
+Using strings which have to be translated
 
 	i18n('hello'); //returns 'salut'
 	i18n('Hello %s!', 'Jim'); //returns 'Salut Jim!'
@@ -108,13 +117,20 @@ The second possibility is to use the configuration method available in the libra
 
 Translates a single expression. Returns translated parsed and substituted string. If the translation is not found it returns the expression given.
 
-	// (this.locale == 'fr')
+	// (locale == 'fr')
 	i18n('Hello'); // Salut
 	i18n('Hello %s', 'Restimel'); // Salut Restimel
 	i18n('Hello {{name}}', { name: 'Restimel' }); // Salut Restimel
 
-	// give context (this.locale == 'fr')
+	// give context (locale == 'fr')
+	i18n.context('phone greating', 'Hello'); // Allo
 	i18n({str: 'Hello', context: 'phone greating'}); // Allo
+
+	// give an object (locale == 'fr')
+	i18n({
+		en: 'Hello',
+		fr: 'Salut'
+	}); // Salut
 
 	// passing specific locale (needed?)
 	i18n({str: 'Hello', locale: 'fr'}); // Salut
@@ -135,9 +151,16 @@ Plurals translation of a single phrase. Singular and plural forms will get added
 	i18n.n('%s cat', '%s cats', 1); // 1 Katze
 	i18n.n('%s cat', '%s cats', 3); // 3 Katzen
 
+	//using numeric values
+	i18n.n({
+		0: 'no cats',
+		1: 'a cat',
+		default: '%s cats'
+	}, quantity);
+
 ### i18n.configuration()
 
-Change default configuration
+#### Change default configuration
 
 Define locale to use
 
@@ -161,7 +184,6 @@ Define locale configuration at once
 			key: 'fr-be',
 			name: 'Belge',
 			data: 'dictionary-be.json',
-
 		}
 	]});
 
@@ -182,6 +204,8 @@ Set the current locale globally or in current scope.
 	// set locale depending of browser context
 	i18n.setLocale(); //equivalent to i18n.setLocale(navigator.language);
 
+Note: if you have put a storage system (cookie, localStorage), i18n.setLocale() will use the last locale used in the browser.
+
 ### getLocale()
 
 Get the current locale from current scope or globally.
@@ -191,6 +215,7 @@ Get the current locale from current scope or globally.
 	i18n.getLocale({locale: true}); // 'fr'
 	i18n.getLocale({name: true}); // 'French'
 	i18n.getLocale({locale: true, name: true}); // {locale: 'fr', name: 'French'}
+	i18n.getLocale({data: 'hello'}); // 'salut'
 
 ### getLocales()
 
@@ -199,7 +224,8 @@ Returns a whole catalog optionally based on current scope and locale.
 	i18n.getLocales(); // ['en', 'fr', 'de']
 	i18n.getLocales({locale: true}) // ['en', 'fr', 'de']
 	i18n.getLocales({name: true}) // ['English', 'Français', 'Deutsch']
-	i18n.getLocales({locale: true, name: true}) // [{locale: 'en', name: 'English'}, {locale: 'fr', name: 'Français'}, {locale: 'de', name: 'Deutsch'}]
+	i18n.getLocales({data: 'hello'}) // ['hello', 'salut', 'hallo']
+	i18n.getLocales({locale: true, name: true, data:'hello'}) // [{locale: 'en', name: 'English', data: 'hello'}, {locale: 'fr', name: 'Français', data: 'salut'}, {locale: 'de', name: 'Deutsch', data: 'hallo'}]
 
 ### clearData()
 
@@ -326,6 +352,43 @@ It is possible to add new entry in the data.
 		en: 'the English version',
 		fr: 'the French version'
 	});
+
+## Managing Errors
+
+The API give several feed back when issues occurs. There are splitted in 3 kinds: info, warning and error.
+
+It is possible to listen on these messages with "log".
+
+	i18n.configuration({
+		log: {
+			info: function(code, message, details) {},
+			warn: function(code, message, details) {},
+			error: function(code, message, details) {}
+		}
+	});
+
+Arguments are:
+* **code** {Number}:. The goal of this "code" is to handle issues in a easy way.
+* **message** {String}: information message to express the issue. The message is in English.
+* **details** {Array}: some details depending of the issue. 
+
+Here are code details:
+* 0 → 999: reserved for future usage
+* 1000 → 3999: info
+* 4000 → 6999: warning
+	* 4030: The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored. (details: [locale key, the secondary given])
+	* 4031: The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored. (details: [locale key, typeof secondary given])
+	* 4100: The sentence "%s" is not translated for language "%s". (details: [sentence without translation, current locale])
+	* 4101: It is not possible to translate object (%s) to language "%s". (details: [object stringified, current locale, the object])
+* 7000 → 9999: error
+	* 7010: dictionary is in a wrong format (%s): %s (details: [type of dictionary, the value received]) called if not possible to load dictionary.
+	* 7011: item is in a wrong format (%s while object is expected): %s (details: [type of dictionary, the value received])
+	* 7012: data is in a wrong format (%s): %s (details: [type of data, the value received]) called if not possible to load data.
+	* 7013: data with key "%s" is in a wrong format (%s): %s (details: [locale key, type of data, the value received])
+	* 7014: data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s (details: [locale key, type of data, the value received])
+	* 7020: data received from "%s" is not in a valid JSON ("%s") (details: [the url sent, the response])
+	* 7100: Translation is not possible due to an unsupported type (%s): %s (details: [typeof given argument, the argument])
+	* 7400 → 7599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'
 
 ## Add optional plug-in to enhance helpers or support different template engines
 
