@@ -12,6 +12,10 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 Keep tune for further update I am working on it.
 
+## Goal
+
+i18n-js-formater's mission is to provide to the end-user the best output (translated, formatted, secured) in an easy way to build it with JavaScript.
+
 ## quick usage example
 
 	i18n.configure({
