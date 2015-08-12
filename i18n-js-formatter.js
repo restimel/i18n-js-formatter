@@ -17,21 +17,14 @@
 (function() {
 	'use strict';
 
-	/* status variables */
-	var locales, localeKeys, currentLocale,
-		defaultKeyLocale, useDfltLocale, storage,
-		syncLoading, lazyLoading,
-		onLocaleReady,
-		log,
-		data, loadingMethod, status;
-	_reset();
+	var version = '0.0.2';
 
-/*
-* 0 → 999: reserved for future usage
-* 1000 → 3999: info
-* 4000 → 6999: warning
-* 7000 → 9999: error
-*/
+	/*
+	 * 0 → 999: reserved for future usage
+	 * 1000 → 3999: info
+	 * 4000 → 6999: warning
+	 * 7000 → 9999: error
+	 */
 	var _codeMessage = {
 		/* warning */
 		4030: 'The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored.',
@@ -62,6 +55,15 @@
 		7504: 'Gateway timeout: %s',
 		7505: 'HTTP version is not supported by server: %s'
 	};
+
+	/* status variables */
+	var locales, localeKeys, currentLocale,
+		defaultKeyLocale, useDfltLocale, storage,
+		syncLoading, lazyLoading,
+		onLocaleReady,
+		log,
+		data, loadingMethod, status;
+	_reset();
 
 	/* API methods */
 
@@ -290,6 +292,19 @@
 				_resetDataKey(key);
 			}
 		}
+	};
+
+	/**
+	 * Retrieve the current version
+	 * X.Y.Z
+	 * X: major version (which can potentially break retro-compatibility)
+	 * Y: minor version (stable version with new features, bug fix)
+	 * Z: small change (some bug fix or some new feature)
+	 *
+	 * @return {String} the version
+	 */
+	i18n.version = function() {
+		return version;
 	};
 
 	/** should be used for test only */
@@ -564,7 +579,8 @@
 
 		if (!key) {
 			self.navigator.languages.some(function(lng) {
-				return key = _formatLocaleKey(lng);
+				key = _formatLocaleKey(lng);
+				return key;
 			});
 
 			if (!key) {
@@ -758,7 +774,8 @@
 			xhr.open('GET', url, false);
 			xhr.send(null);
 			if (xhr.status === 200 || xhr.status === 0) {
-				if (rslt = _manageResponse(xhr.responseText)) {
+				rslt = _manageResponse(xhr.responseText);
+				if (rslt) {
 					success(rslt, key);
 				}
 			} else {
@@ -768,7 +785,8 @@
 			xhr.onreadystatechange = function() {
 				if (xhr.readyState === xhr.DONE) {
 					if (xhr.status === 200 || xhr.status === 0) {
-		                if (rslt = _manageResponse(xhr.responseText)) {
+						rslt = _manageResponse(xhr.responseText);
+		                if (rslt) {
 							success(rslt, key);
 						}
 					} else {
@@ -822,10 +840,10 @@
 
 		switch(typeof sentenceKey) {
 			case 'string':
-				sentence = _translation_string(sentenceKey, key, origKey);
+				sentence = _translationString(sentenceKey, key, origKey);
 				break;
 			case 'object':
-				sentence = _translation_object(sentenceKey, key, origKey);
+				sentence = _translationObject(sentenceKey, key, origKey);
 				break;
 			default:
 				sentence = '';
@@ -835,34 +853,35 @@
 		return sentence;
 	}
 
-	function _translation_string(sentenceKey, key, origKey) {
+	function _translationString(sentenceKey, key, origKey) {
 		var ldata, sentence;
 
 		ldata = data[key];
 		sentence = ldata[sentenceKey];
 
-		sentence = _transation_fallback(sentenceKey, key, origKey, sentence, _translation_issue_string);
+		sentence = _translationFallback(sentenceKey, key, origKey, sentence, _translationIssueString);
 
 		return sentence;
 	}
 
-	function _translation_issue_string(sentenceKey, origKey) {
+	function _translationIssueString(sentenceKey, origKey) {
 		_warning(4100, [sentenceKey, origKey]);
 		return sentenceKey;
 	}
 
-	function _translation_object(sentenceObject, key, origKey) {
+	function _translationObject(sentenceObject, key, origKey) {
 		var sentence;
 
 		sentence = sentenceObject[key];
 
-		sentence = _transation_fallback(sentenceObject, key, origKey, sentence, _translation_issue_object);
+		sentence = _translationFallback(sentenceObject, key, origKey, sentence, _translationIssueObject);
 
 		return sentence;
 	}
 
-	function _translation_issue_object(sentenceKey, origKey) {
+	function _translationIssueObject(sentenceKey, origKey) {
 		var json;
+
 		try {
 			json = JSON.stringify(sentenceKey);
 		} catch(e) {
@@ -873,7 +892,7 @@
 		return '';
 	}
 
-	function _transation_fallback(sentenceKey, key, origKey, sentence, not_translated) {
+	function _translationFallback(sentenceKey, key, origKey, sentence, notTranslated) {
 		var secondary;
 
 		if (typeof sentence !== 'string') {
@@ -881,7 +900,7 @@
 			if (secondary) {
 				sentence = _translation(sentenceKey, secondary, origKey);
 			} else {
-				sentence = not_translated(sentenceKey, origKey);
+				sentence = notTranslated(sentenceKey, origKey);
 			}
 		}
 
