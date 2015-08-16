@@ -1639,4 +1639,225 @@ describe('i18n', function() {
 		});
 	});
 
+	describe('basic parser', function() {
+		beforeEach(function() {
+			this.logInfo = jasmine.createSpy('logInfo');
+			this.logWarn = jasmine.createSpy('logWarn');
+			this.logError = jasmine.createSpy('logError');
+
+			$$.configuration({
+				locales: ['en', 'fr', 'fr-be'],
+				dictionary: {
+					'Hello %s!': {
+						en: 'Hello %s!',
+						fr: 'Salut %s !'
+					},
+					'%d cats': {
+						en: '%d cats',
+						fr: '%d chats'
+					},
+					'%d issues: %s': {
+						en: '%d issues: %s',
+						fr: '%d problèmes : %s'
+					}
+				},
+				secondary: {
+					'fr-be': 'fr'
+				},
+				log: {
+					info: this.logInfo,
+					warn: this.logWarn,
+					error: this.logError
+				},
+				defaultLocale: 'en'
+			});
+		});
+
+		afterEach(function() {
+			$$.clearData();
+		});
+
+		xit('should remplace the %s wilcard', function() {
+			expect($$('Hello %s!', 'Restimel')).toBe('Hello Restimel!');
+			$$.setLocale('fr');
+			expect($$('Hello %s!', 'Restimel')).toBe('Salut Restimel !');
+			$$.setLocale('fr-be');
+			expect($$('Hello %s!', 'Restimel')).toBe('Salut Restimel !');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		xit('should convert to string with %s wilcard', function() {
+			var obj;
+
+			obj = {};
+			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+
+			obj = 42;
+			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+
+			obj = function() {};
+			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+
+			obj = true;
+			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		xit('should remplace the %d wildcard', function() {
+			expect($$('%d cats', 42)).toBe('42 cats');
+			expect($$('%d cats', 42.76)).toBe('42.76 cats');
+			$$.setLocale('fr');
+			expect($$('%d cats', 42)).toBe('42 chats');
+			expect($$('%d cats', 42.76)).toBe('42,76 chats');
+			$$.setLocale('fr-be');
+			expect($$('%d cats', 42)).toBe('42 chats');
+			expect($$('%d cats', 42.76)).toBe('42,76 chats');
+
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		xit('should convert to number the %d wildcard', function() {
+			var obj;
+
+			obj = {};
+			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
+
+			obj = "42";
+			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
+
+			obj = function() {};
+			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
+
+			obj = true;
+			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		xit('should remplace several wildcards', function() {
+			expect($$('%d issues: %s', 2, 'bug1, bug2')).toBe('2 issues: bug1, bug2');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		xit('should parse unknown string', function() {
+			expect($$.parse('%d %s', 42, 'cats')).toBe('42 cats');
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+	});
+
+	describe('detailed parser', function() {
+		describe('displays numbers', function() {
+			beforeEach(function() {
+				this.logInfo = jasmine.createSpy('logInfo');
+				this.logWarn = jasmine.createSpy('logWarn');
+				this.logError = jasmine.createSpy('logError');
+
+				$$.configuration({
+					locales: ['en', 'fr', 'fr-be'],
+					secondary: {
+						'fr-be': 'fr'
+					},
+					format: {
+						decimal: {
+							en: '.',
+							fr: ','
+						},
+						thousandSeparator: {
+							en: ',',
+							fr: ' '
+						}
+					}
+					log: {
+						info: this.logInfo,
+						warn: this.logWarn,
+						error: this.logError
+					},
+					defaultLocale: 'en'
+				});
+			});
+
+			afterEach(function() {
+				$$.clearData();
+			});
+
+			xit('should display large number', function() {
+				var number = 12345678;
+				expect($$.parse('%d', number)).toBe('12,345,678');
+
+				$$.setlocale('fr-be');
+				expect($$.parse('%d', number)).toBe('12 345 678');
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			xit('should display decimal number', function() {
+				var number = 12345.678;
+				expect($$.parse('%d', number)).toBe('12,345.678');
+
+				$$.setlocale('fr-be');
+				expect($$.parse('%d', number)).toBe('12 345,678');
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			xit('should display number in short format', function() {
+				var nb1 = 0.00000123;
+				var nb2 = 1.2345;
+				var nb3 = 123.45678;
+				var nb4 = 12345.678;
+				var nb5 = 12345678;
+				var nb6 = 9990000000000000;
+				var nb7 = 42;
+
+				expect($$.parse('%D', nb1)).toBe('1.23µ');
+				expect($$.parse('%D', nb2)).toBe('1.23');
+				expect($$.parse('%D', nb3)).toBe('123.46');
+				expect($$.parse('%D', nb4)).toBe('12.35k');
+				expect($$.parse('%D', nb5)).toBe('12.35M');
+				expect($$.parse('%D', nb6)).toBe('999T');
+				expect($$.parse('%D', nb7)).toBe('42');
+
+				$$.setlocale('fr-be');
+				$$.configuration({
+					format: {
+						shortPrecision: 1
+					}
+				});
+
+				expect($$.parse('%D', nb1)).toBe('1,2µ');
+				expect($$.parse('%D', nb2)).toBe('1,2');
+				expect($$.parse('%D', nb3)).toBe('123,5');
+				expect($$.parse('%D', nb4)).toBe('12,3k');
+				expect($$.parse('%D', nb5)).toBe('12,3M');
+				expect($$.parse('%D', nb6)).toBe('1,0P');
+				expect($$.parse('%D', nb7)).toBe('42');
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+		});
+	});
+
 });
