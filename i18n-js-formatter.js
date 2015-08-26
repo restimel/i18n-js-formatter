@@ -200,6 +200,7 @@
 	 *
 	 * @param [options.key] {Boolean} if true, the locale's key will be returned
 	 * @param [options.name] {Boolean} if true, the locale's name will be returned
+	 * @param [options.secondary] {Boolean} if true, the locale's key fallback will be returned
 	 * @param [options.data] {String} if defined, the locale's translation will be returned
 	 * @return [String|Object] If only one option is given, it return the value of this option
 	 *						   If several options are given, it return an object with the key/value of wanted options.
@@ -213,6 +214,7 @@
 	 *
 	 * @param [options.key] {Boolean} if true, the locales' key will be returned
 	 * @param [options.name] {Boolean} if true, the locales' name will be returned
+	 * @param [options.secondary] {Boolean} if true, the locales' key fallback will be returned
 	 * @param [options.data] {String} if defined, the locales' translation will be returned
 	 * @return [String[]|Object[]] If only one option is given, it return the value list of this option
 	 *							   If several options are given, it return a list of object with the key/value of wanted options.
@@ -229,6 +231,7 @@
 	 * @param [options] {Object|String} options to retrieve data. If a string it defines key.
 	 * @param [options.key] {String} the locale's data to get. If not defined data of all locales are returned.
 	 * @param [options.format] {String} the result format. Value can be 'dictionary' or 'data' (default is 'data').
+	 * @param [options.locale] {String} is an alias for 'key'
 	 * @return {Object} the data
 	 */
 	i18n.getData = function(options) {
@@ -554,7 +557,7 @@
 						lastResult = data[locale.key] && data[locale.key][value];
 						break;
 					default:
-					lastResult = locale[attribute];
+						lastResult = locale[attribute];
 				}
 				result[attribute] = lastResult;
 				nb++;

@@ -6,9 +6,9 @@ Parser can be extended with your own parsers.
 
 It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
-## Version 0.0.1
+You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
 
-**This library is still under developement and is still not usable right now. I hope this can be done soon.**
+## Version 0.0.2
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 

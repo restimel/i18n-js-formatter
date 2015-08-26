@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>i18n js formater - live demonstration</title>
+
+	<style type="text/css">
+
+#historyArea {
+	position: absolute;
+	top: 0;
+	bottom: 45px;
+	left: 0;
+	right: 150px;
+	overflow: auto;
+	margin: 0;
+}
+#history > li > pre {
+	display: inline-block;
+	width: 100%;
+}
+#history > li > button {
+	float: right;
+}
+
+#commandArea {
+	position: absolute;
+	bottom: 0;
+	height: 45px;
+	left: 0;
+	right: 150px;
+	margin: 0;
+}
+#command {
+	width: 100%;
+	height: 100%;
+}
+
+#controls {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	width: 150px;
+	right: 0;
+	margin: 0;
+}
+#controls button {
+	display: block;
+	margin-top: 10px;
+	left: 10px;
+	right: 10px;
+	height: 50px;
+}
+#executeCommand {
+	position: absolute;
+	bottom: 50px;
+}
+
+	</style>
+</head>
+<body>
+<section id="historyArea">
+	<ol id="history"></ol>
+</section>
+<section id="controls">
+	<button id="load1">Load Data</button>
+	<button id="reset">Reset Data</button>
+	<button id="executeCommand" title="Run the JavaScript command (shortcut: ctrl + Enter)">Run</button>
+</section>
+<section id="commandArea">
+	<!-- <textarea id="command" placeholder="Enter your JavaScript code here"></textarea> -->
+	<div id='commandContainer' style='border: 1px solid'></div>
+</section>
+
+<script src="../i18n-js-formatter.js"></script>
+
+<script src="lib/complete.ly.1.0.1.min.js"></script>
+<script src="script/autoCompleteJS.js"></script>
+<script>
+
+var completely = completely(document.getElementById('commandContainer'), {promptInnerHTML : '&gt;'});
+var elHistory = document.getElementById('history');
+var elCommand = completely.input;
+
+var historyLog = [];
+var currentHistory = 0;
+
+var autoCompleteMap = {
+	configuration: ['locales', 'localeName', 'secondary', 'alias', 'defaultLocale', 'storage', 'syncLoading', 'lazyLoading', 'onLocaleReady', 'dictionary', 'data', 'log'],
+	configuration_log: ['warning', 'info', 'error'],
+	getLocale: ['key', 'name', 'secondary', 'data'],
+	getLocales: ['key', 'name', 'secondary', 'data'],
+	getData: ['key', 'locale', 'format']
+};
+
+function replaceSpecialChar(char) {
+	var map = {
+		'\n': '\\n',
+		'\r': '\\r',
+		'\t': '\\t',
+		'\v': '\\v'
+	};
+
+	return map[char] || char;
+}
+
+function codeToHtml(code) {
+	var data, html;
+
+	data = code;
+
+	if (typeof data === 'undefined') {
+		data = 'undefined';
+	} else
+	if (typeof data === 'object') {
+		try {
+			data = JSON.stringify(data);
+		} catch(e) {}
+	}
+
+	html = data.toString().replace(/[\n\r\t\v]/g, replaceSpecialChar);
+
+	return html;
+}
+
+function fillCommand(command) {
+	elCommand.value = command;
+}
+
+function getHistory(hIndex) {
+	var command;
+
+	if (hIndex < 0) {
+		return;
+	}
+
+	if (hIndex >= historyLog.length) {
+		command = '';
+		currentHistory = historyLog.length;
+	} else {
+		command = historyLog[hIndex];
+		currentHistory = hIndex;
+	}
+
+	fillCommand(command);
+}
+
+function addHistory(command, results) {
+	var li = document.createElement('li');
+	var pre = document.createElement('pre');
+	var action = document.createElement('button');
+	var details = document.createElement('details');
+	var summary = document.createElement('summary');
+	var result = document.createElement('p');
+
+	currentHistory = historyLog.push(command);
+
+	pre.textContent = codeToHtml(command);
+	result.textContent = codeToHtml(results);
+	summary.textContent = 'Result';
+	action.textContent = '↓';
+
+	action.onclick = fillCommand.bind(this, command);
+	action.title = 'Re-use this code';
+
+	li.appendChild(pre);
+	li.appendChild(action);
+	details.appendChild(summary);
+	details.appendChild(result);
+	li.appendChild(details);
+
+	if (elHistory.lastElementChild) {
+		elHistory.lastElementChild.lastElementChild.open = false;
+	}
+	elHistory.appendChild(li);
+	details.open = true;
+	details.scrollIntoView();
+
+}
+
+function executeCommand() {
+	var command = elCommand.value;
+	var result;
+
+	try {
+		result = eval(command);
+	} catch(e) {
+		alert(e);
+		return;
+	}
+
+	addHistory(command, result);
+	elCommand.value  = '';
+}
+
+function loadCommand(cIndex) {
+	var codes = [
+		'i18n.configuration({\n\tlocales: ["en", "fr"],\n\tdictionary: {\n\t\t"Hello": {\n\t\t\ten: "Hello",\n\t\t\tfr: "Salut"\n\t\t}\n\t},\n\t\t"Hello %s!": {\n\t\t\ten: "Hello %s!",\n\t\t\tfr: "Salut %s !"\n\t\t}\n\t}\n});\ni18n.getLocales();',
+		'i18n._reset();\ni18n.getData();'
+	];
+	var code = codes[cIndex];
+
+	if (!code) {
+		console.warn('code '+cIndex+ ' unknown.');
+		return;
+	}
+
+	elCommand.value = code;
+	executeCommand();
+}
+
+function shortKeys(evt) {
+	if (evt.ctrlKey) {
+		switch (evt.keyCode) {
+			case 13:
+				executeCommand();
+				break;
+			case 38:
+				getHistory(currentHistory - 1);
+				break;
+			case 40:
+				getHistory(currentHistory + 1);
+				break;
+		}
+	}
+}
+
+
+completely.options = buildOptionsFromText('')[0];
+
+completely.onChange = function(text) {
+	var infos = buildOptionsFromText(text);
+	var options = infos[0];
+	var startFrom = infos[1];
+	
+	completely.options = options;
+	completely.startFrom = startFrom;
+	completely.repaint();
+};
+
+completely.repaint(); 
+completely.hint.value = 'Enter your JavaScript code here';
+
+/* bind action on elements */
+document.getElementById('executeCommand').onclick = executeCommand;
+document.getElementById('load1').onclick = loadCommand.bind(this, 0);
+document.getElementById('reset').onclick = loadCommand.bind(this, 1);
+elCommand.addEventListener('keydown', shortKeys, false);
+
+setTimeout(function() {
+	completely.input.focus();
+}, 0);
+
+</script>
+</body>
+</html>
