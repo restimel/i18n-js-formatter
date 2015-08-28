@@ -49,11 +49,17 @@ To give plural translations (this should be done in version 0.3)
 	i18n.n('a cat', '%s cats', 1); // in German: 'eine Katze'
 	i18n.n('a cat', '%s cats', 3); // in German: '3 Katzen'
 
+## Licence
+
+Creative Commons Attribution 3.0 Unported License: You are free to use, share, modify it while you keep credit to author and contributors (http://creativecommons.org/licenses/by/3.0/)
+
 ## Installation
 
 You only have to insert the i18n-js-formatter.js file in your web page.
 
 	<script src="i18n-js-formatter.js"></script>
+
+It supports AMD module, nodeJS module and ES6 module.
 
 ## Test
 

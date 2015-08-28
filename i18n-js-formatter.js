@@ -111,7 +111,7 @@
 		}
 
 		if (typeof options.alias === 'string') {
-			self[options.alias] = i18n;
+			_export(options.alias);
 		}
 
 		if (typeof options.onLocaleReady !== 'undefined') {
@@ -958,6 +958,26 @@
 		return message;
 	}
 
+	function _export(name) {
+		/**
+		 * export to either browser or node.js
+		 */
+		if (typeof exports !== 'undefined') {
+			exports[name] = i18n;
+		} else {
+			self[name] = i18n;
+
+			if (typeof define === 'function' && define.amd) {
+				define(function() {
+					var obj = {};
+
+					obj[name] = i18n;
+					return obj;
+				});
+			}
+		}
+	}
+
 	/*
 	 * generic helper function
 	 */
@@ -995,9 +1015,9 @@
 		i18n.configuration(_i18n_config);
 
 		if (!_i18n_config.doNotAliasi18n) {
-			self.i18n = i18n;
+			_export('i18n');
 		}
 	} else {
-		self.i18n = i18n;
+		_export('i18n');
 	}
 })();
