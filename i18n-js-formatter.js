@@ -945,13 +945,15 @@
 	}
 
 	function _getMessage(code, details) {
+		var idx;
 		var message = _codeMessage[code];
 
 		if (!message) {
 			message = 'unknown code (' + code + ') with details (' + details + ')';
 		} else {
-			details.forEach(function(detail) {
-				message = message.replace(/%s/, detail);
+			idx = 0;
+			message = message.replace(/%s/g, function() {
+				return details[idx++];
 			});
 		}
 

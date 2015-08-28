@@ -195,8 +195,8 @@ function executeCommand() {
 
 function loadCommand(cIndex) {
 	var codes = [
-		'i18n.configuration({\n\tlocales: ["en", "fr"],\n\tdictionary: {\n\t\t"Hello": {\n\t\t\ten: "Hello",\n\t\t\tfr: "Salut"\n\t\t}\n\t},\n\t\t"Hello %s!": {\n\t\t\ten: "Hello %s!",\n\t\t\tfr: "Salut %s !"\n\t\t}\n\t}\n});\ni18n.getLocales();',
-		'i18n._reset();\ni18n.getData();'
+		'i18n.configuration({locales: ["en", "fr"], dictionary: {"Hello": {en: "Hello", fr: "Salut"}, "Hello %s!": {en: "Hello %s!", fr: "Salut %s !"}}}); i18n.getLocales();',
+		'i18n._reset(); i18n.getData();'
 	];
 	var code = codes[cIndex];
 
