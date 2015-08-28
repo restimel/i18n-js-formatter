@@ -1783,7 +1783,7 @@ describe('i18n', function() {
 							en: ',',
 							fr: ' '
 						}
-					}
+					},
 					log: {
 						info: this.logInfo,
 						warn: this.logWarn,
