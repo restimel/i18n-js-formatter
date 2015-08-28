@@ -1,0 +1,9 @@
+Change log for i18n-js-formatter
+
+Version 0.1
+	* i18n configuration: set allowed locales, give them name, give them secondary fallback
+	* retrieve configuration
+	* load data (format dictionary & data)
+	* get data from specific locale or alll locales.
+	* load data from raw object, function, and ajax (synchronously & asynchrously)
+	* translate strings

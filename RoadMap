@@ -1,0 +1,31 @@
+Road map for i18n-js-formatter
+
+Version 0.1
+
+	* Parser
+		* parser plug-in
+			* home-hand parser
+				* string
+				* pretty number
+			* sprintf (parser)
+
+Version 0.2
+
+	* add context for transaltion
+		* i18n.context('context', 'translation key', values)
+		* i18n.c('context', 'translation key', values)
+
+Version 0.3
+
+	* add plural translations
+		* i18n.n('singular', 'plural', quantity, other values)
+		* i18n.n({0: '0 text', default: 'other quantities'}, quantity, other values)
+
+To plan
+	
+	* clone i18n instance to allow scope modificaltion
+
+	* Parser
+		* pretty date
+		* pretty duration (1000s → 16min 40s)
+		* pretty conversion (1000 → 1k, 1000s → 16min)
