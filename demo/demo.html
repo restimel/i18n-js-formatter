@@ -102,6 +102,13 @@ var autoCompleteMap = {
 	loadFormatter: ['formatter', 'name', 'weight']
 };
 
+/* Load sprintf parser */
+i18n.loadParser({
+	parser: callSprintf,
+	name: 'sprintf',
+	weight: 100
+});
+
 function replaceSpecialChar(char) {
 	var map = {
 		'\n': '\\n',
