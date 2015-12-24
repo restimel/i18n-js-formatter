@@ -22,7 +22,7 @@ i18n-js-formater's mission is to provide to the end-user the best output (transl
 
 configuration:
 
-	i18n.configure({
+	i18n.configuration({
 		locales: ['en', 'fr'],
 		dictonary: 'dictionary.json'
 	});
@@ -66,14 +66,14 @@ It supports AMD module, nodeJS module and ES6 module.
 Jasmine tests are provided in folder `spec`.
 Run tests with mainTest.html (located in the root folder) to assert it works well: https://restimel.github.io/i18n-js-formatter/mainTest.html
 
-## Configure
+## Configuration
 
 There are 2 ways to configure the library.
 
 The first way is to define an object with wanted options (cf below) in variable _i18n_config before running the i18n-js-formatter script.
 For some options, this is the only way to set them.
 
-The second possibility is to use the configuration method available in the library API.
+The second possibility is to use the configuration method available in the library API (cf section bellow).
 
 ### list of configuration options
 

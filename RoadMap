@@ -10,7 +10,7 @@ Version 0.1
 
 Version 0.2
 
-	* add context for transaltion
+	* add context for translation
 		* i18n.context('context', 'translation key', values)
 		* i18n.c('context', 'translation key', values)
 
