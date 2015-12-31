@@ -272,8 +272,10 @@ Get the current locale from current scope or globally.
 	i18n.setLocale('fr');
 	i18n.getLocale(); // 'fr'
 	i18n.getLocale({locale: true}); // 'fr'
-	i18n.getLocale({name: true}); // 'French'
-	i18n.getLocale({locale: true, name: true}); // {locale: 'fr', name: 'French'}
+	i18n.getLocale({key: true}); // 'fr'
+	i18n.getLocale({name: true}); // 'Français'
+	i18n.getLocale({locale: true, name: true}); // {locale: 'fr', name: 'Français'}
+	i18n.getLocale({key: true, name: true}); // {key: 'fr', name: 'Français'}
 	i18n.getLocale({data: 'hello'}); // 'salut'
 
 ### getLocales()
@@ -282,6 +284,7 @@ Returns a whole catalog optionally based on current scope and locale.
 
 	i18n.getLocales(); // ['en', 'fr', 'de']
 	i18n.getLocales({locale: true}) // ['en', 'fr', 'de']
+	i18n.getLocales({key: true}) // ['en', 'fr', 'de']
 	i18n.getLocales({name: true}) // ['English', 'Français', 'Deutsch']
 	i18n.getLocales({data: 'hello'}) // ['hello', 'salut', 'hallo']
 	i18n.getLocales({locale: true, name: true, data:'hello'}) // [{locale: 'en', name: 'English', data: 'hello'}, {locale: 'fr', name: 'Français', data: 'salut'}, {locale: 'de', name: 'Deutsch', data: 'hallo'}]
