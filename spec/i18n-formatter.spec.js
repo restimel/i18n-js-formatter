@@ -51,7 +51,7 @@ describe('i18n-formatter', function() {
 				$$.loadFormatter({formatter: callSprintf, weight: 100, name: 'sprintf'});
 			});
 
-			it('should remplace the %s wildcard', function() {
+			it('should replace the %s wildcard', function() {
 				expect($$('Hello %s!', 'Restimel')).toBe('Hello Restimel!');
 				$$.setLocale('fr');
 				expect($$('Hello %s!', 'Restimel')).toBe('Salut Restimel !');
@@ -82,7 +82,7 @@ describe('i18n-formatter', function() {
 				expect(this.logError).not.toHaveBeenCalled();
 			});
 
-			it('should remplace numeric wildcard', function() {
+			it('should replace numeric wildcard', function() {
 				expect($$('%d cats', 42)).toBe('42 cats');
 				expect($$('%d cats', 42.76)).toBe('42 cats');
 				expect($$('%f cats', 42.76)).toBe('42.76 cats');
@@ -95,7 +95,7 @@ describe('i18n-formatter', function() {
 				expect(this.logError).not.toHaveBeenCalled();
 			});
 
-			it('should remplace several wildcards', function() {
+			it('should replace several wildcards', function() {
 				expect($$('%d issues: %s', 2, 'bug1, bug2')).toBe('2 issues: bug1, bug2');
 
 				expect(this.logInfo).not.toHaveBeenCalled();
@@ -103,7 +103,7 @@ describe('i18n-formatter', function() {
 				expect(this.logError).not.toHaveBeenCalled();
 			});
 
-			it('should not remplace unknown wildcards', function() {
+			it('should not replace unknown wildcards', function() {
 				expect($$.parse('%D %S %W', 42)).toBe('%D %S %W');
 
 				expect(this.logWarn).toHaveBeenCalledWith(4200, jasmine.any(String), ['sprintf', jasmine.any(String)]);
@@ -114,12 +114,12 @@ describe('i18n-formatter', function() {
 		});
 	}
 
-	xdescribe('use i18n-formatter', function() {
+	describe('use i18n-formatter', function() {
 		beforeEach(function() {
-			$$.loadFormatter({formatter: callSprintf, weight: 100, name: 'sprintf'});
+			$$.loadFormatter({formatter: s_formatter, weight: 100, name: 's_formatter'});
 		});
 
-		it('should remplace the %s wildcard', function() {
+		it('should replace the %s wildcard', function() {
 			$$.setLocale('en');
 			expect($$('Hello %s!', 'Restimel')).toBe('Hello Restimel!');
 			$$.setLocale('fr');
@@ -146,7 +146,7 @@ describe('i18n-formatter', function() {
 			expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
 		});
 
-		xit('should remplace the %d wildcard', function() {
+		xit('should replace the %d wildcard', function() {
 			expect($$('%d cats', 42)).toBe('42 cats');
 			expect($$('%d cats', 42.76)).toBe('42.76 cats');
 			$$.setLocale('fr');
@@ -157,7 +157,7 @@ describe('i18n-formatter', function() {
 			expect($$('%d cats', 42.76)).toBe('42,76 chats');
 		});
 
-		xit('should convert to number the %d wildcard', function() {
+		it('should convert to number the %d wildcard', function() {
 			var obj;
 
 			obj = {};
@@ -173,8 +173,14 @@ describe('i18n-formatter', function() {
 			expect($$('%d cats', obj)).toBe((+obj) + ' cats');
 		});
 
-		it('should remplace several wildcards', function() {
+		it('should replace several wildcards', function() {
 			expect($$('%d issues: %s', 2, 'bug1, bug2')).toBe('2 issues: bug1, bug2');
+		});
+
+		it('should convert special characters', function() {
+			expect($$('42 %%')).toBe('42 %');
+			expect($$('42% of success')).toBe('42% of success');
+			expect($$('42%%success')).toBe('42%success');
 		});
 	});
 });
