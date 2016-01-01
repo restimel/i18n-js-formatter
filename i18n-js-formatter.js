@@ -29,6 +29,7 @@
 		/* warning */
 		4030: 'The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored.',
 		4031: 'The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored.',
+		4050: 'The configuration option %s is badly set because there is no valid key defined. This setting has been ignored.',
 		4100: 'The sentence "%s" is not translated for language "%s".',
 		4101: 'It is not possible to translate object (%s) to language "%s".',
 		4200: 'Parser "%s" has thrown an issue: %s',
@@ -100,6 +101,9 @@
 			_each(options.log, _configureLog);
 		}
 
+		if (options.localeSet && options.localeSet instanceof Array) {
+			needLoading = _configureLocaleSet(options) || needLoading;
+		} else
 		if (options.locales instanceof Array) {
 			_configureLocales(options);
 		} else
@@ -392,6 +396,76 @@
 		return locale;
 	}
 
+	function _cleanData() {
+		_each(sv.data, function(value, key) {
+			if (sv.localeKeys.indexOf(key) === -1) {
+				delete sv.data[key];
+			}
+		});
+
+		sv.localeKeys.forEach(function(key) {
+			if (!sv.data[key]) {
+				_resetDataKey(key);
+			}
+		});
+	}
+
+	function _configureLocaleSet(options) {
+		var nextLocales = {};
+		var needLoading = false;
+
+		sv.localeKeys = [];
+
+		options.localeSet.forEach(function(localeObj) {
+			var key, name, secondary, dataDictionary;
+			var locale;
+			var data;
+
+			if (typeof localeObj !== 'object') {
+				return;
+			}
+
+			key = localeObj.localeKey || localeObj.key || localeObj.locale;
+			name = localeObj.localeName || localeObj.name;
+			secondary = localeObj.secondary;
+			dataDictionary = localeObj.data;
+
+			if (typeof key !== 'string') {
+				_warning(4050, ['localeSet']);
+				return;
+			}
+
+			if (!name && options.localeName) {
+				name = options.localeName[key];
+			}
+
+			locale = _createLocale(key, name);
+			key = locale.key;
+
+			if (typeof secondary === 'string') {
+				locale.secondary = secondary;
+			}
+
+			if (dataDictionary) {
+				data = {};
+				data[key] = dataDictionary;
+				_loadData(data);
+				needLoading = true;
+			}
+
+			if (!nextLocales[key]) {
+				sv.localeKeys.push(key);
+			}
+			nextLocales[key] = locale;
+		});
+
+		_cleanData();
+
+		sv.locales = nextLocales;
+
+		return needLoading;
+	}
+
 	function _configureLocales(options) {
 		var nextLocales = {};
 
@@ -413,17 +487,7 @@
 			nextLocales[key] = locale;
 		});
 
-		_each(sv.data, function(value, key) {
-			if (sv.localeKeys.indexOf(key) === -1) {
-				delete sv.data[key];
-			}
-		});
-
-		sv.localeKeys.forEach(function(key) {
-			if (!sv.data[key]) {
-				_resetDataKey(key);
-			}
-		});
+		_cleanData();
 
 		sv.locales = nextLocales;
 	}

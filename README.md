@@ -440,6 +440,7 @@ Here are code details:
 * 4000 → 6999: warning
 	* 4030: The secondary fallback of "%s" cannot be set to "%s" because it is out of locales scope. This setting has been ignored. (details: [locale key, the secondary given])
 	* 4031: The secondary fallback of "%s" cannot be of type "%s". It must be a string or false. This setting has been ignored. (details: [locale key, typeof secondary given])
+	* 4050: The configuration option %s is badly set because there is no valid key defined. This setting has been ignored. (details: [option name])
 	* 4100: The sentence "%s" is not translated for language "%s". (details: [sentence without translation, current locale])
 	* 4101: It is not possible to translate object (%s) to language "%s". (details: [object stringified, current locale, the object])
 	* 4200: 'Parser "%s" has thrown an issue: %s' (details: [parser name, detail thrown by parser])

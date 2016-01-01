@@ -1428,7 +1428,7 @@ describe('i18n', function() {
 			});
 		});
 
-		xit('should configure all locales options at once', function() {
+		it('should configure all locales options at once', function() {
 			var spyEn = jasmine.createSpy('data_En');
 			var spyFr = jasmine.createSpy('data_Fr');
 
@@ -1442,7 +1442,7 @@ describe('i18n', function() {
 				}, {
 					key: 'fr',
 					name: 'Français',
-					seconadary: 'en',
+					secondary: 'en',
 					data: spyFr
 				}]
 			});
@@ -1459,6 +1459,28 @@ describe('i18n', function() {
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		it('should warn when all locales options at once are badly set', function() {
+			var spyEn = jasmine.createSpy('data_En');
+			var spyFr = jasmine.createSpy('data_Fr');
+
+			$$.configuration({
+				defaultLocale: 'en',
+				localeSet: [{
+					noKey: 'en',
+					name: 'English',
+					secondary: false,
+					data: spyEn
+				}, 'fr']
+			});
+
+			expect($$.getLocales({key: true, name: true, secondary: true})).toEqual([]);
+			expect(spyEn).not.toHaveBeenCalled();
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logWarn).toHaveBeenCalledWith(4050, jasmine.any(String), ['localeSet']);
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
