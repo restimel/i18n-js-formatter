@@ -2,7 +2,7 @@
 
 A simple translation module with dynamic json storage which helps to format strings quickly and easily.
 
-Parser can be extended with your own parsers.
+Formatter can be extended with your own formatters.
 
 It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
@@ -81,8 +81,8 @@ The second possibility is to use the configuration method available in the libra
 			This is to avoid variable conflicts with other library.
 			This option is only available with _i18_config configuration (at start).
 			/!\ if you use this variable you must also use 'alias' to bind the API to a variable.
-* **doNotLoadParser**: {Boolean} if true wrappers does not load parser.
-			The parser have to be load later. This allow to load them with different configuration.
+* **doNotLoadFormatter**: {Boolean} if true wrappers does not load formatter.
+			The formatter have to be load later. This allow to load them with different configuration.
 			This option is only available with _i18_config configuration (at start).
 * **alias**:	{String} allow to save the function to another global variable.
 			example: i18n.configuration({alias: '$$'}); // now you can use the variable $$ to access the API
@@ -150,7 +150,7 @@ Example:
 	i18n.parse('Hello %s', 'Restimel'); // Hello Restimel
 	i18n.parse('Hello {{name}}', { name: 'Restimel' }); // Hello Restimel
 
-The parsers are also called on each translation string:
+The formatters are also called on each translation string:
 
 	i18n.setLocale('fr');
 	i18n('Hello %s', 'Restimel'); // Salut Restimel
@@ -159,19 +159,19 @@ The parsers are also called on each translation string:
 Note: calling directly i18n.parse will not prompt warning log if the key string is not in data dictionary. So for short string where only formatting is expected i18n.parse() is better than i18n().
 
 WARNING:
-By default, no parser are loaded. You must load a parser (with i18n.loadParser()) in order to do the parsing.
+By default, no formatter are loaded. You must load a formatter (with i18n.loadFormatter()) in order to do the parsing.
 
-An inner parser will be added soon.
+An inner formatter will be added soon.
 
-It is possible to add several parser and they will be all called.
+It is possible to add several formatter and they will be all called.
 
-#### i18n.loadParser
+#### i18n.loadFormatter
 
-This is to add a new parser to the i18n API.
+This is to add a new formatter to the i18n API.
 
-	i18n.loadParser(parserFunction);
+	i18n.loadFormatter(formatterFunction);
 
-The parser function will be called with 3 arguments:
+The formatter function will be called with 3 arguments:
 
 * text {String}: this is the raw text which must be parsed
 * args {Any[]}: this is the list of arguments given to replace wildcards.
@@ -179,22 +179,22 @@ The parser function will be called with 3 arguments:
 
 It must return a string.
 
-It is possible to add several parsers and order them with the weight attribute:
+It is possible to add several formatters and order them with the weight attribute:
 
-	i18n.loadParser({
-		parser: parserFunction,
+	i18n.loadFormatter({
+		formatter: formatterFunction,
 		weight: 150
 	});
 
-By default weight is 100. If the weight is higher than another parser, the parser will be called before.
+By default weight is 100. If the weight is higher than another formatter, the formatter will be called before.
 
 #### sprintf support
 
-src/wrapperSprintf.js contains a simple method to handle Sprintf API as a parser for i18n API.
+src/wrapperSprintf.js contains a simple method to handle Sprintf API as a formatter for i18n API.
 
-If _i18n_config.doNotLoadParser is set to true, the sprintf parser is not automatically added to i18n but you can load the function "callSprintf" manually with the options you want.
+If _i18n_config.doNotLoadFormatter is set to true, the sprintf formatter is not automatically added to i18n but you can load the function "callSprintf" manually with the options you want.
 
-#### i18n parser (to come soon)
+#### i18n formatter (to come soon)
 
 ##### number format support
 
@@ -443,7 +443,7 @@ Here are code details:
 	* 4050: The configuration option %s is badly set because there is no valid key defined. This setting has been ignored. (details: [option name])
 	* 4100: The sentence "%s" is not translated for language "%s". (details: [sentence without translation, current locale])
 	* 4101: It is not possible to translate object (%s) to language "%s". (details: [object stringified, current locale, the object])
-	* 4200: 'Parser "%s" has thrown an issue: %s' (details: [parser name, detail thrown by parser])
+	* 4200: 'Formatter "%s" has thrown an issue: %s' (details: [formatter name, detail thrown by formatter])
 * 7000 → 9999: error
 	* 7010: dictionary is in a wrong format (%s): %s (details: [type of dictionary, the value received]) called if not possible to load dictionary.
 	* 7011: item is in a wrong format (%s while object is expected): %s (details: [type of dictionary, the value received])
@@ -452,5 +452,5 @@ Here are code details:
 	* 7014: data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s (details: [locale key, type of data, the value received])
 	* 7020: data received from "%s" is not in a valid JSON ("%s") (details: [the url sent, the response])
 	* 7100: Translation is not possible due to an unsupported type (%s): %s (details: [typeof given argument, the argument])
-	* 7200: Parser %s can not be added because it is not a function. (details: [parser name])
+	* 7200: Formatter %s can not be added because it is not a function. (details: [formatter name])
 	* 8400 → 8599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'

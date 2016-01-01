@@ -32,7 +32,7 @@
 		4050: 'The configuration option %s is badly set because there is no valid key defined. This setting has been ignored.',
 		4100: 'The sentence "%s" is not translated for language "%s".',
 		4101: 'It is not possible to translate object (%s) to language "%s".',
-		4200: 'Parser "%s" has thrown an issue: %s',
+		4200: 'Formatter "%s" has thrown an issue: %s',
 
 		/* errors */
 		7010: 'dictionary is in a wrong format (%s): %s',
@@ -43,7 +43,7 @@
 		7020: 'data recieved from "%s" is not in a valid JSON ("%s")',
 		7030: 'The secondaries fallback create a circular loop (%s).',
 		7100: 'Translation is not possible due to an unsupported type (%s): %s',
-		7200: 'Parser %s can not be added because it is not a function.',
+		7200: 'Formatter %s can not be added because it is not a function.',
 		8401: 'Unauthorized request: %s',
 		8403: 'Request forbidden: %s',
 		8404: 'Page not found: %s',
@@ -286,22 +286,22 @@
 	};
 
 	/**
-	 * Add a parser to the parser list
+	 * Add a formatter to the formatter list
 	 *
-	 * @param options.parser {Function} a parser to call on string to parse
-	 * @param [options.name] {String} the name of the parser (mainly useful for messages);
-	 * @param [options.weight] {Number} the importance of the parser. The heigher the weight is the first the parser will be called.
+	 * @param options.formatter {Function} a formatter to call on string to parse
+	 * @param [options.name] {String} the name of the formatter (mainly useful for messages);
+	 * @param [options.weight] {Number} the importance of the formatter. The heigher the weight is the first the formatter will be called.
 	 */
-	i18n.loadParser = function(options) {
+	i18n.loadFormatter = function(options) {
 		if (typeof options !== 'object') {
-			options = {parser: options};
+			options = {formatter: options};
 		}
 
-		var parser = options.parser;
-		var name = options.name || parser.name || '';
+		var formatter = options.formatter;
+		var name = options.name || formatter.name || '';
 		var weight = options.weight;
 
-		_addParser(parser, name, weight);
+		_addFormatter(formatter, name, weight);
 	};
 
 	/**
@@ -365,7 +365,7 @@
 			syncLoading: false,
 			lazyLoading: true,
 			onLocaleReady: null,
-			parser: [],
+			formatter: [],
 			status: {
 				callLocaleLoaded: false
 			},
@@ -724,27 +724,27 @@
 		return key;
 	}
 
-	function _addParser(parser, name, weight) {
-		if (typeof parser !== 'function') {
+	function _addFormatter(formatter, name, weight) {
+		if (typeof formatter !== 'function') {
 			_error(7200, [name]);
 			return;
 		}
 
 		if (typeof weight === 'undefined') {
-			if (sv.parser.length) {
-				weight = sv.parser[sv.parser.length - 1].w - 10;
+			if (sv.formatter.length) {
+				weight = sv.formatter[sv.formatter.length - 1].w - 10;
 			} else {
 				weight = 100;
 			}
 		}
 
-		sv.parser.push({
-			f: parser,
+		sv.formatter.push({
+			f: formatter,
 			w: weight,
 			name: name
 		});
 
-		sv.parser.sort(function(a, b) {
+		sv.formatter.sort(function(a, b) {
 			return b.w - a.w;
 		});
 	}
@@ -754,11 +754,11 @@
 
 		values = Array.prototype.slice.call(arguments, 1);
 
-		txt = sv.parser.reduce(function (text, parser) {
+		txt = sv.formatter.reduce(function (text, formatter) {
 			try {
-				text = parser.f(text, values, sv);
+				text = formatter.f(text, values, sv);
 			} catch(e) {
-				_warning(4200, [parser.name, e.message]);
+				_warning(4200, [formatter.name, e.message]);
 			}
 			return text;
 		}, text);

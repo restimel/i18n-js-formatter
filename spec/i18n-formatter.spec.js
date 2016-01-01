@@ -1,4 +1,4 @@
-describe('i18n-parser', function() {
+describe('i18n-formatter', function() {
 	'use strict';
 
 	beforeEach(function() {
@@ -46,9 +46,9 @@ describe('i18n-parser', function() {
 	});
 
 	if (typeof sprintf !== 'undefined') {
-		describe('use parser sprintf', function() {
+		describe('use formatter sprintf', function() {
 			beforeEach(function() {
-				$$.loadParser({parser: callSprintf, weight: 100, name: 'sprintf'});
+				$$.loadFormatter({formatter: callSprintf, weight: 100, name: 'sprintf'});
 			});
 
 			it('should remplace the %s wildcard', function() {
@@ -114,9 +114,9 @@ describe('i18n-parser', function() {
 		});
 	}
 
-	xdescribe('use i18n-parser', function() {
+	xdescribe('use i18n-formatter', function() {
 		beforeEach(function() {
-			$$.loadParser({parser: callSprintf, weight: 100, name: 'sprintf'});
+			$$.loadFormatter({formatter: callSprintf, weight: 100, name: 'sprintf'});
 		});
 
 		it('should remplace the %s wildcard', function() {

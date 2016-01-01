@@ -7,13 +7,13 @@
 		return sprintf.apply(this, args);
 	}
 
-	if (_i18n_config.doNotLoadParser) {
+	if (_i18n_config.doNotLoadFormatter) {
 		self.callSprintf = callSprintf;
 	} else {
 		if (typeof _i18n_config === 'object' && _i18n_config.alias) {
 			i18n = _i18n_config.alias;
 		}
 
-		self[i18n].loadParser(callSprintf, 100);
+		self[i18n].loadFormatter(callSprintf, 100);
 	}
 })();

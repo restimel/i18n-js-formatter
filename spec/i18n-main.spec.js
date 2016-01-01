@@ -1671,7 +1671,7 @@ describe('i18n', function() {
 		});
 	});
 
-	describe('basic parser', function() {
+	describe('basic formatter', function() {
 		beforeEach(function() {
 			this.logInfo = jasmine.createSpy('logInfo');
 			this.logWarn = jasmine.createSpy('logWarn');
@@ -1712,7 +1712,7 @@ describe('i18n', function() {
 			$$._reset();
 		});
 
-		it('should not remplace the %s wilcard without parser', function() {
+		it('should not remplace the %s wilcard without formatter', function() {
 			expect($$('Hello %s!', 'Restimel')).toBe('Hello %s!');
 			$$.setLocale('fr');
 			expect($$('Hello %s!', 'Restimel')).toBe('Salut %s !');
@@ -1724,74 +1724,74 @@ describe('i18n', function() {
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		it('should call parser', function() {
-			var parser = jasmine.createSpy('parser');
+		it('should call formatter', function() {
+			var formatter = jasmine.createSpy('formatter');
 
-			$$.loadParser(parser);
+			$$.loadFormatter(formatter);
 
 			$$('Hello %s!', 'Restimel');
-			expect(parser).toHaveBeenCalledWith('Hello %s!', ['Restimel'], jasmine.any(Object));
-			expect(parser.calls.count()).toEqual(1);
+			expect(formatter).toHaveBeenCalledWith('Hello %s!', ['Restimel'], jasmine.any(Object));
+			expect(formatter.calls.count()).toEqual(1);
 
-			parser.calls.reset();
+			formatter.calls.reset();
 			$$.parse('Hello %s!', 'Restimel');
-			expect(parser).toHaveBeenCalledWith('Hello %s!', ['Restimel'], jasmine.any(Object));
-			expect(parser.calls.count()).toEqual(1);
+			expect(formatter).toHaveBeenCalledWith('Hello %s!', ['Restimel'], jasmine.any(Object));
+			expect(formatter.calls.count()).toEqual(1);
 		});
 
 		it('should parse unknown string', function() {
-			var response = 'parser response';
-			var parser = jasmine.createSpy('parser').and.returnValue(response);
+			var response = 'formatter response';
+			var formatter = jasmine.createSpy('formatter').and.returnValue(response);
 
-			$$.loadParser(parser);
+			$$.loadFormatter(formatter);
 			expect($$.parse('%d %s', 42, 'cats')).toBe(response);
-			expect(parser).toHaveBeenCalledWith('%d %s', [42, 'cats'], jasmine.any(Object));
+			expect(formatter).toHaveBeenCalledWith('%d %s', [42, 'cats'], jasmine.any(Object));
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		it('should reject not function parser', function() {
-			var parser = function() {};
+		it('should reject not function formatter', function() {
+			var formatter = function() {};
 
-			$$.loadParser(parser);
+			$$.loadFormatter(formatter);
 			expect(this.logError).not.toHaveBeenCalled();
 
-			$$.loadParser({parser: parser});
+			$$.loadFormatter({formatter: formatter});
 			expect(this.logError).not.toHaveBeenCalled();
 
-			$$.loadParser({parser: 42, name: 'toto'});
+			$$.loadFormatter({formatter: 42, name: 'toto'});
 			expect(this.logError).toHaveBeenCalledWith(7200, jasmine.any(String), ['toto']);
 
 			this.logError.calls.reset();
-			$$.loadParser(42);
+			$$.loadFormatter(42);
 			expect(this.logError).toHaveBeenCalledWith(7200, jasmine.any(String), ['']);
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
 		});
 
-		it('should call parser in given order', function() {
+		it('should call formatter in given order', function() {
 			var order = [];
-			var parser = function(value) {
+			var formatter = function(value) {
 				return function(text) {
 					return text + ' ' + value;
 				};
 			};
-			var parser1 = parser('p1');
-			var parser2 = parser('p2');
-			var parser3 = parser('p3');
-			var parser4 = parser('p4');
+			var formatter1 = formatter('p1');
+			var formatter2 = formatter('p2');
+			var formatter3 = formatter('p3');
+			var formatter4 = formatter('p4');
 
-			$$.loadParser({parser: parser1, weight: 100});
-			$$.loadParser({parser: parser2});
+			$$.loadFormatter({formatter: formatter1, weight: 100});
+			$$.loadFormatter({formatter: formatter2});
 			expect($$.parse('text')).toBe('text p1 p2');
 
-			$$.loadParser({parser: parser3, weight: 200});
+			$$.loadFormatter({formatter: formatter3, weight: 200});
 			expect($$.parse('txt')).toBe('txt p3 p1 p2');
 
-			$$.loadParser({parser: parser4, weight: 95});
+			$$.loadFormatter({formatter: formatter4, weight: 95});
 			expect($$.parse('t')).toBe('t p3 p1 p4 p2');
 
 			expect(this.logInfo).not.toHaveBeenCalled();

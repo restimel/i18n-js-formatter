@@ -74,7 +74,7 @@
 
 <script>
 var _i18n_config = {
-	doNotLoadParser: true //because we also want to reload them after a _reset()
+	doNotLoadFormatter: true //because we also want to reload them after a _reset()
 };
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sprintf/1.0.3/sprintf.min.js"></script>
@@ -94,12 +94,12 @@ var historyLog = [];
 var currentHistory = 0;
 
 var autoCompleteMap = {
-	configuration: ['locales', 'localeName', 'secondary', 'alias', 'defaultLocale', 'storage', 'syncLoading', 'lazyLoading', 'onLocaleReady', 'dictionary', 'data', 'log'],
+	configuration: ['locales', 'localeName', 'localeSet', 'secondary', 'alias', 'defaultLocale', 'storage', 'syncLoading', 'lazyLoading', 'onLocaleReady', 'dictionary', 'data', 'log'],
 	configuration_log: ['warning', 'info', 'error'],
 	getLocale: ['key', 'name', 'secondary', 'data'],
 	getLocales: ['key', 'name', 'secondary', 'data'],
 	getData: ['key', 'locale', 'format'],
-	loadParser: ['parser', 'name', 'weight']
+	loadFormatter: ['formatter', 'name', 'weight']
 };
 
 function replaceSpecialChar(char) {
