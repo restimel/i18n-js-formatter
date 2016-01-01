@@ -651,8 +651,12 @@
 					case 'data':
 						lastResult = sv.data[locale.key] && sv.data[locale.key][value];
 						break;
+					case 'localeKey':
 					case 'locale':
 						lastResult = locale.key;
+						break;
+					case 'localeName':
+						lastResult = locale.name;
 						break;
 					default:
 						lastResult = locale[attribute];

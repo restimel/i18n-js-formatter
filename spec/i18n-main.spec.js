@@ -224,11 +224,21 @@ describe('i18n', function() {
 			it('should get locales', function() {
 				expect($$.getLocales()).toEqual(['en', 'fr', 'de', 'fr-be']);
 				expect($$.getLocales({key: true})).toEqual(['en', 'fr', 'de', 'fr-be']);
+				expect($$.getLocales({localeKey: true})).toEqual(['en', 'fr', 'de', 'fr-be']);
 			});
 
 			it('should get locale names', function() {
 				expect($$.getLocales({
 					name: true
+				})).toEqual([
+					'English',
+					'Français',
+					'Deutsch',
+					'Belge'
+				]);
+
+				expect($$.getLocales({
+					localeName: true
 				})).toEqual([
 					'English',
 					'Français',
