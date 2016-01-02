@@ -1,6 +1,28 @@
 describe('i18n', function() {
 	'use strict';
 
+	var defaultSIsuffix = [
+		{suffix: 'P', multiple: 1e+15},
+		{suffix: 'T', multiple: 1e+12},
+		{suffix: 'G', multiple: 1e+9},
+		{suffix: 'M', multiple: 1e+6},
+		{suffix: 'k', multiple: 1e+3},
+		{suffix: '', multiple: 1e+0},
+		{suffix: 'm', multiple: 1e-3},
+		{suffix: 'µ', multiple: 1e-6},
+		{suffix: 'n', multiple: 1e-9},
+		{suffix: 'p', multiple: 1e-12},
+		{suffix: 'f', multiple: 1e-15}
+	];
+	var defaultRules = {
+		number: {
+			thousandSeparator: ',',
+			decimalSeparator: '.',
+			exponentialSeparator: 'e',
+			SIsuffix: defaultSIsuffix
+		}
+	};
+
 	it('should declare variables', function() {
 		expect(i18n).toBeDefined();
 		expect($$).toBeDefined(); // '$$' has been added as an alias by _i18n_config
@@ -392,21 +414,9 @@ describe('i18n', function() {
 		describe('define formatter rules', function() {
 			it('should have default rules', function() {
 				$$.setLocale('en');
-				expect($$.getRules()).toEqual({
-					number: {
-						thousandSeparator: ',',
-						decimalSeparator: '.',
-						exponentialSeparator: 'e'
-					}
-				});
+				expect($$.getRules()).toEqual(defaultRules);
 
-				expect($$.getRules('fr')).toEqual({
-					number: {
-						thousandSeparator: ',',
-						decimalSeparator: '.',
-						exponentialSeparator: 'e'
-					}
-				});
+				expect($$.getRules('fr')).toEqual(defaultRules);
 
 				expect(this.logInfo).not.toHaveBeenCalled();
 				expect(this.logWarn).not.toHaveBeenCalled();
@@ -439,7 +449,8 @@ describe('i18n', function() {
 					number: {
 						thousandSeparator: ',',
 						decimalSeparator: '.',
-						exponentialSeparator: '10^'
+						exponentialSeparator: '10^',
+						SIsuffix: defaultSIsuffix
 					}
 				});
 
@@ -447,7 +458,8 @@ describe('i18n', function() {
 					number: {
 						thousandSeparator: ' ',
 						decimalSeparator: ',',
-						exponentialSeparator: 'e'
+						exponentialSeparator: 'e',
+						SIsuffix: defaultSIsuffix
 					}
 				});
 
@@ -1545,7 +1557,8 @@ describe('i18n', function() {
 				number: {
 					thousandSeparator: ' ',
 					decimalSeparator: ',',
-					exponentialSeparator: 'e'
+					exponentialSeparator: 'e',
+					SIsuffix: defaultSIsuffix
 				}
 			});
 

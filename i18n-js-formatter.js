@@ -63,7 +63,20 @@
 		number: {
 			thousandSeparator: ',',
 			decimalSeparator: '.',
-			exponentialSeparator: 'e'
+			exponentialSeparator: 'e',
+			SIsuffix: [
+				{suffix: 'P', multiple: 1e+15},
+				{suffix: 'T', multiple: 1e+12},
+				{suffix: 'G', multiple: 1e+9},
+				{suffix: 'M', multiple: 1e+6},
+				{suffix: 'k', multiple: 1e+3},
+				{suffix: '', multiple: 1e+0},
+				{suffix: 'm', multiple: 1e-3},
+				{suffix: 'µ', multiple: 1e-6},
+				{suffix: 'n', multiple: 1e-9},
+				{suffix: 'p', multiple: 1e-12},
+				{suffix: 'f', multiple: 1e-15}
+			]
 		}
 	};
 
@@ -551,6 +564,12 @@
 
 		if (locale) {
 			_extend(locale.formatRules, rules);
+			if (rules.number && rules.number.SIsuffix) {
+				/* sort from biggest multiple to smallest multiple */
+				locale.formatRules.number.SIsuffix.sort(function(s1, s2) {
+					return s2.multiple - s1.multiple;
+				});
+			}
 		}
 	}
 
@@ -1193,12 +1212,11 @@
 			if (typeof value !== 'object') {
 				origObj[key] = value;
 			} else {
+				if (value instanceof Array) {
+					origObj[key] = [];
+				} else
 				if (typeof origObj[key] !== 'object') {
-					if (value instanceof Array) {
-						origObj[key] = [];
-					} else {
-						origObj[key] = {};
-					}
+					origObj[key] = {};
 				}
 
 				_extend(origObj[key], value);

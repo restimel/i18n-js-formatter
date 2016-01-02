@@ -17,6 +17,10 @@ describe('i18n-formatter', function() {
 					en: '%d cats',
 					fr: '%d chats'
 				},
+				'%D cats': {
+					en: '%D cats',
+					fr: '%D chats'
+				},
 				'%f cats': {
 					en: '%f cats',
 					fr: '%f chats'
@@ -224,10 +228,10 @@ describe('i18n-formatter', function() {
 				expect($$('%d', -12345)).toBe('-12 345');
 			});
 
-			xit('should replace the %D wildcard', function() {
+			it('should replace the %D wildcard', function() {
 				expect($$('%D cats', 42)).toBe('42 cats');
 				expect($$('%D cats', 42.76)).toBe('42.76 cats');
-				expect($$('%D cats', 1234.5)).toBe('1.2345k cats');
+				expect($$('%D cats', 1234.5)).toBe('1.235k cats');
 
 				expect($$('%D cats', 0.0000000000000042)).toBe('4.2f cats');
 				expect($$('%D cats', 0.0000000000042)).toBe('4.2p cats');
@@ -240,15 +244,24 @@ describe('i18n-formatter', function() {
 				expect($$('%D cats', 4200000000)).toBe('4.2G cats');
 				expect($$('%D cats', 4200000000000)).toBe('4.2T cats');
 				expect($$('%D cats', 4200000000000000)).toBe('4.2P cats');
+				expect($$('%D cats', 4200000000000000000)).toBe('4,200P cats');
 
 				$$.setLocale('fr');
 				expect($$('%D cats', 42)).toBe('42 chats');
 				expect($$('%D cats', 42.76)).toBe('42,76 chats');
-				expect($$('%D cats', 1234.5)).toBe('1,2345k chats');
+				expect($$('%D cats', 1234.5)).toBe('1,235k chats');
 				$$.setLocale('fr-be');
 				expect($$('%D cats', 42)).toBe('42 chats');
 				expect($$('%D cats', 42.76)).toBe('42,76 chats');
-				expect($$('%D cats', 1234.5)).toBe('1,2345k chats');
+				expect($$('%D cats', 1234.5)).toBe('1,235k chats');
+
+				expect($$.parse('%D', 0)).toBe('0');
+				expect($$.parse('%D', NaN)).toBe('NaN');
+				expect($$.parse('%D', Infinity)).toBe('Infinity');
+
+				expect($$.parse('%D', -4200000)).toBe('-4,2M');
+				expect($$.parse('%D', -0.000042)).toBe('-42µ');
+				expect($$.parse('%D', -123456789001)).toBe('-123,457G');
 			});
 
 			xit('should replace the %i wildcard', function() {

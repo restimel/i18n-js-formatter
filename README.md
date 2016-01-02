@@ -116,7 +116,7 @@ The second possibility is to use the configuration method available in the libra
 * **syncLoading**:	{Boolean} If true, the json file loading is done synchronously.
 * **formatRules**: {Object} rules for some output format depending of locales.
 					For each locale keys, an object contains the rules.
-	* **number**: {Object} rules for displaying numbers. Attributes are **thousandSeparator**, **decimalSeparator**, **exponentialSeparator** (see formatter section for more details)
+	* **number**: {Object} rules for displaying numbers. Attributes are **thousandSeparator**, **decimalSeparator**, **exponentialSeparator**, **SIsuffix** (see formatter section for more details)
 * **localeSet**:	{Object} define all options at one for defined locales. It replaces locales defined with options "locales".
 	* *key*:	{String} [Required] the locale to define.
 	* *name*:	{String} the locale pretty name.
@@ -528,7 +528,7 @@ The kind character can be either *d*, *D*, *e*, *f*, *i*.
 
 * *f*: display a float number as it is in JavaScript whatever is the language. Example: i18n('%f', 1234.56) => '1234.56'
 * *d*: display a float number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234.56' (en) or '1 234,56' (fr) (see number parameter options below).
-* *D*: display a float number with suffix. Example: i18n('%D', 1234.56) => '1.23k' | i18n('%f', 0.0123) => '12.3m'
+* *D*: display a float number with suffix. Example: i18n('%D', 1234.56) => '1.23k' | i18n('%f', 0.0123) => '12.3m' (by default, number are rounded to 3 decimals)
 * *i*: display an integer number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234' (en) or '1 234' (fr)
 * *e*: display a number in scientific format. Example: i18n('%e', 1234.56) => '1.23456e+3' | i18n('%f', 0.0123) => '1.23e-2'
 
@@ -571,12 +571,15 @@ It is also possible to use the LocaleSet parameter.
 
 Parameters are:
 
-* *thousandSeparator*: Used to separate thousand digits. Example: i18n('%d', 1234567) => '1,234,567'
+* *thousandSeparator*: {String} Used to separate thousand digits. Example: i18n('%d', 1234567) => '1,234,567'
 	Default value: ','
-* *decimalSeparator*: Used to separate integer part from decimal part. Example: i18n('%d', 123.456) => '123.456' (if separator is '.'), i18n('%d', 123.456) => '123,456' (if separator is ',')
+* *decimalSeparator*: {String} Used to separate integer part from decimal part. Example: i18n('%d', 123.456) => '123.456' (if separator is '.'), i18n('%d', 123.456) => '123,456' (if separator is ',')
 	Default value: '.'
-* *exponentialSeparator*: Used by scientific notation. Example: i18n('%e', 1234567) => '1.234567e+6' (if separator is 'e'), i18n('%d', 1234567) => '1.234567 10^+6' (if separator is ' 10^')
+* *exponentialSeparator*: {String} Used by scientific notation. Example: i18n('%e', 1234567) => '1.234567e+6' (if separator is 'e'), i18n('%d', 1234567) => '1.234567 10^+6' (if separator is ' 10^')
 	Default value: 'e'
+* *SIsuffix*: {Object[]} list of SI suffix and their multipler. The object contain the suffix character (property suffix) and the multipler value (property multiple).
+Example: [{suffix: 'M', multiple: 1000000}, {suffix: 'k', multiple: 1000}]
+Default value is the list of SI suffixes for all thousand from 10^-15 to 10^15.
 
 #### date support
 

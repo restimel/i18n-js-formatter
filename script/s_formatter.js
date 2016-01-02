@@ -1,4 +1,5 @@
 (function() {
+	'use strict';
 	var i18n = 'i18n';
 
 	function s_formatter(text, values, statusVariable) {
@@ -32,17 +33,37 @@
 		}
 
 		function getNumber(value, variation) {
-			var splitValue, nb;
+			var splitValue, nb, status;
 
 			nb = Number(value);
 
 			splitValue = nb.toString().split('.');
 
-			return {
+			status = {
 				number: nb,
 				integer: splitValue[0],
 				decimal: splitValue[1]
 			};
+
+			if (variation) {
+				variation.forEach(function(code) {
+					var nb = parseInt(code.slice(1), 10);
+
+					if (isNaN(nb)) {
+						return;
+					}
+
+					switch(code.charAt(0)) {
+						case '.':
+							if (status.decimal && status.decimal.length > nb) {
+								status.decimal = (Math.round(('0.'+status.decimal) * Math.pow(10, nb)) / Math.pow(10, nb)).toString().slice(2);
+							}
+							break;
+					}
+				});
+			}
+
+			return status;
 		}
 
 		function prettyNumber(origValue, variation) {
@@ -60,6 +81,49 @@
 			}
 
 			return value;
+		}
+
+		function shortNumber(origValue, variation) {
+			var value, computeValue, i, sign, suffix;
+
+			origValue = Number(origValue);
+			sign = origValue < 0;
+			computeValue = Math.abs(origValue);
+
+			if (!isFinite(computeValue)) {
+				return computeValue;
+			}
+
+			/* default number of rounded decimal is 3 */
+			if (!variation) {
+				variation = ['.3'];
+			} else if (variation.every(function(v) {
+				return v.indexOf('.') !== 0
+			})) {
+				variation.push('.3');
+			}
+
+			/* special case: 0 should be display like single digit (as 1) */
+			if (origValue === 0) {
+				computeValue = 1;
+			}
+
+			suffix = getRules().number.SIsuffix;
+			i = 0;
+			do {
+				value = computeValue / suffix[i].multiple;
+			} while(++i < suffix.length && value < 1);
+			i--;
+
+			if (origValue === 0) {
+				value = 0;
+			}
+
+			if (sign) {
+				value = -value;
+			}
+
+			return prettyNumber(value, variation) + suffix[i].suffix;
 		}
 
 		function replacement(pattern, arg, variation, kind) {
@@ -99,6 +163,7 @@
 				case 'd':
 					return prettyNumber(value, variation);
 				case 'D':
+					return shortNumber(value, variation);
 				case 'i':
 				case 'e':
 					return Number(value);
