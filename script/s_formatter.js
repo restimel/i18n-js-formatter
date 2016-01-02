@@ -13,7 +13,19 @@
 			if (!arg) {
 				value = values[count];
 			} else {
-				console.log('TODO')
+				arg = arg.slice(1, -1);
+				if (/\d+/.test(arg)) {
+					value = values[parseInt(arg, 10) - 1];
+				} else {
+					arg = arg.split('.');
+					value = arg.reduce(function(obj, property) {
+						if (typeof obj !== 'undefined') {
+							obj = obj[property];
+						}
+
+						return obj;
+					}, values[0]);
+				}
 			}
 
 			switch(kind) {

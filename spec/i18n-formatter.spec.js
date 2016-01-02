@@ -134,7 +134,7 @@ describe('i18n-formatter', function() {
 			$$.loadFormatter({formatter: s_formatter, weight: 100, name: 's_formatter'});
 		});
 
-		xit('should identify correct argument', function() {
+		it('should identify correct argument', function() {
 			expect($$.parse('%s', 'foo1', 'foo2')).toBe('foo1');
 			expect($$.parse('%(1)s', 'bar1', 'bar2')).toBe('bar1');
 			expect($$.parse('%(2)s', 'foo1', 'foo2')).toBe('foo2');
