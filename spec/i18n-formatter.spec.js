@@ -205,7 +205,7 @@ describe('i18n-formatter', function() {
 				expect($$('%f cats', 1234.5)).toBe('1234.5 chats');
 			});
 
-			xit('should replace the %d wildcard', function() {
+			it('should replace the %d wildcard', function() {
 				expect($$('%d cats', 42)).toBe('42 cats');
 				expect($$('%d cats', 42.76)).toBe('42.76 cats');
 				expect($$('%d cats', 1234.5)).toBe('1,234.5 cats');
@@ -217,6 +217,11 @@ describe('i18n-formatter', function() {
 				expect($$('%d cats', 42)).toBe('42 chats');
 				expect($$('%d cats', 42.76)).toBe('42,76 chats');
 				expect($$('%d cats', 1234.5)).toBe('1 234,5 chats');
+
+				expect($$('%d', 0)).toBe('0');
+				expect($$('%d', 123456)).toBe('123 456');
+				expect($$('%d', -123456)).toBe('-123 456');
+				expect($$('%d', -12345)).toBe('-12 345');
 			});
 
 			xit('should replace the %D wildcard', function() {
