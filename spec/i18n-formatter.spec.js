@@ -191,7 +191,7 @@ describe('i18n-formatter', function() {
 		});
 
 		describe('number formatting', function() {
-			xit('should replace the %f wildcard', function() {
+			it('should replace the %f wildcard', function() {
 				expect($$('%f cats', 42)).toBe('42 cats');
 				expect($$('%f cats', 42.76)).toBe('42.76 cats');
 				expect($$('%f cats', 1234.5)).toBe('1234.5 cats');

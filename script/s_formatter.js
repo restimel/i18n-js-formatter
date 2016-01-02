@@ -20,15 +20,19 @@
 				case 's':
 					return value.toString();
 					break;
+				case 'f':
 				case 'd':
-					return +value;
+				case 'D':
+				case 'i':
+				case 'e':
+					return Number(value);
 					break;
 				case '%':
 					return '%';
 			}
 		}
 
-		text = text.replace(/%(\([^\)]+\))?(\{[^\}]*\})?([%ds])/g, replacement);
+		text = text.replace(/%(\([^\)]+\))?(\{[^\}]*\})?([%dDefis])/g, replacement);
 		return text;
 	}
 
