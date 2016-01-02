@@ -1,7 +1,7 @@
 (function() {
 	var i18n = 'i18n';
 
-	function callSprintf(text, values, sv) {
+	function callSprintf(text, values, statusVariable) {
 		var args = [text].concat(values);
 
 		return sprintf.apply(this, args);

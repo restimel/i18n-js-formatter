@@ -1,7 +1,7 @@
 (function() {
 	var i18n = 'i18n';
 
-	function s_formatter(text, values, sv) {
+	function s_formatter(text, values, statusVariable) {
 		var args = [text].concat(values);
 		var count = -1;
 

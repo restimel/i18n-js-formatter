@@ -68,7 +68,7 @@
 	};
 
 	/* status variables */
-	var sv;
+	var statusVariables;
 	_reset();
 
 	/* API methods */
@@ -132,19 +132,19 @@
 		}
 
 		if (typeof options.onLocaleReady !== 'undefined') {
-			sv.onLocaleReady = options.onLocaleReady;
+			statusVariables.onLocaleReady = options.onLocaleReady;
 		}
 
 		if (typeof options.syncLoading === 'boolean') {
-			sv.syncLoading = options.syncLoading;
+			statusVariables.syncLoading = options.syncLoading;
 		}
 
 		if (typeof options.lazyLoading === 'boolean') {
-			sv.lazyLoading = options.lazyLoading;
+			statusVariables.lazyLoading = options.lazyLoading;
 		}
 
 		if (needLoading) {
-			sv.status.callLocaleLoaded = true;
+			statusVariables.status.callLocaleLoaded = true;
 		}
 
 		if (typeof options.dictionary !== 'undefined') {
@@ -157,20 +157,20 @@
 
 		if (typeof options.storage !== 'undefined') {
 			_configureStorage(options.storage);
-			if (!sv.useDfltLocale) {
-				_setStorage(sv.currentLocale.key);
+			if (!statusVariables.useDfltLocale) {
+				_setStorage(statusVariables.currentLocale.key);
 			}
 		}
 
 		if (typeof options.defaultLocale !== 'undefined') {
-			sv.defaultKeyLocale = options.defaultLocale;
+			statusVariables.defaultKeyLocale = options.defaultLocale;
 		}
 
-		if (sv.useDfltLocale && sv.localeKeys.length) {
-			sv.currentLocale = sv.locales[_getDefaultKey()];
+		if (statusVariables.useDfltLocale && statusVariables.localeKeys.length) {
+			statusVariables.currentLocale = statusVariables.locales[_getDefaultKey()];
 		}
 
-		if (needLoading && sv.lazyLoading) {
+		if (needLoading && statusVariables.lazyLoading) {
 			_loadCurrentLocale();
 		}
 	};
@@ -193,20 +193,20 @@
 			key = _formatLocaleKey(key);
 		}
 
-		if (key === sv.currentLocale.key) {
+		if (key === statusVariables.currentLocale.key) {
 			key = false;
 		} else
-		if (!sv.locales[key]) {
+		if (!statusVariables.locales[key]) {
 			key = false;
 			saveChanged = false;
 		} else {
-			sv.currentLocale = sv.locales[key];
+			statusVariables.currentLocale = statusVariables.locales[key];
 			_loadCurrentLocale();
 		}
 
 		if (saveChanged) {
-			sv.useDfltLocale = useDflt;
-			_setStorage(i18n.getLocale(), sv.useDfltLocale);
+			statusVariables.useDfltLocale = useDflt;
+			_setStorage(i18n.getLocale(), statusVariables.useDfltLocale);
 		}
 
 		return key;
@@ -223,7 +223,7 @@
 	 *						   If several options are given, it return an object with the key/value of wanted options.
 	 */
 	i18n.getLocale = function(options) {
-		return _getLocale(sv.currentLocale, options);
+		return _getLocale(statusVariables.currentLocale, options);
 	};
 
 	/**
@@ -237,8 +237,8 @@
 	 *							   If several options are given, it return a list of object with the key/value of wanted options.
 	 */
 	i18n.getLocales = function(options) {
-		return sv.localeKeys.map(function(key) {
-			return _getLocale(sv.locales[key], options);
+		return statusVariables.localeKeys.map(function(key) {
+			return _getLocale(statusVariables.locales[key], options);
 		});
 	};
 
@@ -259,7 +259,7 @@
 		var dico;
 
 		key = _formatLocaleKey(key);
-		dico = sv.data[key];
+		dico = statusVariables.data[key];
 
 		if (format === 'dictionary') {
 			rslt = {};
@@ -269,9 +269,9 @@
 				if (dico && dico[sentence]) {
 					rslt[sentence][key] = dico[sentence];
 				} else {
-					sv.localeKeys.forEach(function(key) {
-						if (sv.data[key] && sv.data[key][sentence]) {
-							rslt[sentence][key] = sv.data[key][sentence];
+					statusVariables.localeKeys.forEach(function(key) {
+						if (statusVariables.data[key] && statusVariables.data[key][sentence]) {
+							rslt[sentence][key] = statusVariables.data[key][sentence];
 						}
 					});
 				}
@@ -280,7 +280,7 @@
 			if (key && typeof dico !== 'undefined') {
 				rslt = dico;
 			} else {
-				rslt = sv.data;
+				rslt = statusVariables.data;
 			}
 		}
 
@@ -331,11 +331,11 @@
 	 */
 	i18n.clearData = function(key) {
 		if (typeof key === 'undefined') {
-			sv.data = {};
-			sv.localeKeys.forEach(_resetDataKey);
+			statusVariables.data = {};
+			statusVariables.localeKeys.forEach(_resetDataKey);
 		} else {
 			key = _formatLocaleKey(key);
-			if (sv.data[key]) {
+			if (statusVariables.data[key]) {
 				_resetDataKey(key);
 			}
 		}
@@ -352,12 +352,12 @@
 		var useDflt = typeof key === 'undefined';
 
 		if (useDflt) {
-			key = sv.currentLocale.key;
+			key = statusVariables.currentLocale.key;
 		} else {
 			key = _formatLocaleKey(key);
 		}
 
-		return (sv.locales[key] && sv.locales[key].formatRules) || {};
+		return (statusVariables.locales[key] && statusVariables.locales[key].formatRules) || {};
 	};
 
 	/**
@@ -381,7 +381,7 @@
 	 */
 
 	function _reset() {
-		sv = {
+		statusVariables = {
 			locales: {},
 			localeKeys: [],
 			defaultKeyLocale: undefined,
@@ -409,7 +409,7 @@
 	}
 
 	function _resetDataKey(key) {
-		sv.data[key] = null;
+		statusVariables.data[key] = null;
 	}
 
 	function _createLocale(key, name) {
@@ -417,7 +417,7 @@
 
 		key = key.toLowerCase();
 
-		dflt = sv.locales[key] || {};
+		dflt = statusVariables.locales[key] || {};
 		locale = {
 			key: key,
 			name: _default(name, dflt.name),
@@ -429,14 +429,14 @@
 	}
 
 	function _cleanData() {
-		_each(sv.data, function(value, key) {
-			if (sv.localeKeys.indexOf(key) === -1) {
-				delete sv.data[key];
+		_each(statusVariables.data, function(value, key) {
+			if (statusVariables.localeKeys.indexOf(key) === -1) {
+				delete statusVariables.data[key];
 			}
 		});
 
-		sv.localeKeys.forEach(function(key) {
-			if (!sv.data[key]) {
+		statusVariables.localeKeys.forEach(function(key) {
+			if (!statusVariables.data[key]) {
 				_resetDataKey(key);
 			}
 		});
@@ -446,7 +446,7 @@
 		var nextLocales = {};
 		var needLoading = false;
 
-		sv.localeKeys = [];
+		statusVariables.localeKeys = [];
 
 		options.localeSet.forEach(function(localeObj) {
 			var key, name, secondary, formatRules, dataDictionary;
@@ -491,14 +491,14 @@
 			}
 
 			if (!nextLocales[key]) {
-				sv.localeKeys.push(key);
+				statusVariables.localeKeys.push(key);
 			}
 			nextLocales[key] = locale;
 		});
 
 		_cleanData();
 
-		sv.locales = nextLocales;
+		statusVariables.locales = nextLocales;
 
 		return needLoading;
 	}
@@ -506,7 +506,7 @@
 	function _configureLocales(options) {
 		var nextLocales = {};
 
-		sv.localeKeys = [];
+		statusVariables.localeKeys = [];
 
 		options.locales.forEach(function(key) {
 			var locale;
@@ -519,22 +519,22 @@
 			key = locale.key;
 
 			if (!nextLocales[key]) {
-				sv.localeKeys.push(key);
+				statusVariables.localeKeys.push(key);
 			}
 			nextLocales[key] = locale;
 		});
 
 		_cleanData();
 
-		sv.locales = nextLocales;
+		statusVariables.locales = nextLocales;
 	}
 
 	function _configurelocaleNames(options) {
 		_each(options.localeName, function(value, key) {
 			key = _formatLocaleKey(key);
 
-			if (sv.locales[key]) {
-				sv.locales[key].name = value;
+			if (statusVariables.locales[key]) {
+				statusVariables.locales[key].name = value;
 			}
 		});
 	}
@@ -544,7 +544,7 @@
 
 		if (typeof lng === 'string') {
 			lng = _formatLocaleKey(lng);
-			locale = sv.locales[lng];
+			locale = statusVariables.locales[lng];
 		} else {
 			locale = lng;
 		}
@@ -567,7 +567,7 @@
 			var value = origValue;
 			key = _formatLocaleKey(key);
 
-			if (sv.locales[key]) {
+			if (statusVariables.locales[key]) {
 				if (typeof value !== 'string') {
 					if (value === false || value === null) {
 						value = false;
@@ -598,7 +598,7 @@
 				value = preparationSecondaries[key];
 
 				if (typeof value === 'undefined') {
-					value = sv.locales[key].secondary;
+					value = statusVariables.locales[key].secondary;
 				}
 			}
 
@@ -614,12 +614,12 @@
 
 		/* copy secondaries */
 		_each(preparationSecondaries, function(value, key) {
-			sv.locales[key].secondary = value;
+			statusVariables.locales[key].secondary = value;
 		});
 	}
 
 	function _configureLog(optLog, kind) {
-		sv.log[kind] = optLog;
+		statusVariables.log[kind] = optLog;
 	}
 
 	function _configureStorage(options) {
@@ -648,24 +648,24 @@
 		}
 
 		type = type.split(':');
-		sv.storage.kind = type[0];
-		sv.storage.name = type[1];
+		statusVariables.storage.kind = type[0];
+		statusVariables.storage.name = type[1];
 	}
 
 	function _setStorage(value, reset) {
-		switch(sv.storage.kind) {
+		switch(statusVariables.storage.kind) {
 			case 'cookie':
 				if (reset) {
-					document.cookie = sv.storage.name + '=';
+					document.cookie = statusVariables.storage.name + '=';
 				} else {
-					document.cookie = sv.storage.name + '=' + value;
+					document.cookie = statusVariables.storage.name + '=' + value;
 				}
 				break;
 			case 'localStorage':
 				if (reset) {
-					self.localStorage.removeItem(sv.storage.name);
+					self.localStorage.removeItem(statusVariables.storage.name);
 				} else {
-					self.localStorage.setItem(sv.storage.name, value);
+					self.localStorage.setItem(statusVariables.storage.name, value);
 				}
 				break;
 		}
@@ -674,9 +674,9 @@
 	function _getStorage() {
 		var value, srch;
 
-		switch(sv.storage.kind) {
+		switch(statusVariables.storage.kind) {
 			case 'cookie':
-				srch = sv.storage.name + '=';
+				srch = statusVariables.storage.name + '=';
 				value = document.cookie.split(';').filter(function(str) {
 					return str.indexOf(srch) === 0;
 				})[0];
@@ -685,7 +685,7 @@
 				}
 				break;
 			case 'localStorage':
-				value = self.localStorage.getItem(sv.storage.name);
+				value = self.localStorage.getItem(statusVariables.storage.name);
 		}
 
 		return value;
@@ -705,7 +705,7 @@
 			if (value) {
 				switch (attribute) {
 					case 'data':
-						lastResult = sv.data[locale.key] && sv.data[locale.key][value];
+						lastResult = statusVariables.data[locale.key] && statusVariables.data[locale.key][value];
 						break;
 					case 'localeKey':
 					case 'locale':
@@ -734,8 +734,8 @@
 	function _getDefaultKey() {
 		var key = _getStorage();
 
-		if (!key && typeof sv.defaultKeyLocale === 'string') {
-			key = _formatLocaleKey(sv.defaultKeyLocale);
+		if (!key && typeof statusVariables.defaultKeyLocale === 'string') {
+			key = _formatLocaleKey(statusVariables.defaultKeyLocale);
 		}
 
 		if (!key) {
@@ -745,7 +745,7 @@
 			});
 
 			if (!key) {
-				key = sv.localeKeys[0];
+				key = statusVariables.localeKeys[0];
 			}
 		}
 
@@ -755,8 +755,8 @@
 	function _getCatalog() {
 		var catalog = [];
 
-		sv.localeKeys.forEach(function(key) {
-			var dico = sv.data[key];
+		statusVariables.localeKeys.forEach(function(key) {
+			var dico = statusVariables.data[key];
 			if (dico) {
 				_each(dico, function(v, sentence) {
 					if (catalog.indexOf(sentence) === -1) {
@@ -773,7 +773,7 @@
 		key = _default(key, '');
 		key = key.toLowerCase();
 
-		while (!sv.locales[key] && key) {
+		while (!statusVariables.locales[key] && key) {
 			key = key.replace(/(?:^|-)[^-]*$/, '');
 		}
 
@@ -787,20 +787,20 @@
 		}
 
 		if (typeof weight === 'undefined') {
-			if (sv.formatter.length) {
-				weight = sv.formatter[sv.formatter.length - 1].w - 10;
+			if (statusVariables.formatter.length) {
+				weight = statusVariables.formatter[statusVariables.formatter.length - 1].w - 10;
 			} else {
 				weight = 100;
 			}
 		}
 
-		sv.formatter.push({
+		statusVariables.formatter.push({
 			f: formatter,
 			w: weight,
 			name: name
 		});
 
-		sv.formatter.sort(function(a, b) {
+		statusVariables.formatter.sort(function(a, b) {
 			return b.w - a.w;
 		});
 	}
@@ -810,9 +810,9 @@
 
 		values = Array.prototype.slice.call(arguments, 1);
 
-		txt = sv.formatter.reduce(function (text, formatter) {
+		txt = statusVariables.formatter.reduce(function (text, formatter) {
 			try {
-				text = formatter.f(text, values, sv);
+				text = formatter.f(text, values, statusVariables);
 			} catch(e) {
 				_warning(4200, [formatter.name, e.message]);
 			}
@@ -861,11 +861,11 @@
 	}
 
 	function _loadCurrentLocale() {
-		var key = sv.currentLocale.key;
-		var method = sv.loadingMethod[key];
-		var dictionary = sv.data[key];
+		var key = statusVariables.currentLocale.key;
+		var method = statusVariables.loadingMethod[key];
+		var dictionary = statusVariables.data[key];
 
-		sv.status.callLocaleLoaded = true;
+		statusVariables.status.callLocaleLoaded = true;
 
 		if (!dictionary || typeof dictionary !== 'object') {
 			switch(typeof method) {
@@ -893,7 +893,7 @@
 	}
 
 	function _addData(dictionary) {
-		var loadData = sv.lazyLoading ? _saveData : _loadData;
+		var loadData = statusVariables.lazyLoading ? _saveData : _loadData;
 
 		if (typeof dictionary !== 'object') {
 			_error(7012, [typeof dictionary, dictionary]);
@@ -902,7 +902,7 @@
 
 		_each(dictionary, loadData);
 
-		if (sv.status.callLocaleLoaded === true) {
+		if (statusVariables.status.callLocaleLoaded === true) {
 			_localeReady();
 		}
 	}
@@ -914,7 +914,7 @@
 
 		_addDataByKey(dico, key);
 
-		if (sv.status.callLocaleLoaded === true) {
+		if (statusVariables.status.callLocaleLoaded === true) {
 			_localeReady();
 		}
 	}
@@ -927,7 +927,7 @@
 		if (typeof dico === 'object') {
 			_addDataWithKey(dico, key);
 		} else {
-			sv.loadingMethod[key] = dico;
+			statusVariables.loadingMethod[key] = dico;
 		}
 	}
 
@@ -955,10 +955,10 @@
 		}
 
 		_each(values, function(value, key) {
-			var dico = sv.data[key];
+			var dico = statusVariables.data[key];
 
 			if (dico === null) {
-				dico = sv.data[key] = {};
+				dico = statusVariables.data[key] = {};
 			}
 
 			if (!dico) {
@@ -973,7 +973,7 @@
 		var xhr = new XMLHttpRequest();
 		var rslt;
 
-		if (sv.syncLoading) {
+		if (statusVariables.syncLoading) {
 			xhr.open('GET', url, false);
 			xhr.send(null);
 			if (xhr.status === 200 || xhr.status === 0) {
@@ -1015,18 +1015,18 @@
 	}
 
 	function _localeReady() {
-		if (sv.status.callLocaleLoaded === true
-		&&	typeof sv.onLocaleReady === 'function'
-		&& _hasDataKey(sv.currentLocale.key))
+		if (statusVariables.status.callLocaleLoaded === true
+		&&	typeof statusVariables.onLocaleReady === 'function'
+		&& _hasDataKey(statusVariables.currentLocale.key))
 		{
-			sv.status.callLocaleLoaded = false;
-			sv.onLocaleReady(sv.currentLocale.key);
+			statusVariables.status.callLocaleLoaded = false;
+			statusVariables.onLocaleReady(statusVariables.currentLocale.key);
 		}
 	}
 
 	function _hasDataKey(key) {
-		var hasData = typeof sv.data[key] === 'object' && sv.data[key] !== null;
-		var secondary = sv.locales[key].secondary;
+		var hasData = typeof statusVariables.data[key] === 'object' && statusVariables.data[key] !== null;
+		var secondary = statusVariables.locales[key].secondary;
 
 		return hasData && (!secondary || secondary && _hasDataKey(secondary));
 	}
@@ -1038,7 +1038,7 @@
 	function _translation(sentenceKey, key, origKey) {
 		var sentence;
 
-		key = key || sv.currentLocale.key;
+		key = key || statusVariables.currentLocale.key;
 		origKey = origKey || key;
 
 		switch(typeof sentenceKey) {
@@ -1059,7 +1059,7 @@
 	function _translationString(sentenceKey, key, origKey) {
 		var ldata, sentence;
 
-		ldata = sv.data[key];
+		ldata = statusVariables.data[key];
 		sentence = ldata && ldata[sentenceKey];
 
 		sentence = _translationFallback(sentenceKey, key, origKey, sentence, _translationIssueString);
@@ -1099,7 +1099,7 @@
 		var secondary;
 
 		if (typeof sentence !== 'string') {
-			secondary = sv.locales[key].secondary;
+			secondary = statusVariables.locales[key].secondary;
 			if (secondary) {
 				sentence = _translation(sentenceKey, secondary, origKey);
 			} else {
@@ -1117,8 +1117,8 @@
 	function _info(code, details) {
 		var message = _getMessage(code, details);
 
-		if (typeof sv.log.info === 'function') {
-			sv.log.info(code, message, details);
+		if (typeof statusVariables.log.info === 'function') {
+			statusVariables.log.info(code, message, details);
 		} else {
 			console.info(message);
 		}
@@ -1127,8 +1127,8 @@
 	function _warning(code, details) {
 		var message = _getMessage(code, details);
 
-		if (typeof sv.log.warn === 'function') {
-			sv.log.warn(code, message, details);
+		if (typeof statusVariables.log.warn === 'function') {
+			statusVariables.log.warn(code, message, details);
 		} else {
 			console.warn(message);
 		}
@@ -1137,8 +1137,8 @@
 	function _error(code, details) {
 		var message = _getMessage(code, details);
 
-		if (typeof sv.log.error === 'function') {
-			sv.log.error(code, message, details);
+		if (typeof statusVariables.log.error === 'function') {
+			statusVariables.log.error(code, message, details);
 		} else {
 			console.error(message);
 		}
