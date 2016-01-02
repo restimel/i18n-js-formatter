@@ -5,7 +5,29 @@
 		var args = [text].concat(values);
 		var count = -1;
 
-		function replacement(pattern, arg, code, kind) {
+		function stringReplacement(value, variation) {
+			if (typeof value === 'undefined') {
+				value = 'undefined';
+			} else {
+				value = value.toString();
+			}
+
+			if (variation) {
+				if (variation.indexOf('case') !== -1) {
+					value = value.toLowerCase();
+				} else if (variation.indexOf('CASE') !== -1) {
+					value = value.toUpperCase();
+				} else if (variation.indexOf('Case') !== -1) {
+					value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+				} else if (variation.indexOf('CasE') !== -1) {
+					value = value.charAt(0).toUpperCase() + value.slice(1);
+				}
+			}
+
+			return value;
+		}
+
+		function replacement(pattern, arg, variation, kind) {
 			var value;
 
 			count++;
@@ -28,10 +50,15 @@
 				}
 			}
 
+			if (variation) {
+				variation = variation.slice(1, -1).split(',').map(function(v) {
+					return v.trim();
+				});
+			}
+
 			switch(kind) {
 				case 's':
-					return value.toString();
-					break;
+					return stringReplacement(value, variation);
 				case 'f':
 				case 'd':
 				case 'D':

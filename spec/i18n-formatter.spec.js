@@ -182,7 +182,7 @@ describe('i18n-formatter', function() {
 				expect($$('Hello %s!', obj)).toBe('Hello ' + obj.toString() + '!');
 			});
 
-			xit('should change the case', function() {
+			it('should change the case', function() {
 				expect($$.parse('%{case}s', 'some Strings')).toBe('some strings');
 				expect($$.parse('%{CASE}s', 'some Strings')).toBe('SOME STRINGS');
 				expect($$.parse('%{Case}s', 'some Strings')).toBe('Some strings');
