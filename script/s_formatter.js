@@ -66,7 +66,7 @@
 			return status;
 		}
 
-		function prettyNumber(origValue, variation) {
+		function prettyNumber(origValue, variation, isInteger) {
 			var status = getNumber(origValue, variation);
 			var integer = status.integer;
 			var rules = getRules().number;
@@ -76,7 +76,7 @@
 
 			value = integer.replace(/(\d)(?=(?:\d{3})+$)/g, '$1' + thousandSeparator);
 
-			if (status.decimal) {
+			if (!isInteger && status.decimal) {
 				value = [value, decimalSeparator, status.decimal].join('');
 			}
 
@@ -165,6 +165,7 @@
 				case 'D':
 					return shortNumber(value, variation);
 				case 'i':
+					return prettyNumber(value, variation, true);
 				case 'e':
 					return Number(value);
 					break;

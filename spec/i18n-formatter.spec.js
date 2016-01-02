@@ -25,6 +25,10 @@ describe('i18n-formatter', function() {
 					en: '%f cats',
 					fr: '%f chats'
 				},
+				'%i cats': {
+					en: '%i cats',
+					fr: '%i chats'
+				},
 				'%d issues: %s': {
 					en: '%d issues: %s',
 					fr: '%d problèmes : %s'
@@ -264,7 +268,7 @@ describe('i18n-formatter', function() {
 				expect($$.parse('%D', -123456789001)).toBe('-123,457G');
 			});
 
-			xit('should replace the %i wildcard', function() {
+			it('should replace the %i wildcard', function() {
 				expect($$('%i cats', 42)).toBe('42 cats');
 				expect($$('%i cats', 42.76)).toBe('42 cats');
 				expect($$('%i cats', 1234.5)).toBe('1,234 cats');
