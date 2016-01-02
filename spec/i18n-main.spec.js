@@ -389,6 +389,74 @@ describe('i18n', function() {
 			]);
 		});
 
+		describe('define formatter rules', function() {
+			xit('should have default rules', function() {
+				$$.setLocale('en');
+				expect($$.getRules()).toEqual({
+					number: {
+						thousandSeparator: ',',
+						decimalSeparator: '.',
+						exponentialSeparator: 'e'
+					}
+				});
+
+				expect($$.getRules('fr')).toEqual({
+					number: {
+						thousandSeparator: ',',
+						decimalSeparator: '.',
+						exponentialSeparator: 'e'
+					}
+				});
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			xit('should change the rules for existing keys', function() {
+				$$.configuration({formatRules: {
+					en: {
+						number: {
+							exponentialSeparator: '10^'
+						}
+					},
+					fr: {
+						number: {
+							thousandSeparator: ' ',
+							decimalSeparator: ','
+						}
+					},
+					xbl: {
+						number: {
+							thousandSeparator: 'foo',
+							decimalSeparator: 'bar',
+							exponentialSeparator: 'baz'
+						}
+					}
+				}});
+				$$.setLocale('en');
+				expect($$.getRules()).toEqual({
+					number: {
+						thousandSeparator: ',',
+						decimalSeparator: '.',
+						exponentialSeparator: '10^'
+					}
+				});
+
+				expect($$.getRules('fr')).toEqual({
+					number: {
+						thousandSeparator: ' ',
+						decimalSeparator: ',',
+						exponentialSeparator: 'e'
+					}
+				});
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			})
+		});
+
 		describe('$$.getData()', function() {
 			beforeEach(function() {
 				$$.configuration({
@@ -1453,7 +1521,13 @@ describe('i18n', function() {
 					key: 'fr',
 					name: 'Français',
 					secondary: 'en',
-					data: spyFr
+					data: spyFr,
+					formatRules: {
+						number: {
+							thousandSeparator: ' ',
+							decimalSeparator: ','
+						}
+					}
 				}]
 			});
 
@@ -1466,6 +1540,14 @@ describe('i18n', function() {
 
 			$$.setLocale('fr');
 			expect(spyFr).toHaveBeenCalled();
+
+			expect($$.getRules()).toEqual({
+				number: {
+					thousandSeparator: ' ',
+					decimalSeparator: ',',
+					exponentialSeparator: 'e'
+				}
+			});
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();

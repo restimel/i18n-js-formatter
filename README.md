@@ -114,6 +114,9 @@ The second possibility is to use the configuration method available in the libra
 * **lazyLoading**:	{Boolean} If true, load json file only when locale is changed (it works only with data loading and not with dictionary loading).
 					[Default value: true]
 * **syncLoading**:	{Boolean} If true, the json file loading is done synchronously.
+* **formatRules**: {Object} rules for some output format depending of locales.
+					For each locale keys, an object contains the rules.
+	* **number**: {Object} rules for displaying numbers. Attributes are **thousandSeparator**, **decimalSeparator**, **exponentialSeparator** (see formatter section for more details)
 * **localeSet**:	{Object} define all options at one for defined locales. It replaces locales defined with options "locales".
 	* *key*:	{String} [Required] the locale to define.
 	* *name*:	{String} the locale pretty name.
@@ -188,17 +191,34 @@ It is possible to add several formatters and order them with the weight attribut
 
 By default weight is 100. If the weight is higher than another formatter, the formatter will be called before.
 
+#### i18n.getRules
+
+It retrieves the current formatting rules or the one specified by the first argument.
+
+	i18n.getRules('fr') =>	{
+								number: {
+									thousandSeparator: ' ',
+									decimalSeparator: ',',
+									exponentialSeprator: 'e'
+								}
+							}
+
+	// in locale (en)
+	i18n.getRules() =>	{
+							number: {
+								thousandSeparator: ',',
+								decimalSeparator: '.',
+								exponentialSeprator: 'e'
+							}
+						}
+
+See formatter section to get more details about Rules values
+
 #### sprintf support
 
 src/wrapperSprintf.js contains a simple method to handle Sprintf API as a formatter for i18n API.
 
 If _i18n_config.doNotLoadFormatter is set to true, the sprintf formatter is not automatically added to i18n but you can load the function "callSprintf" manually with the options you want.
-
-#### i18n formatter (to come soon)
-
-##### number format support
-
-##### date support
 
 ### i18n.context() [version 0.2]
 
@@ -454,3 +474,110 @@ Here are code details:
 	* 7100: Translation is not possible due to an unsupported type (%s): %s (details: [typeof given argument, the argument])
 	* 7200: Formatter %s can not be added because it is not a function. (details: [formatter name])
 	* 8400 → 8599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'
+
+## i18n formatter
+
+A formatter is provided with the i18n-js-formatter library but as many wants to use their own formatters (like sprintf), this formatter is not loaded by default.
+
+To load it, you must include the script "script/s_formatter.js".
+If you have set _i18n_config.doNotLoadFormatter to true, then you should load it into the i18n manager explicitely:
+
+	i18n.loadFormatter(s_formatter);
+
+### formatter usage
+
+A formatting tag starts with a '%' and ends with a character to indicates the kind of output.
+
+	"%s" will display the value as a string
+	"%d" will display the value as a number
+
+It is possible to give more information to format it better. The full syntax is %(position){variation}k
+
+	* (position): [optional]
+		If position is a number, it reads the value of the given arguments (starting at 1). Example: i18n('%(2)s %(1)s', 'alpha', 'bravo') => 'bravo alpha'
+		If position is a string, it reads the property value of the first argument. Example: i18n('%(foo)s %(bar)s', {foo: 'alpha', bar: 'bravo'}) => 'alpha bravo'
+		By default, it refers to the N argument where N is the number of formatting replacement. i18n('%s %s', 'a', 'b') is equivalent to i18n('%(1)s %(2)s', 'a', 'b')
+	* {variation}: [optional]
+		Depending to the output format, it allows to change the display (see below for more details). For example, i18n('%{.2}f', 1.2345) => '1.23'
+		Many rules can be added, they must be separated by comma. For example, i18n('%{p2, .2, d2}f', 1.2345) => '01.23'
+	* k: the kind of out output, it defines how the output must be interpreted.
+		It is composed with a single letter.
+
+#### special character
+
+*%%* it displays a single %.
+
+Note: if the format does not follow `%(position){variation}k` then it is not necessary to "escape" the '%'.
+
+#### string format support (s)
+
+It converts the value to string.
+The kind character is "*s*".
+
+Possible variations:
+
+* *case*: convert string to lower case
+* *CASE*: convert string to upper case
+* *Case*: convert string to lower case except the first charcter which is upper case
+* *CasE*: The first character is set to upper case. Others are stay unchanged.
+
+#### number format support (d, D, e, f, i)
+
+It converts the value to number.
+The kind character can be either *d*, *D*, *e*, *f*, *i*.
+
+* *f*: display a float number as it is in JavaScript whatever is the language. Example: i18n('%f', 1234.56) => '1234.56'
+* *d*: display a float number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234.56' (en) or '1 234,56' (fr) (see number parameter options below).
+* *D*: display a float number with suffix. Example: i18n('%D', 1234.56) => '1.23k' | i18n('%f', 0.0123) => '12.3m'
+* *i*: display an integer number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234' (en) or '1 234' (fr)
+* *e*: display a number in scientific format. Example: i18n('%e', 1234.56) => '1.23456e+3' | i18n('%f', 0.0123) => '1.23e-2'
+
+oxb ?
+
+Possible variations:
+
+* *.N*: (N must be a number) it rounds the number to N decimals. Example: i18n('%{.1}f', 1.234) => '1.2'
+* *pN*: (N must be a number) The integer part must have at least N digits. It adds 0 before digits to have the right number of digits. Example: i18n('%{p3}f', 12) => '012'
+* *dN*: (N must be a number) The decimal part must have at least N digits. It adds 0 after digits to have the right number of digits. Example: i18n('%{d3}f', 1.2) => '1.20'
+
+##### Separator configuration
+
+To manage some parameters it is possible to change some separator depending to the locale.
+
+	i18n.configuration({
+		formatRules: {
+			en: {
+				number: {
+					thousandSeparator: ',',
+					decimalSeparator: '.'
+				}
+			}
+		}
+	});
+
+It is also possible to use the LocaleSet parameter.
+
+	i18n.configuration({
+		LocaleSet: [{
+			key: 'en',
+			formatRules: {
+				number: {
+					thousandSeparator: ',',
+					decimalSeparator: '.'
+				}
+			}
+		}
+	});
+
+Parameters are:
+
+* *thousandSeparator*: Used to separate thousand digits. Example: i18n('%d', 1234567) => '1,234,567'
+	Default value: ','
+* *decimalSeparator*: Used to separate integer part from decimal part. Example: i18n('%d', 123.456) => '123.456' (if separator is '.'), i18n('%d', 123.456) => '123,456' (if separator is ',')
+	Default value: '.'
+* *exponentialSeparator*: Used by scientific notation. Example: i18n('%e', 1234567) => '1.234567e+6' (if separator is 'e'), i18n('%d', 1234567) => '1.234567 10^+6' (if separator is ' 10^')
+	Default value: 'e'
+
+#### date support
+
+%T
