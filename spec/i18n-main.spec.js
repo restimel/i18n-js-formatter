@@ -390,7 +390,7 @@ describe('i18n', function() {
 		});
 
 		describe('define formatter rules', function() {
-			xit('should have default rules', function() {
+			it('should have default rules', function() {
 				$$.setLocale('en');
 				expect($$.getRules()).toEqual({
 					number: {
@@ -413,7 +413,7 @@ describe('i18n', function() {
 				expect(this.logError).not.toHaveBeenCalled();
 			});
 
-			xit('should change the rules for existing keys', function() {
+			it('should change the rules for existing keys', function() {
 				$$.configuration({formatRules: {
 					en: {
 						number: {

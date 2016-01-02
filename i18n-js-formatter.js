@@ -59,6 +59,14 @@
 		8505: 'HTTP version is not supported by server: %s'
 	};
 
+	var defaultRules = {
+		number: {
+			thousandSeparator: ',',
+			decimalSeparator: '.',
+			exponentialSeparator: 'e'
+		}
+	};
+
 	/* status variables */
 	var sv;
 	_reset();
@@ -113,6 +121,10 @@
 
 		if (typeof options.secondary === 'object') {
 			_configureSecondaries(options.secondary);
+		}
+
+		if (typeof options.formatRules === 'object') {
+			_configureFormatRules(options.formatRules);
 		}
 
 		if (typeof options.alias === 'string') {
@@ -330,6 +342,25 @@
 	};
 
 	/**
+	 * Get the format rules for the given locale
+	 *
+	 * @param [key] {String} the locale's rule to retrieve. If not defined the current locale's rule is return.
+	 *
+	 * @return {Object} the formatted rule of the locale
+	 */
+	i18n.getRules = function(key) {
+		var useDflt = typeof key === 'undefined';
+
+		if (useDflt) {
+			key = sv.currentLocale.key;
+		} else {
+			key = _formatLocaleKey(key);
+		}
+
+		return (sv.locales[key] && sv.locales[key].formatRules) || {};
+	};
+
+	/**
 	 * Retrieve the current version
 	 * X.Y.Z
 	 * X: major version (which can potentially break retro-compatibility)
@@ -390,7 +421,8 @@
 		locale = {
 			key: key,
 			name: _default(name, dflt.name),
-			secondary: false
+			secondary: false,
+			formatRules: _extend({}, defaultRules)
 		};
 
 		return locale;
@@ -417,7 +449,7 @@
 		sv.localeKeys = [];
 
 		options.localeSet.forEach(function(localeObj) {
-			var key, name, secondary, dataDictionary;
+			var key, name, secondary, formatRules, dataDictionary;
 			var locale;
 			var data;
 
@@ -428,6 +460,7 @@
 			key = localeObj.localeKey || localeObj.key || localeObj.locale;
 			name = localeObj.localeName || localeObj.name;
 			secondary = localeObj.secondary;
+			formatRules = localeObj.formatRules;
 			dataDictionary = localeObj.data;
 
 			if (typeof key !== 'string') {
@@ -444,6 +477,10 @@
 
 			if (typeof secondary === 'string') {
 				locale.secondary = secondary;
+			}
+
+			if (typeof formatRules === 'object') {
+				_setFormatRules(formatRules, locale);
 			}
 
 			if (dataDictionary) {
@@ -500,6 +537,25 @@
 				sv.locales[key].name = value;
 			}
 		});
+	}
+
+	function _setFormatRules(rules, lng) {
+		var locale;
+
+		if (typeof lng === 'string') {
+			lng = _formatLocaleKey(lng);
+			locale = sv.locales[lng];
+		} else {
+			locale = lng;
+		}
+
+		if (locale) {
+			_extend(locale.formatRules, rules);
+		}
+	}
+
+	function _configureFormatRules(rules) {
+		_each(rules, _setFormatRules);
 	}
 
 	function _configureSecondaries(secondaries) {
@@ -1132,8 +1188,29 @@
 		return typeof value === 'undefined' ? dfltValue : value;
 	}
 
+	function _extend(origObj, extendObj) {
+		_each(extendObj, function(value, key) {
+			if (typeof value !== 'object') {
+				origObj[key] = value;
+			} else {
+				if (typeof origObj[key] !== 'object') {
+					if (value instanceof Array) {
+						origObj[key] = [];
+					} else {
+						origObj[key] = {};
+					}
+				}
+
+				_extend(origObj[key], value);
+			}
+		});
+
+		return origObj;
+	}
+
 	function _each(object, iteratee, context) {
 		var x, f;
+
 		if (typeof context === 'object') {
 			f = iteratee.bind(context);
 		} else {
