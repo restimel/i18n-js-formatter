@@ -758,10 +758,13 @@
 		}
 
 		if (!key) {
-			self.navigator.languages.some(function(lng) {
-				key = _formatLocaleKey(lng);
-				return key;
-			});
+			/* navigator.languages is not defined in worker */
+			if (self.navigator && self.navigator.languages instanceof Array) {
+				self.navigator.languages.some(function(lng) {
+					key = _formatLocaleKey(lng);
+					return key;
+				});
+			}
 
 			if (!key) {
 				key = statusVariables.localeKeys[0];
