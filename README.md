@@ -743,3 +743,88 @@ Parameters are:
 
 #### duration format (t) {not implemented yet}
 
+It converts the value to a duration.
+The kind character is **t**.
+
+* **t**: displays a duration. The default unit of the value is milliseconds but it can be set to a different unit with variation. By default it displays the most precise unit. Example: i18n('%t', 45123) => '45s 123ms', i18n('%t', 105000) => '1min 45s'.
+
+Possible variations:
+
+* **u:S**: (S must be a string) defines the unit of the value. Example: i18n('%{u:min}t', 3610) => '1h 10min'
+S values can be:
+	* **µs** for microseconds
+	* **ms** for milliseconds (default value)
+	* **s** for seconds
+	* **min** for minutes
+	* **h** for hours
+	* **d** for days
+	* **m** for months
+	* **y** for years
+
+* **min:S**: (S must be a string) defines the minimal unit to display (value is floored if it is more precise). Example: i18n('%{min:s}t', 45123) => '45s'
+* **max:S**: (S must be a string) defines the maximal unit to display. Example: i18n('%{max:s}t', 105123) => '105s 123ms'
+* **n:N**: (N must be a number) defines the maximum number of unit to display. Example: i18n('%{n:1}t', 105123) => '1min', i18n('%{n:2}t', 105123) => '1min 45s', i18n('%{n:10}t', 105123) => '1min 45s 123ms'
+* **f:"S"**: (S must be a string) defines the output format. This output is static and the display is no more dynamic regarding the value. Code for describing unit is defined below. These code starts with $. Example: i18n('%{f:"$hh $mmin $ss $ims"}t', 3705123) => '1h 1min 45s 123ms', i18n('%{f:"$h:$m:$s"}t', 3705123) => '1:1:45', i18n('%{f:"$m min"}t', 3705123) => '61 min', i18n('%{f:"$d day $h hour $m min"}t', 3705123) => '0 day 1 hour 1 min', i18n('%{f:"$d day $h hour $s seconds"}t', 3705123) => '0 day 1 hour 105 seconds'
+code can be:
+| code | meaning | value |
+|:----:| ------- | ----- |
+|$i|milliseconds||
+|$s|seconds| = 1000$i |
+|$m|minutes| = 60$s |
+|$h|hours| = 60$m |
+|$d|days| = 24$h |
+|$M|months| = 30$d |
+|$y|years| = 365$d |
+
+Be careful number of months is always computed on 30 days which is not obviously the right number of months.
+In the same way number of years is computed on 365 days which is wrong for bissextil years.
+
+
+##### Textual configuration
+
+To manage some parameters it is possible to change textual values depending on the locale.
+
+	i18n.configuration({
+		formatRules: {
+			en: {
+				duration: {
+					ms: 'ms',
+					s: 's',
+					min: 'min',
+					h: 'h',
+					d: 'd',
+					month: 'month',
+					y: 'y'
+				}
+			}
+		}
+	});
+
+It is also possible to use the LocaleSet parameter.
+
+	i18n.configuration({
+		LocaleSet: [{
+			key: 'en',
+			formatRules: {
+				date: {
+					ms: 'ms',
+					s: 's',
+					min: 'min',
+					h: 'h',
+					d: 'd',
+					month: 'month',
+					y: 'y'
+				}
+			}
+		}
+	});
+
+Parameters are:
+
+* **ms**: milliseconds unit
+* **s**: seconds unit
+* **min**: minutes unit
+* **h**: hours unit
+* **d**: days unit
+* **month**: months unit
+* **y**: years unit
