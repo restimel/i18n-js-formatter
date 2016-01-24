@@ -750,17 +750,16 @@ The kind character is **t**.
 
 Possible variations:
 
-* **u:S**: (S must be a string) defines the unit of the value. Example: i18n('%{u:min}t', 3610) => '1h 10min'
+* **u:S**: (S must be a string) defines the unit of the value. Example: i18n('%{u:s}t', 3610) => '1h 10min'
 S values can be:
 	* **µs** for microseconds
 	* **ms** for milliseconds (default value)
 	* **s** for seconds
-	* **min** for minutes
+	* **m** or **min** for minutes
 	* **h** for hours
 	* **d** for days
-	* **m** for months
+	* **M** for months
 	* **y** for years
-
 * **min:S**: (S must be a string) defines the minimal unit to display (value is floored if it is more precise). Example: i18n('%{min:s}t', 45123) => '45s'
 * **max:S**: (S must be a string) defines the maximal unit to display. Example: i18n('%{max:s}t', 105123) => '105s 123ms'
 * **n:N**: (N must be a number) defines the maximum number of unit to display. Example: i18n('%{n:1}t', 105123) => '1min', i18n('%{n:2}t', 105123) => '1min 45s', i18n('%{n:10}t', 105123) => '1min 45s 123ms'
@@ -768,7 +767,8 @@ S values can be:
 code can be:
 | code | meaning | value |
 |:----:| ------- | ----- |
-|$i|milliseconds||
+|$µ|microseconds||
+|$i|milliseconds| = 1000$µ |
 |$s|seconds| = 1000$i |
 |$m|minutes| = 60$s |
 |$h|hours| = 60$m |
@@ -788,12 +788,13 @@ To manage some parameters it is possible to change textual values depending on t
 		formatRules: {
 			en: {
 				duration: {
+					µs: 'µs',
 					ms: 'ms',
 					s: 's',
 					min: 'min',
 					h: 'h',
 					d: 'd',
-					month: 'month',
+					month: 'M',
 					y: 'y'
 				}
 			}
@@ -806,13 +807,14 @@ It is also possible to use the LocaleSet parameter.
 		LocaleSet: [{
 			key: 'en',
 			formatRules: {
-				date: {
+				duration: {
+					µs: 'µs',
 					ms: 'ms',
 					s: 's',
 					min: 'min',
 					h: 'h',
 					d: 'd',
-					month: 'month',
+					month: 'M',
 					y: 'y'
 				}
 			}

@@ -1801,7 +1801,7 @@ describe('i18n', function() {
 			$$.clearData();
 		});
 
-		it('should translate the key', function() {
+		xit('should translate the key', function() {
 			expect($$.context('number', 'seventy')).toBe('seventy');
 			expect($$.c('number', 'seventy')).toBe('seventy');
 			$$.setLocale('fr');
@@ -1816,7 +1816,7 @@ describe('i18n', function() {
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		it('should fallback the translation', function() {
+		xit('should fallback the translation', function() {
 			$$.setLocale('fr-be');
 
 			expect($$.context('animal', 'cat')).toBe('chat');

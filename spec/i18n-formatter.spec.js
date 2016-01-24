@@ -52,12 +52,26 @@ describe('i18n-formatter', function() {
 						thousandSeparator: ' ',
 						decimalSeparator: ',',
 						exponentialSeparator: ' 10^'
+					},
+					duration: {
+						µs: 'µs',
+						ms: 'ms',
+						s: 's',
+						min: 'min',
+						h: 'h',
+						d: 'j',
+						month: 'M',
+						y: 'a'
 					}
 				},
 				'fr-be': {
 					number: {
 						thousandSeparator: ' ',
 						decimalSeparator: ','
+					},
+					duration: {
+						d: 'j',
+						y: 'a'
 					}
 				}
 			},
@@ -436,6 +450,105 @@ describe('i18n-formatter', function() {
 
 				value = 42.1;
 				expect($$.parse('%{.2,d2,p2}f', value)).toBe('42.10');
+			});
+		});
+
+		describe('duration formatting', function() {
+			xit('should replace the %t wildcard', function() {
+				expect($$.parse('%t', 45123)).toBe('45s 123ms');
+				expect($$.parse('%t', 105000)).toBe('1min 45s');
+				expect($$.parse('%t', 31719845006)).toBe('1y 2d 3h 4min 5s 6ms');
+				expect($$.parse('%t', 7204000)).toBe('2h 4s');
+				$$.setLocale('fr');
+				expect($$.parse('%t', 45123)).toBe('45s 123ms');
+				expect($$.parse('%t', 105000)).toBe('1min 45s');
+				expect($$.parse('%t', 31719845006)).toBe('1a 2j 3h 4min 5s 6ms');
+				expect($$.parse('%t', 7204000)).toBe('2h 4s');
+				$$.setLocale('fr-be');
+				expect($$.parse('%t', 45123)).toBe('45s 123ms');
+				expect($$.parse('%t', 105000)).toBe('1min 45s');
+				expect($$.parse('%t', 31719845006)).toBe('1an 2j 3h 4min 5s 6ms');
+				expect($$.parse('%t', 7204000)).toBe('2h 4s');
+			});
+
+			xit('should defines the value unit with u:S', function() {
+				expect($$.parse('%{u:µs}t', 7204000123)).toBe('2h 4s 123µs');
+				expect($$.parse('%{u:ms}t', 7204123)).toBe('2h 4s 123ms');
+				expect($$.parse('%{u:s}t', 7204)).toBe('2h 4s');
+				expect($$.parse('%{u:m}t', 135)).toBe('2h 15min');
+				expect($$.parse('%{u:min}t', 135)).toBe('2h 15min');
+				expect($$.parse('%{u:h}t', 51)).toBe('2d 3h');
+				expect($$.parse('%{u:d}t', 5)).toBe('5d');
+				expect($$.parse('%{u:M}t', 7)).toBe('7M');
+				expect($$.parse('%{u:y}t', 3)).toBe('3y');
+
+				expect($$.parse('%{u:ms}t', 7204123.456)).toBe('2h 4s 123ms 456µs');
+				expect($$.parse('%{u:s}t', 7204.456)).toBe('2h 4s 456ms');
+				expect($$.parse('%{u:m}t', 1.5)).toBe('1min 30s');
+
+				expect($$.parse('%{u:s}t', 3610)).toBe('1h 10min');
+			});
+
+			xit('should defines the minimal unit with min:S', function() {
+				var value = 31719845006;
+
+				expect($$.parse('%{min:ms}t', value)).toBe('1y 2d 3h 4min 5s 6ms');
+				expect($$.parse('%{min:s}t', value)).toBe('1y 2d 3h 4min 5s');
+				expect($$.parse('%{min:m}t', value)).toBe('1y 2d 3h 4min');
+				expect($$.parse('%{min:min}t', value)).toBe('1y 2d 3h 4min');
+				expect($$.parse('%{min:h}t', value)).toBe('1y 2d 3h');
+				expect($$.parse('%{min:d}t', value)).toBe('1y 2d');
+				expect($$.parse('%{min:M}t', value)).toBe('1y');
+				expect($$.parse('%{min:y}t', value)).toBe('1y');
+
+				expect($$.parse('%{min:ms}t', 123.456)).toBe('123ms');
+
+				expect($$.parse('%{min:s}t', 45123)).toBe('45s');
+			});
+
+			xit('should defines the maximal unit with max:S', function() {
+				var value = 31719845006;
+
+				expect($$.parse('%{max:µs}t', value)).toBe('31,719,845,006,000µs');
+				expect($$.parse('%{max:ms}t', value)).toBe('31,719,845,006ms');
+				expect($$.parse('%{max:s}t', value)).toBe('31,719,845s 6ms');
+				expect($$.parse('%{max:m}t', value)).toBe('528,664min 5s 6ms');
+				expect($$.parse('%{max:min}t', value)).toBe('528,664min 5s 6ms');
+				expect($$.parse('%{max:h}t', value)).toBe('8,811h 4min 5s 6ms');
+				expect($$.parse('%{max:d}t', value)).toBe('367d 3h 4min 5s 6ms');
+				expect($$.parse('%{max:M}t', value)).toBe('12M 7d 3h 4min 5s 6ms');
+				expect($$.parse('%{max:y}t', value)).toBe('1y 2d 3h 4min 5s 6ms');
+
+				expect($$.parse('%{max:s}t', 105123)).toBe('105s 123ms');
+			});
+
+			xit('should defines the maximum number of unit with n:N', function() {
+				var value = 54342010;
+				expect($$.parse('%{n:1}t', value)).toBe('15h');
+				expect($$.parse('%{n:2}t', value)).toBe('15h 5min');
+				expect($$.parse('%{n:3}t', value)).toBe('15h 5min 42s');
+				expect($$.parse('%{n:4}t', value)).toBe('15h 5min 42s 10ms');
+				expect($$.parse('%{n:5}t', value +1)).toBe('15h 5min 42s 11ms');
+				expect($$.parse('%{n:6}t', value +2)).toBe('15h 5min 42s 12ms');
+
+				expect($$.parse('%{n:2}t', 31719845006)).toBe('1y');
+				expect($$.parse('%{n:3}t', 31719845006)).toBe('1y 2d');
+
+				expect($$.parse('%{n:1}t', 105123)).toBe('1min');
+				expect($$.parse('%{n:2}t', 105123)).toBe('1min 45s');
+				expect($$.parse('%{n:10}t', 105123)).toBe('1min 45s 123ms');
+			});
+
+			xit('should format the ouput with f:"S"', function() {
+				var value = 3705123;
+
+				expect($$.parse('%{f:"$hh $mmin $ss $ims"}t', value)).toBe('1h 1min 45s 123ms');
+				expect($$.parse('%{f:"$h:$m:$s"}t', value)).toBe('1:1:45');
+				expect($$.parse('%{f:"$m min"}t', value)).toBe('61 min');
+				expect($$.parse('%{f:"$d day $h hour $m min"}t', value)).toBe('0 day 1 hour 1 min');
+				expect($$.parse('%{f:"$d day $h hour $s seconds"}t', value)).toBe('0 day 1 hour 105 seconds');
+
+				expect($$.parse('%{f:"$y $M $d $h $m $s $i $µ"}t', 34311845006.007)).toBe('1 1 2 3 4 5 6 7');
 			});
 		});
 

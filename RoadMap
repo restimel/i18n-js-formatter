@@ -3,16 +3,19 @@ Road map for i18n-js-formatter
 Version 0.1
 
 	* Formatter
-		* formatter plug-in
-			* home-hand formatter
-				* string (done)
-				* pretty number (done)
+		✓ formatter plug-in
+			✓ home-hand formatter
+				✓ string
+				✓ pretty number
 
 Version 0.2
 
+	* pretty date
+	* pretty duration (1000s → 16min 40s)
 	* add context for translation
 		* i18n.context('context', 'translation key', values)
 		* i18n.c('context', 'translation key', values)
+	* string: check that special characters are correctly upperCase
 
 Version 0.3
 
@@ -26,11 +29,9 @@ To plan
 
 	* Formatter
 		* number Hexa/binaire/Octal
-		* string: check that special characters are correctly upperCase
-		* pretty date
-		* pretty duration (1000s → 16min 40s)
-		* pretty conversion
-			* 1000 → 1k (done)
-			* 1000s → 16min
+		* pretty conversion (custom data)
+			✓ 1000 → 1k
+			* 1000s → 16min (as generic value)
+			* 1024byte → 1kbyte
 		* custom format
 			* allow to use other chars like %J to display a complex format
