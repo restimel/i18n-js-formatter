@@ -453,6 +453,183 @@ describe('i18n-formatter', function() {
 			});
 		});
 
+		describe('date formatting', function() {
+			xit('should replace the %T wildcard', function() {
+				var offset = (new Date()).getTimezoneOffset();
+				var value1;
+
+				// As result depends of the browser timezone offset the value is
+				// recomputed accordingly to give the same result indepently
+				// where you run the test.
+				value1 = 1453125600000 - offset * 60000;
+				//To check if 1453125600000 is the correct timestamp
+				// 1453129200000 → 3PM => 1453125600000 → 2PM and not 4PM
+
+				expect($$.parse('%T', value1)).toBe('1/18/2016, 4:00:00 PM');
+				$$.setLocale('fr');
+				expect($$.parse('%T', value1)).toBe('18/1/2016 16:00:00');
+				$$.setLocale('fr-be');
+				expect($$.parse('%T', value1)).toBe('18/1/2016 16:00:00');
+			});
+
+			xit('should defines the value unit with u:S', function() {
+				var value = 1453125600000 - offset * 60000;
+
+				expect($$.parse('%{u:µs}T', value * 1000)).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{u:ms}T', value)).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{u:s}T', Math.floor(value / 1000))).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{u:m}T', Math.floor(value / 60000))).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{u:min}T', Math.floor(value / 60000))).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{u:h}T', Math.floor(value / 3600000))).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{u:d}T', Math.floor(value / 86400000))).toBe('1/18/2016, 1:00:00 AM');
+				// Not the best tests
+				expect($$.parse('%{u:M}T', Math.floor(value / (86400000 * 30)))).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{u:y}T', Math.floor(value / (86400000 * 365)))).toBe('1/18/2016, 4:00:00 PM');
+
+				//check decimal value
+				expect($$.parse('%{u:d}T', value / 86400000)).toBe('1/18/2016, 4:00:00 PM');
+			});
+
+			xit('should set the tilezone offset with o:N', function() {
+				var value = 1453125600000;
+
+				expect($$.parse('%{o:0}T', value)).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{o:1}T', value)).toBe('1/18/2016, 5:00:00 PM');
+				expect($$.parse('%{o:+1}T', value)).toBe('1/18/2016, 5:00:00 PM');
+				expect($$.parse('%{o:-1}T', value)).toBe('1/18/2016, 3:00:00 PM');
+				expect($$.parse('%{o:12}T', value)).toBe('1/19/2016, 4:00:00 AM');
+				expect($$.parse('%{o:-12}T', value)).toBe('1/18/2016, 4:00:00 AM');
+
+				expect($$.parse('%{o:0}T', 1453129200000)).toBe('1/18/2016, 3:00:00 PM');
+				expect($$.parse('%{o:-6}T', 1453129200000)).toBe('1/18/2016, 9:00:00 AM');
+			});
+
+			xit('should display UTC format with $UTC', function() {
+				expect($$.parse('%{$UTC}T', 1453125600000)).toBe('1/18/2016, 4:00:00 PM');
+				expect($$.parse('%{$U}T', 1453125675000)).toBe('1/18/2016, 4:01:15 PM');
+			});
+
+			xit('should format date with f:"S"', function() {
+				var value = 1451831696000;
+
+				expect($$.parse('%{f:"%Y"}T', value)).toBe('2016');
+				expect($$.parse('%{f:"%y"}T', value)).toBe('16');
+				expect($$.parse('%{f:"%C"}T', value)).toBe('20');
+				expect($$.parse('%{f:"%G"}T', value)).toBe('2015');
+				expect($$.parse('%{f:"%g"}T', value)).toBe('15');
+
+				expect($$.parse('%{f:"%m"}T', value)).toBe('01');
+				expect($$.parse('%{f:"%B"}T', value)).toBe('January');
+				expect($$.parse('%{f:"%b"}T', value)).toBe('Jan');
+				expect($$.parse('%{f:"%h"}T', value)).toBe('Jan');
+
+				expect($$.parse('%{f:"%U"}T', value)).toBe('01');
+				expect($$.parse('%{f:"%W"}T', value)).toBe('00');
+				expect($$.parse('%{f:"%V"}T', value)).toBe('53');
+
+				expect($$.parse('%{f:"%d"}T', value)).toBe('03');
+				expect($$.parse('%{f:"%e"}T', value)).toBe('3');
+				expect($$.parse('%{f:"%j"}T', value)).toBe('003');
+				expect($$.parse('%{f:"%u"}T', value)).toBe('7');
+				expect($$.parse('%{f:"%w"}T', value)).toBe('0');
+				expect($$.parse('%{f:"%A"}T', value)).toBe('Sunday');
+				expect($$.parse('%{f:"%a"}T', value)).toBe('Sun');
+
+				expect($$.parse('%{f:"%H"}T', value)).toBe('14');
+				expect($$.parse('%{f:"%k"}T', value)).toBe('14');
+				expect($$.parse('%{f:"%I"}T', value)).toBe('02');
+				expect($$.parse('%{f:"%l"}T', value)).toBe(' 2');
+				expect($$.parse('%{f:"%P"}T', value)).toBe('pm');
+				expect($$.parse('%{f:"%p"}T', value)).toBe('PM');
+
+				expect($$.parse('%{f:"%M"}T', value)).toBe('34');
+				expect($$.parse('%{f:"%S"}T', value)).toBe('56');
+				expect($$.parse('%{f:"%s"}T', value)).toBe('1451831696');
+
+				expect($$.parse('%{f:"%r"}T', value)).toBe('02:34:56 PM');
+				expect($$.parse('%{f:"%R"}T', value)).toBe('14:34');
+				expect($$.parse('%{f:"%T"}T', value)).toBe('14:34:56');
+				expect($$.parse('%{f:"%D"}T', value)).toBe('01/03/2016');
+				expect($$.parse('%{f:"%F"}T', value)).toBe('2016-01-03');
+
+				expect($$.parse('%{f:"%%"}T', value)).toBe('%');
+				expect($$.parse('%{f:"%n"}T', value)).toBe('\n');
+				expect($$.parse('%{f:"%t"}T', value)).toBe('\t');
+
+				value = 1453130145000;
+
+				expect($$.parse('%{f:"%M:%s"}T', value)).toBe('15:45');
+				expect($$.parse('%{f:"%Mmin %ss"}T', value)).toBe('15min 45s');
+			});
+
+			xit('should format date with f:%"S"', function() {
+				var value = 1451831696000;
+
+				expect($$.parse('%{f:%"Y"}T', value)).toBe('2016');
+				expect($$.parse('%{f:%"y"}T', value)).toBe('16');
+				expect($$.parse('%{f:%"C"}T', value)).toBe('20');
+				expect($$.parse('%{f:%"G"}T', value)).toBe('2015');
+				expect($$.parse('%{f:%"g"}T', value)).toBe('15');
+
+				expect($$.parse('%{f:%"m"}T', value)).toBe('01');
+				expect($$.parse('%{f:%"B"}T', value)).toBe('January');
+				expect($$.parse('%{f:%"b"}T', value)).toBe('Jan');
+				expect($$.parse('%{f:%"h"}T', value)).toBe('Jan');
+
+				expect($$.parse('%{f:%"U"}T', value)).toBe('01');
+				expect($$.parse('%{f:%"W"}T', value)).toBe('00');
+				expect($$.parse('%{f:%"V"}T', value)).toBe('53');
+
+				expect($$.parse('%{f:%"d"}T', value)).toBe('03');
+				expect($$.parse('%{f:%"e"}T', value)).toBe('3');
+				expect($$.parse('%{f:%"j"}T', value)).toBe('003');
+				expect($$.parse('%{f:%"u"}T', value)).toBe('7');
+				expect($$.parse('%{f:%"w"}T', value)).toBe('0');
+				expect($$.parse('%{f:%"A"}T', value)).toBe('Sunday');
+				expect($$.parse('%{f:%"a"}T', value)).toBe('Sun');
+
+				expect($$.parse('%{f:%"H"}T', value)).toBe('14');
+				expect($$.parse('%{f:%"k"}T', value)).toBe('14');
+				expect($$.parse('%{f:%"I"}T', value)).toBe('02');
+				expect($$.parse('%{f:%"l"}T', value)).toBe(' 2');
+				expect($$.parse('%{f:%"P"}T', value)).toBe('pm');
+				expect($$.parse('%{f:%"p"}T', value)).toBe('PM');
+
+				expect($$.parse('%{f:%"M"}T', value)).toBe('34');
+				expect($$.parse('%{f:%"S"}T', value)).toBe('56');
+				expect($$.parse('%{f:%"s"}T', value)).toBe('1451831696');
+
+				expect($$.parse('%{f:%"r"}T', value)).toBe('02:34:56 PM');
+				expect($$.parse('%{f:%"R"}T', value)).toBe('14:34');
+				expect($$.parse('%{f:%"T"}T', value)).toBe('14:34:56');
+				expect($$.parse('%{f:%"D"}T', value)).toBe('01/03/2016');
+				expect($$.parse('%{f:%"F"}T', value)).toBe('2016-01-03');
+
+				expect($$.parse('%{f:%"%"}T', value)).toBe('%');
+				expect($$.parse('%{f:%"n"}T', value)).toBe('\n');
+				expect($$.parse('%{f:%"t"}T', value)).toBe('\t');
+
+				value = 1453130145000;
+
+				expect($$.parse('%{f:%"M:s"}T', value)).toBe('15:45');
+			});
+
+			xit('should translate formats', function() {
+				var value = 1451831696000;
+
+				expect($$.parse('%{f:"%B %b %h %A %a"}T', value)).toBe('January Jan Jan Sunday Sun');
+				expect($$.parse('%{f:%"B b h A a"}T', value)).toBe('January Jan Jan Sunday Sun');
+
+				$$.setLocale('fr');
+				expect($$.parse('%{f:"%B %b %h %A %a"}T', value)).toBe('Janvier Jan Jan dimanche Dim');
+				expect($$.parse('%{f:%"B b h A a"}T', value)).toBe('Janvier Jan Jan dimanche Dim');
+
+				$$.setLocale('fr-be');
+				expect($$.parse('%{f:"%B %b %h %A %a"}T', value)).toBe('Janvier Jan Jan dimanche Dim');
+				expect($$.parse('%{f:%"B b h A a"}T', value)).toBe('Janvier Jan Jan dimanche Dim');
+			});
+		});
+
 		describe('duration formatting', function() {
 			xit('should replace the %t wildcard', function() {
 				expect($$.parse('%t', 45123)).toBe('45s 123ms');

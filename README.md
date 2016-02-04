@@ -638,7 +638,7 @@ S values can be:
 	* **m** for months
 	* **y** for years
 
-* **o:N**: (N must be a number) displays the date from the given timezone. The number can be preceded by a + or a -. Example: i18n('%{o:0}T', 1453129200000) => '1/18/2016, 3:00:00 PM' (en), i18n('%{o:-6}T', 1453129200000) => '1/18/2016, 9:00:00 AM' (en) The result is no more depending of the browser local timezone.
+* **o:N**: (N must be a number) displays the date from the given timezone. The number can be preceded by a + or a - (0 is for GMT). Example: i18n('%{o:0}T', 1453129200000) => '1/18/2016, 3:00:00 PM' (en), i18n('%{o:-6}T', 1453129200000) => '1/18/2016, 9:00:00 AM' (en) The result is no more depending of the browser local timezone.
 * **$U** or **$UTC**: preset format to display UTC Time
 * **f:"S"**: (S must be a string) format the output. Example: i18n('%{f:"%M:%s"}T', 1453130145000) => '15:45', i18n('%{f:"%Mmin %ss"}T', 1453130145000) => '15min 45s'
 The formating token are the same recognized by strftime (cf bellow to have the full details).
