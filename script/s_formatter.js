@@ -3,6 +3,17 @@
 	var i18n = 'i18n';
 	var has_i18n_config = typeof _i18n_config === 'object';
 
+	var timeUnitScale = [
+		31536000000, // y
+		2592000000, // month
+		86400000, // d
+		3600000, // h
+		60000, // min
+		1000, // s
+		1, // ms
+		0.001 // µs
+	];
+
 	function s_formatter(text, values, statusVariable) {
 		var args = [text].concat(values);
 		var count = -1;
@@ -189,6 +200,174 @@
 			return result.join('');
 		}
 
+		function getTimeUnitIndex(unit) {
+			var index = {
+				'y': 0,
+				'month': 1,
+				'M': 1,
+				'd': 2,
+				'h': 3,
+				'min': 4,
+				'm': 4,
+				's': 5,
+				'ms': 6,
+				'i': 6,
+				'µs': 7,
+				'µ': 7
+			}[unit];
+
+			if (typeof index === 'undefined') {
+				return -1;
+			}
+			return index;
+		}
+
+		function getTimestamp(value, variation) {
+			var unit, code, index, multiplier;
+
+			if (variation instanceof Array) {
+				code = variation.filter(function(v) {
+					return v.indexOf('u:') === 0;
+				})[0];
+			}
+
+			if (code) {
+				unit = code.substr(2);
+			} else {
+				unit = 'ms';
+			}
+
+			index = getTimeUnitIndex(unit);
+			multiplier = timeUnitScale[index];
+			if (!multiplier) {
+				return value;
+			}
+
+			return value * multiplier;
+		}
+
+		function duration(origValue, variation) {
+			var microTs, timeUnit, durationScale, durationValue, defaultFormat, format, code;
+			var maxUnit = -1;
+			var minUnit = Infinity;
+			var limit = 0;
+
+			timeUnit = getRules().duration;
+			durationScale = [
+				['$y', 'y', true],
+				['$M', 'month', true],
+				['$d', 'd', true],
+				['$h', 'h', true],
+				['$m', 'min', true],
+				['$s', 's', true],
+				['$i', 'ms', true],
+				['$µ', 'µs', true]
+			];
+			durationValue = [];
+			defaultFormat = [];
+
+			function activateUnit(str) {
+				var codes = str.match(/\$./g) || [];
+				var maxUnit = Infinity;
+
+				durationScale.forEach(function(code) {
+					code[2] = codes.indexOf(code[0]) !== -1;
+				});
+			}
+
+			microTs = getTimestamp(origValue, variation) * 1000;
+
+			if (variation) {
+				/* output format */
+				code = variation.filter(function(v) {
+					return v.indexOf('f:"') === 0;
+				})[0];
+				if (code) {
+					format = code.slice(3, -1);
+					activateUnit(format);
+				}
+
+				/* output format inner$ */
+				code = variation.filter(function(v) {
+					return v.indexOf('f:$"') === 0;
+				})[0];
+				if (code) {
+					format = code.slice(4, -1).replace(/([yMdhmsiµ$])/g, '$$$1');
+					activateUnit(format);
+				}
+
+				/* min unit */
+				code = variation.filter(function(v) {
+					return v.indexOf('min:') === 0;
+				})[0];
+				if (code) {
+					minUnit = getTimeUnitIndex(code.substr(4));
+				}
+
+				/* max unit */
+				code = variation.filter(function(v) {
+					return v.indexOf('max:') === 0;
+				})[0];
+				if (code) {
+					maxUnit = getTimeUnitIndex(code.substr(4));
+				}
+
+				/* max number display value */
+				code = variation.filter(function(v) {
+					return v.indexOf('n:') === 0;
+				})[0];
+				if (code) {
+					limit = parseInt(code.substr(2), 10);
+					if (maxUnit >= 0 && maxUnit + limit > minUnit) {
+						minUnit = maxUnit + limit -1;
+						limit = 0;
+					}
+				}
+			}
+
+			/* compute best value for each unit */
+			timeUnitScale.forEach(function(scale, index) {
+				scale *= 1000; //To convert in µs
+				var chunk = Math.floor(microTs / scale);
+				var code = durationScale[index];
+
+
+				if (!code[2] || index < maxUnit || index > minUnit) {
+					durationValue.push(0);
+					return;
+				}
+				if (chunk && limit) {
+					minUnit = index + limit -1;
+					limit = 0;
+				}
+
+				microTs -= chunk * scale;
+				durationValue.push(chunk);
+
+				if (chunk) {
+					defaultFormat.push(code[0] + timeUnit[code[1]]);
+				}
+			});
+
+			format = format ? format : defaultFormat.join(' ');
+
+			format = format.replace(/\$([yMdhmsiµ$])/g, function(pattern, code) {
+				var index = 'yMdhmsiµ'.indexOf(code);
+
+				if (index === -1) {
+					if (code === '$') {
+						return code;
+					} else {
+						return pattern
+					}
+				}
+
+				return prettyNumber(durationValue[index], [], true);
+			});
+
+			return format;
+		}
+
 		function replacement(pattern, arg, variation, kind) {
 			var value;
 
@@ -231,12 +410,14 @@
 					return prettyNumber(value, variation, true);
 				case 'e':
 					return expNumber(value, variation);
+				case 't':
+					return duration(value, variation);
 				case '%':
 					return '%';
 			}
 		}
 
-		text = text.replace(/%(\([^\)]+\))?(\{[^\}]*\})?([%dDefis])/g, replacement);
+		text = text.replace(/%(\([^\)]+\))?(\{[^\}]*\})?([%dDefist])/g, replacement);
 		return text;
 	}
 

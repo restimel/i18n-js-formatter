@@ -77,6 +77,16 @@
 				{suffix: 'p', multiple: 1e-12},
 				{suffix: 'f', multiple: 1e-15}
 			]
+		},
+		duration: {
+			y: 'y',
+			month: 'M',
+			d: 'd',
+			h: 'h',
+			min: 'min',
+			s: 's',
+			ms: 'ms',
+			'µs': 'µs'
 		}
 	};
 

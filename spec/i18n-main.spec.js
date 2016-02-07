@@ -20,6 +20,16 @@ describe('i18n', function() {
 			decimalSeparator: '.',
 			exponentialSeparator: 'e',
 			SIsuffix: defaultSIsuffix
+		},
+		duration: {
+			y: 'y',
+			month: 'M',
+			d: 'd',
+			h: 'h',
+			min: 'min',
+			s: 's',
+			ms: 'ms',
+			'µs': 'µs'
 		}
 	};
 
@@ -445,23 +455,23 @@ describe('i18n', function() {
 					}
 				}});
 				$$.setLocale('en');
-				expect($$.getRules()).toEqual({
+				expect($$.getRules()).toEqual(jasmine.objectContaining({
 					number: {
 						thousandSeparator: ',',
 						decimalSeparator: '.',
 						exponentialSeparator: '10^',
 						SIsuffix: defaultSIsuffix
 					}
-				});
+				}));
 
-				expect($$.getRules('fr')).toEqual({
+				expect($$.getRules('fr')).toEqual(jasmine.objectContaining({
 					number: {
 						thousandSeparator: ' ',
 						decimalSeparator: ',',
 						exponentialSeparator: 'e',
 						SIsuffix: defaultSIsuffix
 					}
-				});
+				}));
 
 				expect(this.logInfo).not.toHaveBeenCalled();
 				expect(this.logWarn).not.toHaveBeenCalled();
@@ -1553,14 +1563,14 @@ describe('i18n', function() {
 			$$.setLocale('fr');
 			expect(spyFr).toHaveBeenCalled();
 
-			expect($$.getRules()).toEqual({
+			expect($$.getRules()).toEqual(jasmine.objectContaining({
 				number: {
 					thousandSeparator: ' ',
 					decimalSeparator: ',',
 					exponentialSeparator: 'e',
 					SIsuffix: defaultSIsuffix
 				}
-			});
+			}));
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();

@@ -750,7 +750,7 @@ The kind character is **t**.
 
 Possible variations:
 
-* **u:S**: (S must be a string) defines the unit of the value. Example: i18n('%{u:s}t', 3610) => '1h 10min'
+* **u:S**: (S must be a string) defines the unit of the value. Example: i18n('%{u:s}t', 4200) => '1h 10min'
 S values can be:
 	* **µs** for microseconds
 	* **ms** for milliseconds (default value)
@@ -758,7 +758,7 @@ S values can be:
 	* **m** or **min** for minutes
 	* **h** for hours
 	* **d** for days
-	* **M** for months
+	* **M** or **month** for months
 	* **y** for years
 * **min:S**: (S must be a string) defines the minimal unit to display (value is floored if it is more precise). Example: i18n('%{min:s}t', 45123) => '45s'
 * **max:S**: (S must be a string) defines the maximal unit to display. Example: i18n('%{max:s}t', 105123) => '105s 123ms'
