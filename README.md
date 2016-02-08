@@ -53,6 +53,14 @@ To give plural translations (this should be done in version 0.3)
 
 Creative Commons Attribution 3.0 Unported License: You are free to use, share, modify it while you keep credit to author and contributors (http://creativecommons.org/licenses/by/3.0/)
 
+## Download
+
+Get the minified version of
+
+[the i18n API](https://restimel.github.io/i18n-js-formatter/i18n-js-formatter.min.js)
+
+[the full API (i18n API + formatter)](https://restimel.github.io/i18n-js-formatter/i18n-js-formatter.full.min.js)
+
 ## Installation
 
 You only have to insert the i18n-js-formatter.js file in your web page.
