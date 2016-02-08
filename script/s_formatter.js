@@ -15,7 +15,6 @@
 	];
 
 	function s_formatter(text, values, statusVariable) {
-		var args = [text].concat(values);
 		var count = -1;
 
 		function getRules() {
@@ -268,7 +267,6 @@
 
 			function activateUnit(str) {
 				var codes = str.match(/\$./g) || [];
-				var maxUnit = Infinity;
 
 				durationScale.forEach(function(code) {
 					code[2] = codes.indexOf(code[0]) !== -1;
