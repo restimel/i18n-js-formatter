@@ -1,7 +1,6 @@
-#/etc/shell
+#!/bin/bash
 
 if ! type "uglifyjs" >& /dev/null; then
-  # install foobar here
   echo ""
   echo "uglify is not installed yet."
   echo "Type 'npm install uglify-js -g' to install it."
