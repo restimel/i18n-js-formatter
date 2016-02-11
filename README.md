@@ -49,6 +49,10 @@ To give plural translations (this should be done in version 0.3)
 	i18n.n('a cat', '%s cats', 1); // in German: 'eine Katze'
 	i18n.n('a cat', '%s cats', 3); // in German: '3 Katzen'
 
+## Parsing
+
+In order to parse all your strings from your code and translate them easily, you can use [i18n-js-parser](https://github.com/restimel/i18n-js-parser).
+
 ## Licence
 
 Creative Commons Attribution 3.0 Unported License: You are free to use, share, modify it while you keep credit to author and contributors (http://creativecommons.org/licenses/by/3.0/)
@@ -60,6 +64,16 @@ Get the minified version of
 [the i18n API](https://restimel.github.io/i18n-js-formatter/i18n-js-formatter.min.js)
 
 [the full API (i18n API + formatter)](https://restimel.github.io/i18n-js-formatter/i18n-js-formatter.full.min.js)
+
+Get source files:
+
+[i18n library](https://restimel.github.io/i18n-js-formatter/i18n-js-formatter.js)
+
+[sprintf wrapper](https://restimel.github.io/i18n-js-formatter/script/wrapperSprintf.js) (to load it as formatter) note: you must also load sprintf
+
+[inner formatter](https://restimel.github.io/i18n-js-formatter/script/wrapperSprintf.js) (the one described below)
+
+You don't need both sprintf wrapper and the inner formatter. Only one is enough ;)
 
 ## Installation
 
