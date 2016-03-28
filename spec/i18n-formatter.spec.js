@@ -351,6 +351,24 @@ describe('i18n-formatter', function() {
 				expect($$('%e cats', obj)).toBe((+obj).toExponential() + ' cats');
 			});
 
+			it('should support huge number', function() {
+				var value, result;
+
+				value = '123456789123456789';
+				expect($$.parse('%f', value)).toBe('123456789123456789');
+				expect($$.parse('%d', value)).toBe('123,456,789,123,456,789');
+				expect($$.parse('%D', value)).toBe('123.457P');
+				expect($$.parse('%i', value)).toBe('123,456,789,123,456,789');
+				expect($$.parse('%e', value)).toBe('1.2345678912345678e+17');
+
+				value = '-123456789123456789';
+				expect($$.parse('%f', value)).toBe('-123456789123456789');
+				expect($$.parse('%d', value)).toBe('-123,456,789,123,456,789');
+				expect($$.parse('%D', value)).toBe('-123.457P');
+				expect($$.parse('%i', value)).toBe('-123,456,789,123,456,789');
+				expect($$.parse('%e', value)).toBe('-1.2345678912345678e+17');
+			});
+
 			it('should round decimal part with .N', function() {
 				var value;
 

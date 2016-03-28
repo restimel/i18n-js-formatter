@@ -59,9 +59,19 @@
 		}
 
 		function getNumber(value, variation) {
-			var splitValue, nb, status;
+			var splitValue, nb, inb, status;
 
-			nb = Number(value);
+			nb = value;
+			if (typeof nb !== 'number') {
+				inb = +nb;
+				if (typeof nb !== 'string') {
+					nb = inb;
+				}
+
+				if (typeof nb === 'string' && inb.toString() === nb || isNaN(inb)) {
+					nb = inb;
+				}
+			}
 
 			splitValue = nb.toString().split('.');
 
