@@ -751,13 +751,14 @@ describe('i18n-formatter', function() {
 			});
 		});
 
-		it('should replace several wildcards', function() {
-			expect($$('%d issues: %s', 2, 'bug1, bug2')).toBe('2 issues: bug1, bug2');
-		});
-
 		it('should convert special characters', function() {
 			expect($$('42 %%')).toBe('42 %');
-			expect($$('42%%success')).toBe('42%success');
+			expect($$('42%% of tests')).toBe('42% of tests');
+		});
+
+		it('should replace several wildcards', function() {
+			expect($$('%d issues: %s', 2, 'bug1, bug2')).toBe('2 issues: bug1, bug2');
+			expect($$('%d%% %s', 100, 'success')).toBe('100% success');
 		});
 
 		it('should not convert unknown syntax', function() {

@@ -421,6 +421,7 @@
 				case 't':
 					return duration(value, variation);
 				case '%':
+					count--; // should not been count as a replacement
 					return '%';
 			}
 		}
