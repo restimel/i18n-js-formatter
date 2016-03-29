@@ -20,6 +20,7 @@ Version 0.2
 	* number: support percent, 0.1 → 10%
 	✓ add script for minification (with and without s_formatter)
 		* update documentation
+	* improve demonstration page
 
 Version 0.3
 
@@ -27,14 +28,18 @@ Version 0.3
 		* propose different escape kind
 			* HTML
 			* regexp
+			* URL
 			* none
 	* add plural translations
 		* i18n.n('singular', 'plural', quantity, other values)
 		* i18n.n({0: '0 text', default: 'other quantities'}, quantity, other values)
+	* create cutom formatter
 
 To plan
 	
 	* clone i18n instance to allow scope modification
+
+	* default formatting variation
 
 	* Formatter
 		* number Hexa/binaire/Octal

@@ -2,8 +2,9 @@ Change log for i18n-js-formatter
 
 Version 0.2
 	* inner-formatter
-		(on going) format duration
+		format duration
 		(on going) format date
+		huge number are not rounded
 	* (on going) set a context for keys
 
 Version 0.1

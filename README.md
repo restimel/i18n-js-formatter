@@ -573,7 +573,7 @@ Possible variations:
 
 * **case**: convert string to lower case
 * **CASE**: convert string to upper case
-* **Case**: convert string to lower case except the first charcter which is upper case
+* **Case**: convert string to lower case except the first character which is upper case
 * **CasE**: The first character is set to upper case. Others are stay unchanged.
 
 #### number format (d, D, e, f, i)
@@ -587,7 +587,7 @@ The kind character can be either **d**, **D**, **e**, **f**, **i**.
 * **i**: displays an integer number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234' (en) or '1 234' (fr)
 * **e**: displays a number in scientific format. Example: i18n('%e', 1234.56) => '1.23456e+3' | i18n('%f', 0.0123) => '1.23e-2'
 
-oxb ?
+It supports huge number (higher than 2^53) without rounding the value if the value comes from a string (otherwise JavaScript will round it to the closest writable number by the matrice).
 
 Possible variations:
 
@@ -763,7 +763,7 @@ Parameters are:
 * **shortDays**: {String[]} List of day abbreviated names
 
 
-#### duration format (t) {not implemented yet}
+#### duration format (t)
 
 It converts the value to a duration.
 The kind character is **t**.
