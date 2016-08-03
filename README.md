@@ -1,4 +1,4 @@
-# i18n JS formater
+# i18n JS formatter
 
 A simple translation module with dynamic json storage which helps to format strings quickly and easily.
 
@@ -8,7 +8,7 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
 
-## Version 0.0.2
+## Version 0.1.3
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 
@@ -16,7 +16,7 @@ Keep tune for further update I am working on it.
 
 ## Goal
 
-i18n-js-formater's mission is to provide to the end-user the best output (translated, formatted, secured) in an easy way to build it with JavaScript.
+i18n-js-formatter's mission is to provide to the end-user the best output (translated, formatted, secured) in an easy way to build it with JavaScript.
 
 ## quick usage example
 
@@ -36,6 +36,13 @@ Using strings which have to be translated
 	i18n('hello'); //returns 'salut'
 	i18n('Hello %s!', 'Jim'); //returns 'Salut Jim!'
 
+Format number depending on locale
+
+	i18n('%d sentences', 1234567.8);
+		//returns '1,234,567.8 sentences' (en)
+		//returns '1 234 567,8 phrases' (fr)
+		//returns '1.234.567,8 Sätze' (de)
+
 To give a context to help the translation (this should be done in version 0.2)
 
 	i18n.context('computer key', 'Give the correct key'); // should be translated in French 'Donnez la bonne touche'
@@ -48,6 +55,14 @@ To give plural translations (this should be done in version 0.3)
 
 	i18n.n('a cat', '%s cats', 1); // in German: 'eine Katze'
 	i18n.n('a cat', '%s cats', 3); // in German: '3 Katzen'
+
+To escape string easily depending on context (mainly to avoid user entries to create unexpected issues)
+
+	i18n('quotes: %{esc:html}s', 'I <b>cannot</b> hack your site');
+		// in English: 'quotes: I &lt;b&gt;cannot&lt;/b&gt; hack your site'
+	i18n('http://my_site.com/?search=%{esc:uric}s&limit=10', 'foo bar&baz=42');
+		// returns 'http://my_site.com/?search=foo%20bar%26baz%3D42&limit=10'
+
 
 ## Parsing
 
@@ -136,6 +151,8 @@ The second possibility is to use the configuration method available in the libra
 * **lazyLoading**:	{Boolean} If true, load json file only when locale is changed (it works only with data loading and not with dictionary loading).
 					[Default value: true]
 * **syncLoading**:	{Boolean} If true, the json file loading is done synchronously.
+* **defaultFormat**: {Object} rules which are applied by default (these rules are not dependent of locale).
+	* **string**: {Object} rules for displaying strings. Attributes are **escape** (see formatter section for more details)
 * **formatRules**: {Object} rules for some output format depending of locales.
 					For each locale keys, an object contains the rules.
 	* **number**: {Object} rules for displaying numbers. Attributes are **thousandSeparator**, **decimalSeparator**, **exponentialSeparator**, **SIsuffix** (see formatter section for more details)
@@ -575,6 +592,30 @@ Possible variations:
 * **CASE**: convert string to upper case
 * **Case**: convert string to lower case except the first character which is upper case
 * **CasE**: The first character is set to upper case. Others are stay unchanged.
+* **esc:STR**: (STR must be a string of one below) escape the string sequence to be safely inserted in the context defined.
+	* **html**: escape string to be safely inserted in HTML. Characters `"<>&` are escaped to &#Unicode; equivalent.
+	* **js**:
+	* **regex**: escape special characters to insert the string in a regexp like a simple string.
+	* **json**: escape string to be safely added in a JSON as a string. Characters `\"` are escaped to \char; equivalent. Special character are converted to unicode equivalent.
+	* **url**: escape string to be safely used as url. Latin characters, numbers and  `-_.!~*'();,/?:@&=+$#` are not escaped. Others are escaped to %Hex equivalent.
+	* **uri**: alias of url
+	* **uri6**: escape string to be safely used as url in IP v6 (RFC 3986). Latin characters, numbers and  `-_.!~*'();,/?:@&=+$#[]` are not escaped. Others are escaped to %Hex equivalent.
+	* **urlc**: escape string to be safely used as url. Latin characters, numbers and  `-_.!~*'()` are not escaped. Others are escaped to %Hex equivalent.
+	* **uric**: alias of urlcé
+	* **no**: do not escape the string.
+
+##### Default configuration
+
+The default escaping rule is "no" but it can be changed in configuration. This is the default rule which is applied if no escape rule are given.
+
+	i18n.configuration({
+		defaultFormat: {
+			string: {
+				escape: 'html'
+			}
+		}
+	});
+	i18n('hey<script>alert("ho")</script>'); //hey&lt;script&gt;alert(&quot;ho&quot;)&lt;/script&gt;
 
 #### number format (d, D, e, f, i)
 

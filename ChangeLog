@@ -6,6 +6,7 @@ Version 0.2
 		(on going) format date
 		huge number are not rounded
 	* (on going) set a context for keys
+	* escape string to avoid XSS or any issues while inserting strings into special context
 
 Version 0.1
 	* i18n configuration: set allowed locales, give them name, give them secondary fallback

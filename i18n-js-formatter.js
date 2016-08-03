@@ -89,6 +89,11 @@
 			'µs': 'µs'
 		}
 	};
+	var defaultFormat = {
+		string: {
+			escape: 'no'
+		}
+	};
 
 	/* status variables */
 	var statusVariables;
@@ -183,6 +188,10 @@
 			if (!statusVariables.useDfltLocale) {
 				_setStorage(statusVariables.currentLocale.key);
 			}
+		}
+
+		if (typeof options.defaultFormat === 'object') {
+			_setDefaultFormat(statusVariables, options.defaultFormat);
 		}
 
 		if (typeof options.defaultLocale !== 'undefined') {
@@ -423,6 +432,7 @@
 			status: {
 				callLocaleLoaded: false
 			},
+			defaultFormat: _extend({}, defaultFormat),
 			log: {
 				info: null,
 				warn: null,
@@ -679,6 +689,10 @@
 		type = type.split(':');
 		statusVariables.storage.kind = type[0];
 		statusVariables.storage.name = type[1];
+	}
+
+	function _setDefaultFormat(statusVariables, dfltFormat) {
+		_extend(statusVariables.defaultFormat, dfltFormat);
 	}
 
 	function _setStorage(value, reset) {

@@ -21,25 +21,26 @@ Version 0.2
 	✓ add script for minification (with and without s_formatter)
 		* update documentation
 	* improve demonstration page
+	✓ escape values by default
+		✓ propose different escape kind
+			✓ HTML
+			✓ regexp
+			✓ URL
+			✓ none
 
 Version 0.3
 
-	* escape values by default
-		* propose different escape kind
-			* HTML
-			* regexp
-			* URL
-			* none
 	* add plural translations
 		* i18n.n('singular', 'plural', quantity, other values)
 		* i18n.n({0: '0 text', default: 'other quantities'}, quantity, other values)
-	* create cutom formatter
+	* create custom formatter
 
 To plan
 	
 	* clone i18n instance to allow scope modification
 
 	* default formatting variation
+	* custom formatting variation
 
 	* Formatter
 		* number Hexa/binaire/Octal

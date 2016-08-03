@@ -14,6 +14,8 @@
 		0.001 // µs
 	];
 
+	var isEscape = /^esc:/;
+
 	function s_formatter(text, values, statusVariable) {
 		var count = -1;
 
@@ -36,7 +38,72 @@
 			return result.join('');
 		}
 
+		function escapeString(str, rule) {
+			if (typeof rule === 'undefined') {
+				rule = statusVariable.defaultFormat.string.escape;
+			}
+
+			switch (rule) {
+				case 'html':
+				case 'htm':
+					str = str.replace(/['"<>&]/g, function(p) {
+						var code = {
+							'<': '&lt;',
+							'>': '&gt;',
+							'"': '&quot;',
+							'&': '&amp;',
+							'\'': '&#39;'
+						};
+						return code[p];
+					}); break;
+				case 'uri':
+				case 'url': str = encodeURI(str); break;
+				case 'uri6': str = encodeURI(str).replace(/%5[BD]/g, function(p) {
+					if (p === '%5B') {
+						return '[';
+					}
+					if (p === '%5D') {
+						return ']';
+					}
+				}); break;
+				case 'uric':
+				case 'urlc': str = encodeURIComponent(str); break;
+				case 'regex':
+				case 'regexp':
+					str = str.replace(/[\\\n\r\t\v^$.()[\]{}?*+|]/g, function(p) {
+						var code = {
+							'\n': '\\n',
+							'\r': '\\r',
+							'\t': '\\t',
+							'\v': '\\v'
+						};
+						return code[p] || '\\' + p;
+					}); break;
+				case 'json':
+					str = str.replace(/["\\\n\r\t\v]/g, function(p) {
+						var code = {
+							'"': '\\"',
+							'\\': '\\\\',
+							'\n': '\\n',
+							'\r': '\\r',
+							'\t': '\\t',
+							'\v': '\\u000b'
+						};
+						return code[p];
+					}); break;
+				case 'no':
+				case 'none':
+				case 'raw': break;
+				default:
+					console.warn('escape rule %s unknwon', rule);
+			}
+
+			return str;
+		}
+
 		function stringReplacement(value, variation) {
+			var escapeRule;
+
 			if (typeof value === 'undefined') {
 				value = 'undefined';
 			} else {
@@ -53,9 +120,15 @@
 				} else if (variation.indexOf('CasE') !== -1) {
 					value = value.charAt(0).toUpperCase() + value.slice(1);
 				}
+
+				variation.forEach(function(v) {
+					if (isEscape.test(v)) {
+						escapeRule = v.slice(4);
+					}
+				});
 			}
 
-			return value;
+			return escapeString(value, escapeRule);
 		}
 
 		function getNumber(value, variation) {
