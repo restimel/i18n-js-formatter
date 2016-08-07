@@ -1,6 +1,7 @@
 Change log for i18n-js-formatter
 
 Version 0.2
+    * %d si now displaying an int. %f formats all number. %F do not format numbers.
 	* inner-formatter
 		format duration
 		(on going) format date

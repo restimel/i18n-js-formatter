@@ -8,7 +8,7 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
 
-## Version 0.1.3
+## Version 0.1.4
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 
@@ -38,7 +38,7 @@ Using strings which have to be translated
 
 Format number depending on locale
 
-	i18n('%d sentences', 1234567.8);
+	i18n('%f sentences', 1234567.8);
 		//returns '1,234,567.8 sentences' (en)
 		//returns '1 234 567,8 phrases' (fr)
 		//returns '1.234.567,8 Sätze' (de)
@@ -558,10 +558,27 @@ If you have set _i18n_config.doNotLoadFormatter to true, then you should load it
 
 ### formatter usage
 
+#### Summary
+
+| Code | output |
+|:----:| ------ |
+| %% | % |
+| %f | locale formatted number |
+| %D | locale formatted number with suffix |
+| %d | locale formatted integer number |
+| %e | locale formatted number in scientific notation |
+| %i | locale formatted integer number |
+| %F | raw number |
+| %s | string |
+| %t | duration |
+| %T | date |
+
+#### Usage
+
 A formatting tag starts with a '%' and ends with a character to indicates the kind of output.
 
 	"%s" will display the value as a string
-	"%d" will display the value as a number
+	"%f" will display the value as a number
 
 It is possible to give more information to format it better. The full syntax is **%(position){variation}k**
 
@@ -570,8 +587,8 @@ It is possible to give more information to format it better. The full syntax is 
 	If position is a string, it reads the property value of the first argument. Example: i18n('%(foo)s %(bar)s', {foo: 'alpha', bar: 'bravo'}) => 'alpha bravo'
 	By default, it refers to the N argument where N is the number of formatting replacement. i18n('%s %s', 'a', 'b') is equivalent to i18n('%(1)s %(2)s', 'a', 'b')
 * *{variation}*: [optional]
-	Depending to the output format, it allows to change the display (see below for more details). For example, i18n('%{.2}f', 1.2345) => '1.23'
-	Many rules can be added, they must be separated by comma. For example, i18n('%{p2, .2, d2}f', 1.2345) => '01.23'
+	Depending to the output format, it allows to change the display (see below for more details). For example, i18n('%{.2}F', 1.2345) => '1.23'
+	Many rules can be added, they must be separated by comma. For example, i18n('%{p2, .2, d2}F', 1.2345) => '01.23'
 * *k*: the kind of out output, it defines how the output must be interpreted.
 	It is composed with a single letter.
 
@@ -617,24 +634,25 @@ The default escaping rule is "no" but it can be changed in configuration. This i
 	});
 	i18n('hey<script>alert("ho")</script>'); //hey&lt;script&gt;alert(&quot;ho&quot;)&lt;/script&gt;
 
-#### number format (d, D, e, f, i)
+#### number format (d, D, e, f, F, i)
 
 It converts the value to number.
-The kind character can be either **d**, **D**, **e**, **f**, **i**.
+The kind character can be either **d**, **D**, **e**, **f**, **F**, **i**.
 
-* **f**: displays a float number as it is in JavaScript whatever is the language. Example: i18n('%f', 1234.56) => '1234.56'
-* **d**: displays a float number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234.56' (en) or '1 234,56' (fr) (see number parameter options below).
-* **D**: displays a float number with suffix. Example: i18n('%D', 1234.56) => '1.23k' | i18n('%f', 0.0123) => '12.3m' (by default, number are rounded to 3 decimals)
-* **i**: displays an integer number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234' (en) or '1 234' (fr)
-* **e**: displays a number in scientific format. Example: i18n('%e', 1234.56) => '1.23456e+3' | i18n('%f', 0.0123) => '1.23e-2'
+* **F**: displays a float number as it is in JavaScript whatever is the language. Example: i18n('%F', 1234.56) => '1234.56'
+* **f**: displays a float number formatted depending to the locale. Example: i18n('%f', 1234.56) => '1,234.56' (en) or '1 234,56' (fr) (see number parameter options below).
+* **D**: displays a float number with suffix. Example: i18n('%D', 1234.56) => '1.23k' | i18n('%D', 0.0123) => '12.3m' (by default, number are rounded to 3 decimals)
+* **d**: displays an integer number formatted depending to the locale. Example: i18n('%d', 1234.56) => '1,234' (en) or '1 234' (fr)
+* **i**: displays an integer number formatted depending to the locale. Example: i18n('%f', 1234.56) => '1,234' (en) or '1 234' (fr)
+* **e**: displays a number in scientific format. Example: i18n('%e', 1234.56) => '1.23456e+3' | i18n('%e', 0.0123) => '1.23e-2'
 
 It supports huge number (higher than 2^53) without rounding the value if the value comes from a string (otherwise JavaScript will round it to the closest writable number by the matrice).
 
 Possible variations:
 
-* **.N**: (N must be a number) it rounds the number to N decimals. Example: i18n('%{.1}f', 1.234) => '1.2'
-* **pN**: (N must be a number) The integer part must have at least N digits. It adds 0 before digits to have the right number of digits. Example: i18n('%{p3}f', 12) => '012'
-* **dN**: (N must be a number) The decimal part must have at least N digits. It adds 0 after digits to have the right number of digits. Example: i18n('%{d3}f', 1.2) => '1.20'
+* **.N**: (N must be a number) it rounds the number to N decimals. Example: i18n('%{.1}F', 1.234) => '1.2'
+* **pN**: (N must be a number) The integer part must have at least N digits. It adds 0 before digits to have the right number of digits. Example: i18n('%{p3}F', 12) => '012'
+* **dN**: (N must be a number) The decimal part must have at least N digits. It adds 0 after digits to have the right number of digits. Example: i18n('%{d3}F', 1.2) => '1.20'
 
 ##### Separator configuration
 
@@ -667,11 +685,11 @@ It is also possible to use the LocaleSet parameter.
 
 Parameters are:
 
-* **thousandSeparator**: {String} Used to separate thousand digits. Example: i18n('%d', 1234567) => '1,234,567'
+* **thousandSeparator**: {String} Used to separate thousand digits. Example: i18n('%f', 1234567) => '1,234,567'
 	Default value: ','
-* **decimalSeparator**: {String} Used to separate integer part from decimal part. Example: i18n('%d', 123.456) => '123.456' (if separator is '.'), i18n('%d', 123.456) => '123,456' (if separator is ',')
+* **decimalSeparator**: {String} Used to separate integer part from decimal part. Example: i18n('%f', 123.456) => '123.456' (if separator is '.'), i18n('%f', 123.456) => '123,456' (if separator is ',')
 	Default value: '.'
-* **exponentialSeparator**: {String} Used by scientific notation. Example: i18n('%e', 1234567) => '1.234567e+6' (if separator is 'e'), i18n('%d', 1234567) => '1.234567 10^+6' (if separator is ' 10^')
+* **exponentialSeparator**: {String} Used by scientific notation. Example: i18n('%e', 1234567) => '1.234567e+6' (if separator is 'e'), i18n('%e', 1234567) => '1.234567 10^+6' (if separator is ' 10^')
 	Default value: 'e'
 * **SIsuffix**: {Object[]} list of SI suffix and their multipler. The object contain the suffix character (property suffix) and the multipler value (property multiple).
 Example: [{suffix: 'M', multiple: 1000000}, {suffix: 'k', multiple: 1000}]

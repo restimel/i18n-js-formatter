@@ -481,13 +481,15 @@
 			switch(kind) {
 				case 's':
 					return stringReplacement(value, variation);
-				case 'f':
+				case 'F':
 					return rawNumber(value, variation);
-				case 'd':
+				case 'f':
 					return prettyNumber(value, variation);
 				case 'D':
 					return shortNumber(value, variation);
 				case 'i':
+					return prettyNumber(value, variation, true);
+				case 'd':
 					return prettyNumber(value, variation, true);
 				case 'e':
 					return expNumber(value, variation);
@@ -499,7 +501,7 @@
 			}
 		}
 
-		text = text.replace(/%(\([^\)]+\))?(\{[^\}]*\})?([%dDefist])/g, replacement);
+		text = text.replace(/%(\([^\)]+\))?(\{[^\}]*\})?([%dDefFist])/g, replacement);
 		return text;
 	}
 

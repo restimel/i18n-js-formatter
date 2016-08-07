@@ -25,6 +25,10 @@ describe('i18n-formatter', function() {
 					en: '%f cats',
 					fr: '%f chats'
 				},
+				'%F cats': {
+					en: '%F cats',
+					fr: '%F chats'
+				},
 				'%i cats': {
 					en: '%i cats',
 					fr: '%i chats'
@@ -246,37 +250,37 @@ describe('i18n-formatter', function() {
 		});
 
 		describe('number formatting', function() {
+			it('should replace the %F wildcard', function() {
+				expect($$('%F cats', 42)).toBe('42 cats');
+				expect($$('%F cats', 42.76)).toBe('42.76 cats');
+				expect($$('%F cats', 1234.5)).toBe('1234.5 cats');
+				$$.setLocale('fr');
+				expect($$('%F cats', 42)).toBe('42 chats');
+				expect($$('%F cats', 42.76)).toBe('42.76 chats');
+				expect($$('%F cats', 1234.5)).toBe('1234.5 chats');
+				$$.setLocale('fr-be');
+				expect($$('%F cats', 42)).toBe('42 chats');
+				expect($$('%F cats', 42.76)).toBe('42.76 chats');
+				expect($$('%F cats', 1234.5)).toBe('1234.5 chats');
+			});
+
 			it('should replace the %f wildcard', function() {
 				expect($$('%f cats', 42)).toBe('42 cats');
 				expect($$('%f cats', 42.76)).toBe('42.76 cats');
-				expect($$('%f cats', 1234.5)).toBe('1234.5 cats');
+				expect($$('%f cats', 1234.5)).toBe('1,234.5 cats');
 				$$.setLocale('fr');
 				expect($$('%f cats', 42)).toBe('42 chats');
-				expect($$('%f cats', 42.76)).toBe('42.76 chats');
-				expect($$('%f cats', 1234.5)).toBe('1234.5 chats');
+				expect($$('%f cats', 42.76)).toBe('42,76 chats');
+				expect($$('%f cats', 1234.5)).toBe('1 234,5 chats');
 				$$.setLocale('fr-be');
 				expect($$('%f cats', 42)).toBe('42 chats');
-				expect($$('%f cats', 42.76)).toBe('42.76 chats');
-				expect($$('%f cats', 1234.5)).toBe('1234.5 chats');
-			});
+				expect($$('%f cats', 42.76)).toBe('42,76 chats');
+				expect($$('%f cats', 1234.5)).toBe('1 234,5 chats');
 
-			it('should replace the %d wildcard', function() {
-				expect($$('%d cats', 42)).toBe('42 cats');
-				expect($$('%d cats', 42.76)).toBe('42.76 cats');
-				expect($$('%d cats', 1234.5)).toBe('1,234.5 cats');
-				$$.setLocale('fr');
-				expect($$('%d cats', 42)).toBe('42 chats');
-				expect($$('%d cats', 42.76)).toBe('42,76 chats');
-				expect($$('%d cats', 1234.5)).toBe('1 234,5 chats');
-				$$.setLocale('fr-be');
-				expect($$('%d cats', 42)).toBe('42 chats');
-				expect($$('%d cats', 42.76)).toBe('42,76 chats');
-				expect($$('%d cats', 1234.5)).toBe('1 234,5 chats');
-
-				expect($$('%d', 0)).toBe('0');
-				expect($$('%d', 123456)).toBe('123 456');
-				expect($$('%d', -123456)).toBe('-123 456');
-				expect($$('%d', -12345)).toBe('-12 345');
+				expect($$('%f', 0)).toBe('0');
+				expect($$('%f', 123456)).toBe('123 456');
+				expect($$('%f', -123456)).toBe('-123 456');
+				expect($$('%f', -12345)).toBe('-12 345');
 			});
 
 			it('should replace the %D wildcard', function() {
@@ -329,6 +333,20 @@ describe('i18n-formatter', function() {
 				expect($$('%i cats', 1234.5)).toBe('1 234 chats');
 			});
 
+			it('should replace the %d wildcard', function() {
+				expect($$('%d cats', 42)).toBe('42 cats');
+				expect($$('%d cats', 42.76)).toBe('42 cats');
+				expect($$('%d cats', 1234.5)).toBe('1,234 cats');
+				$$.setLocale('fr');
+				expect($$('%d cats', 42)).toBe('42 chats');
+				expect($$('%d cats', 42.76)).toBe('42 chats');
+				expect($$('%d cats', 1234.5)).toBe('1 234 chats');
+				$$.setLocale('fr-be');
+				expect($$('%d cats', 42)).toBe('42 chats');
+				expect($$('%d cats', 42.76)).toBe('42 chats');
+				expect($$('%d cats', 1234.5)).toBe('1 234 chats');
+			});
+
 			it('should replace the %e wildcard', function() {
 				expect($$('%e cats', 4.2)).toBe('4.2e+0 cats');
 				expect($$('%e cats', 42.76)).toBe('4.276e+1 cats');
@@ -352,29 +370,29 @@ describe('i18n-formatter', function() {
 				var obj;
 
 				obj = {};
+				expect($$('%F cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%f cats', obj)).toBe((+obj) + ' cats');
-				expect($$('%d cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%D cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%i cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%e cats', obj)).toBe((+obj).toExponential() + ' cats');
 
 				obj = "42";
+				expect($$('%F cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%f cats', obj)).toBe((+obj) + ' cats');
-				expect($$('%d cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%D cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%i cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%e cats', obj)).toBe((+obj).toExponential() + ' cats');
 
 				obj = function() {};
+				expect($$('%F cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%f cats', obj)).toBe((+obj) + ' cats');
-				expect($$('%d cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%D cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%i cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%e cats', obj)).toBe((+obj).toExponential() + ' cats');
 
 				obj = true;
+				expect($$('%F cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%f cats', obj)).toBe((+obj) + ' cats');
-				expect($$('%d cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%D cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%i cats', obj)).toBe((+obj) + ' cats');
 				expect($$('%e cats', obj)).toBe((+obj).toExponential() + ' cats');
@@ -384,15 +402,15 @@ describe('i18n-formatter', function() {
 				var value, result;
 
 				value = '123456789123456789';
-				expect($$.parse('%f', value)).toBe('123456789123456789');
-				expect($$.parse('%d', value)).toBe('123,456,789,123,456,789');
+				expect($$.parse('%F', value)).toBe('123456789123456789');
+				expect($$.parse('%f', value)).toBe('123,456,789,123,456,789');
 				expect($$.parse('%D', value)).toBe('123.457P');
 				expect($$.parse('%i', value)).toBe('123,456,789,123,456,789');
 				expect($$.parse('%e', value)).toBe('1.2345678912345678e+17');
 
 				value = '-123456789123456789';
-				expect($$.parse('%f', value)).toBe('-123456789123456789');
-				expect($$.parse('%d', value)).toBe('-123,456,789,123,456,789');
+				expect($$.parse('%F', value)).toBe('-123456789123456789');
+				expect($$.parse('%f', value)).toBe('-123,456,789,123,456,789');
 				expect($$.parse('%D', value)).toBe('-123.457P');
 				expect($$.parse('%i', value)).toBe('-123,456,789,123,456,789');
 				expect($$.parse('%e', value)).toBe('-1.2345678912345678e+17');
@@ -402,15 +420,15 @@ describe('i18n-formatter', function() {
 				var value;
 
 				value = 2.456;
+				expect($$.parse('%{.1}F', value)).toBe('2.5');
 				expect($$.parse('%{.1}f', value)).toBe('2.5');
-				expect($$.parse('%{.1}d', value)).toBe('2.5');
 				expect($$.parse('%{.1}D', value)).toBe('2.5');
 				expect($$.parse('%{.1}i', value)).toBe('2');
 				expect($$.parse('%{.1}e', value)).toBe('2.5e+0');
 
 				value = 2.4;
+				expect($$.parse('%{.2}F', value)).toBe('2.4');
 				expect($$.parse('%{.2}f', value)).toBe('2.4');
-				expect($$.parse('%{.2}d', value)).toBe('2.4');
 				expect($$.parse('%{.2}D', value)).toBe('2.4');
 				expect($$.parse('%{.2}i', value)).toBe('2');
 				expect($$.parse('%{.2}e', value)).toBe('2.4e+0');
@@ -429,22 +447,22 @@ describe('i18n-formatter', function() {
 				var value;
 
 				value = 2.456;
+				expect($$.parse('%{d1}F', value)).toBe('2.456');
 				expect($$.parse('%{d1}f', value)).toBe('2.456');
-				expect($$.parse('%{d1}d', value)).toBe('2.456');
 				expect($$.parse('%{d1}D', value)).toBe('2.456');
 				expect($$.parse('%{d1}i', value)).toBe('2');
 				expect($$.parse('%{d1}e', value)).toBe('2.456e+0');
 
 				value = 2.4;
+				expect($$.parse('%{d2}F', value)).toBe('2.40');
 				expect($$.parse('%{d2}f', value)).toBe('2.40');
-				expect($$.parse('%{d2}d', value)).toBe('2.40');
 				expect($$.parse('%{d2}D', value)).toBe('2.40');
 				expect($$.parse('%{d2}i', value)).toBe('2');
 				expect($$.parse('%{d2}e', value)).toBe('2.40e+0');
 
 				value = 2;
+				expect($$.parse('%{d2}F', value)).toBe('2.00');
 				expect($$.parse('%{d2}f', value)).toBe('2.00');
-				expect($$.parse('%{d2}d', value)).toBe('2.00');
 				expect($$.parse('%{d2}D', value)).toBe('2.00');
 				expect($$.parse('%{d2}i', value)).toBe('2');
 				expect($$.parse('%{d2}e', value)).toBe('2.00e+0');
@@ -459,23 +477,23 @@ describe('i18n-formatter', function() {
 				var value;
 
 				value = 2.4;
+				expect($$.parse('%{p2}F', value)).toBe('02.4');
 				expect($$.parse('%{p2}f', value)).toBe('02.4');
-				expect($$.parse('%{p2}d', value)).toBe('02.4');
 				expect($$.parse('%{p2}D', value)).toBe('02.4');
 				expect($$.parse('%{p2}i', value)).toBe('02');
 				expect($$.parse('%{p2}e', value)).toBe('02.4e+0');
 
 				value = 152;
+				expect($$.parse('%{p2}F', value)).toBe('152');
 				expect($$.parse('%{p2}f', value)).toBe('152');
-				expect($$.parse('%{p2}d', value)).toBe('152');
 				expect($$.parse('%{p2}D', value)).toBe('152');
 				expect($$.parse('%{p2}i', value)).toBe('152');
 				expect($$.parse('%{p2}e', value)).toBe('01.52e+2');
 
 				value = 2400;
 				expect($$.parse('%{p2}D', value)).toBe('02.4k');
-				expect($$.parse('%{p5}d', value)).toBe('02,400');
-				expect($$.parse('%{p7}d', value)).toBe('0,002,400');
+				expect($$.parse('%{p5}f', value)).toBe('02,400');
+				expect($$.parse('%{p7}f', value)).toBe('0,002,400');
 			});
 
 			it('should allow to combine variation', function() {
@@ -483,20 +501,20 @@ describe('i18n-formatter', function() {
 
 				value = 2400;
 				expect($$.parse('%{p2,d2}D', value)).toBe('02.40k');
-				expect($$.parse('%{p5,d2}d', value)).toBe('02,400.00');
-				expect($$.parse('%{p5, d2}d', value)).toBe('02,400.00');
+				expect($$.parse('%{p5,d2}f', value)).toBe('02,400.00');
+				expect($$.parse('%{p5, d2}f', value)).toBe('02,400.00');
 
 				value = 2.456;
-				expect($$.parse('%{d1,.1}f', value)).toBe('2.5');
-				expect($$.parse('%{.1,d1}f', value)).toBe('2.5');
-				expect($$.parse('%{d2,.1}f', value)).toBe('2.5');
-				expect($$.parse('%{.1,d2}f', value)).toBe('2.50');
-				expect($$.parse('%{.5,d5}f', value)).toBe('2.45600');
-				expect($$.parse('%{d5,.5}f', value)).toBe('2.456');
-				expect($$.parse('%{.2,d2,p2}f', value)).toBe('02.46');
+				expect($$.parse('%{d1,.1}F', value)).toBe('2.5');
+				expect($$.parse('%{.1,d1}F', value)).toBe('2.5');
+				expect($$.parse('%{d2,.1}F', value)).toBe('2.5');
+				expect($$.parse('%{.1,d2}F', value)).toBe('2.50');
+				expect($$.parse('%{.5,d5}F', value)).toBe('2.45600');
+				expect($$.parse('%{d5,.5}F', value)).toBe('2.456');
+				expect($$.parse('%{.2,d2,p2}F', value)).toBe('02.46');
 
 				value = 42.1;
-				expect($$.parse('%{.2,d2,p2}f', value)).toBe('42.10');
+				expect($$.parse('%{.2,d2,p2}F', value)).toBe('42.10');
 			});
 		});
 
@@ -574,7 +592,7 @@ describe('i18n-formatter', function() {
 				expect($$.parse('%{f:"%W"}T', value)).toBe('00');
 				expect($$.parse('%{f:"%V"}T', value)).toBe('53');
 
-				expect($$.parse('%{f:"%d"}T', value)).toBe('03');
+				expect($$.parse('%{f:"%f"}T', value)).toBe('03');
 				expect($$.parse('%{f:"%e"}T', value)).toBe('3');
 				expect($$.parse('%{f:"%j"}T', value)).toBe('003');
 				expect($$.parse('%{f:"%u"}T', value)).toBe('7');
