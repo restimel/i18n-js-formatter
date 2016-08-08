@@ -220,19 +220,19 @@ describe('i18n-formatter', function() {
 			});
 
 			it('should escape strings', function() {
-				var str = 'aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\\n←→€';
+				var str = 'aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\b\\n←→€';
 
-				expect($$.parse('%s', 'noEscape_' + str)).toBe('noEscape_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\\n←→€');
-				expect($$.parse('%{esc:html}s', 'html_' + str)).toBe('html_aBc ^&quot;-_.!|~*&#39;()[]{}&lt;&gt;;,/?:@&amp;=+$#\r\n\t\v\\n←→€');
-				expect($$.parse('%{esc:js}s', 'js_' + str)).toBe('js_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\\n←→€');
-				expect($$.parse('%{esc:json}s', 'json_' + str)).toBe('json_aBc ^\\"-_.!|~*\'()[]{}<>;,/?:@&=+$#\\r\\n\\t\\u000b\\\\n←→€');
-				expect($$.parse('%{esc:regex}s', 'regex_' + str)).toBe('regex_aBc \\^"-_\\.!\\|~\\*\'\\(\\)\\[\\]\\{\\}<>;,/\\?:@&=\\+\\$#\\r\\n\\t\\v\\\\n←→€');
-				expect($$.parse('%{esc:url}s', 'url_' + str)).toBe('url_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E;,/?:@&=+$#%0D%0A%09%0B%5Cn%E2%86%90%E2%86%92%E2%82%AC');
-				expect($$.parse('%{esc:uri}s', 'uri_' + str)).toBe('uri_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E;,/?:@&=+$#%0D%0A%09%0B%5Cn%E2%86%90%E2%86%92%E2%82%AC');
-				expect($$.parse('%{esc:uri6}s', 'uri6_' + str)).toBe('uri6_aBc%20%5E%22-_.!%7C~*\'()[]%7B%7D%3C%3E;,/?:@&=+$#%0D%0A%09%0B%5Cn%E2%86%90%E2%86%92%E2%82%AC');
-				expect($$.parse('%{esc:urlc}s', 'urlc_' + str)).toBe('urlc_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E%3B%2C%2F%3F%3A%40%26%3D%2B%24%23%0D%0A%09%0B%5Cn%E2%86%90%E2%86%92%E2%82%AC');
-				expect($$.parse('%{esc:uric}s', 'uric_' + str)).toBe('uric_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E%3B%2C%2F%3F%3A%40%26%3D%2B%24%23%0D%0A%09%0B%5Cn%E2%86%90%E2%86%92%E2%82%AC');
-				expect($$.parse('%{esc:no}s', 'no_' + str)).toBe('no_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\\n←→€');
+				expect($$.parse('noEscape_%s', str)).toBe('noEscape_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\b\\n←→€');
+				expect($$.parse('html_%{esc:html}s', str)).toBe('html_aBc ^&quot;-_.!|~*&#39;()[]{}&lt;&gt;;,/?:@&amp;=+$#\r\n\t\v\b\\n←→€');
+				expect($$.parse('js_%{esc:js}s', str)).toBe('js_aBc ^\\"-_.!|~*\'()[]{}<>;,/?:@&=+$#\\r\\n\\t\\u000b\\b\\\\n←→€');
+				expect($$.parse('json_%{esc:json}s', str)).toBe('json_aBc ^\\"-_.!|~*\'()[]{}<>;,/?:@&=+$#\\r\\n\\t\\u000b\\b\\\\n←→€');
+				expect($$.parse('regex_%{esc:regex}s', str)).toBe('regex_aBc \\^"-_\\.!\\|~\\*\'\\(\\)\\[\\]\\{\\}<>;,/\\?:@&=\\+\\$#\\r\\n\\t\\v\\b\\\\n←→€');
+				expect($$.parse('url_%{esc:url}s', str)).toBe('url_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E;,/?:@&=+$#%0D%0A%09%0B%08%5Cn%E2%86%90%E2%86%92%E2%82%AC');
+				expect($$.parse('uri_%{esc:uri}s', str)).toBe('uri_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E;,/?:@&=+$#%0D%0A%09%0B%08%5Cn%E2%86%90%E2%86%92%E2%82%AC');
+				expect($$.parse('uri6_%{esc:uri6}s', str)).toBe('uri6_aBc%20%5E%22-_.!%7C~*\'()[]%7B%7D%3C%3E;,/?:@&=+$#%0D%0A%09%0B%08%5Cn%E2%86%90%E2%86%92%E2%82%AC');
+				expect($$.parse('urlc_%{esc:urlc}s', str)).toBe('urlc_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E%3B%2C%2F%3F%3A%40%26%3D%2B%24%23%0D%0A%09%0B%08%5Cn%E2%86%90%E2%86%92%E2%82%AC');
+				expect($$.parse('uric_%{esc:uric}s', str)).toBe('uric_aBc%20%5E%22-_.!%7C~*\'()%5B%5D%7B%7D%3C%3E%3B%2C%2F%3F%3A%40%26%3D%2B%24%23%0D%0A%09%0B%08%5Cn%E2%86%90%E2%86%92%E2%82%AC');
+				expect($$.parse('no_%{esc:no}s', str)).toBe('no_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\b\\n←→€');
 
 				$$.configuration({
 					defaultFormat: {
@@ -242,10 +242,10 @@ describe('i18n-formatter', function() {
 					}
 				});
 
-				expect($$.parse('%s', 'HTML_' + str)).toBe('HTML_aBc ^&quot;-_.!|~*&#39;()[]{}&lt;&gt;;,/?:@&amp;=+$#\r\n\t\v\\n←→€');
-				expect($$.parse('%{esc:html}s', 'HTMLhtml_' + str)).toBe('HTMLhtml_aBc ^&quot;-_.!|~*&#39;()[]{}&lt;&gt;;,/?:@&amp;=+$#\r\n\t\v\\n←→€');
-				expect($$.parse('%{esc:js}s', 'HTMLjs_' + str)).toBe('HTMLjs_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\\n←→€');
-				expect($$.parse('%{esc:no}s', 'HTMLno_' + str)).toBe('HTMLno_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\\n←→€');
+				expect($$.parse('HTML_%s', str)).toBe('HTML_aBc ^&quot;-_.!|~*&#39;()[]{}&lt;&gt;;,/?:@&amp;=+$#\r\n\t\v\b\\n←→€');
+				expect($$.parse('HTMLhtml_%{esc:html}s', str)).toBe('HTMLhtml_aBc ^&quot;-_.!|~*&#39;()[]{}&lt;&gt;;,/?:@&amp;=+$#\r\n\t\v\b\\n←→€');
+				expect($$.parse('HTMLjs_%{esc:js}s', str)).toBe('HTMLjs_aBc ^\\"-_.!|~*\'()[]{}<>;,/?:@&=+$#\\r\\n\\t\\u000b\\b\\\\n←→€');
+				expect($$.parse('HTMLno_%{esc:no}s', str)).toBe('HTMLno_aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\b\\n←→€');
 			});
 		});
 

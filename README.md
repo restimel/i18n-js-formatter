@@ -611,15 +611,15 @@ Possible variations:
 * **CasE**: The first character is set to upper case. Others are stay unchanged.
 * **esc:STR**: (STR must be a string of one below) escape the string sequence to be safely inserted in the context defined.
 	* **html**: escape string to be safely inserted in HTML. Characters `"<>&` are escaped to &#Unicode; equivalent.
-	* **js**:
+	* **js**: escape string to be evaluated as string in js eval.
 	* **regex**: escape special characters to insert the string in a regexp like a simple string.
 	* **json**: escape string to be safely added in a JSON as a string. Characters `\"` are escaped to \char; equivalent. Special character are converted to unicode equivalent.
 	* **url**: escape string to be safely used as url. Latin characters, numbers and  `-_.!~*'();,/?:@&=+$#` are not escaped. Others are escaped to %Hex equivalent.
-	* **uri**: alias of url
+	* **uri**: alias of url.
 	* **uri6**: escape string to be safely used as url in IP v6 (RFC 3986). Latin characters, numbers and  `-_.!~*'();,/?:@&=+$#[]` are not escaped. Others are escaped to %Hex equivalent.
 	* **urlc**: escape string to be safely used as url. Latin characters, numbers and  `-_.!~*'()` are not escaped. Others are escaped to %Hex equivalent.
-	* **uric**: alias of urlcé
-	* **no**: do not escape the string.
+	* **uric**: alias of urlc.
+	* **no**, **raw**: do not escape the string.
 
 ##### Default configuration
 

@@ -53,6 +53,7 @@
 							'"': '&quot;',
 							'&': '&amp;',
 							'\'': '&#39;'
+							//manage \0 ?
 						};
 						return code[p];
 					}); break;
@@ -70,24 +71,31 @@
 				case 'urlc': str = encodeURIComponent(str); break;
 				case 'regex':
 				case 'regexp':
-					str = str.replace(/[\\\n\r\t\v^$.()[\]{}?*+|]/g, function(p) {
+					str = str.replace(/[\\\n\r\t\v\b\f^$.()[\]{}?*+|\0]/g, function(p) {
 						var code = {
 							'\n': '\\n',
 							'\r': '\\r',
 							'\t': '\\t',
-							'\v': '\\v'
+							'\v': '\\v',
+							'\b': '\\b',
+							'\f': '\\f',
+							'\0': '\\0'
 						};
 						return code[p] || '\\' + p;
 					}); break;
+				case 'js':
 				case 'json':
-					str = str.replace(/["\\\n\r\t\v]/g, function(p) {
+					str = str.replace(/["\\\n\r\t\v\b\f\0]/g, function(p) {
 						var code = {
 							'"': '\\"',
 							'\\': '\\\\',
 							'\n': '\\n',
 							'\r': '\\r',
 							'\t': '\\t',
-							'\v': '\\u000b'
+							'\v': '\\u000b',
+							'\b': '\\b',
+							'\f': '\\f',
+							'\0': '\\u0000'
 						};
 						return code[p];
 					}); break;
