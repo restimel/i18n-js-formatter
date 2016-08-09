@@ -790,6 +790,11 @@
 				});
 			}
 
+			if (!key && self.navigator && self.navigator.language) {
+				key = _formatLocaleKey(self.navigator.language);
+			}
+
+			/* final fallback use the first locale available */
 			if (!key) {
 				key = statusVariables.localeKeys[0];
 			}
