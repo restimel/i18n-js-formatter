@@ -560,18 +560,18 @@ If you have set _i18n_config.doNotLoadFormatter to true, then you should load it
 
 #### Summary
 
-| Code | output |
-|:----:| ------ |
-| %% | % |
-| %f | locale formatted number |
-| %D | locale formatted number with suffix |
-| %d | locale formatted integer number |
-| %e | locale formatted number in scientific notation |
-| %i | locale formatted integer number |
-| %F | raw number |
-| %s | string |
-| %t | duration |
-| %T | date |
+| Code | output | result in English with example: '98765.43' |
+|:----:| ------ | ------ |
+| %% | % | - |
+| %f | locale formatted number | 98,765.43 |
+| %D | locale formatted number with suffix | 98.765k |
+| %d | locale formatted integer number | 98,765 |
+| %e | locale formatted number in scientific notation | 9.877e+4 |
+| %i | locale formatted integer number | 98,765 |
+| %F | raw number | 98765.43 |
+| %s | string | 98765.43 |
+| %t | duration | 1min 38s 765ms 430µs |
+| %T | date | 1/1/1970 00:01:39 AM |
 
 #### Usage
 
@@ -695,7 +695,7 @@ Parameters are:
 Example: [{suffix: 'M', multiple: 1000000}, {suffix: 'k', multiple: 1000}]
 Default value is the list of SI suffixes for all thousand from 10^-15 to 10^15.
 
-#### date format (T) {not implemented yet}
+#### date format (T) {not implemented yet :'( }
 
 It converts the value to a date.
 The kind character is **T**.
