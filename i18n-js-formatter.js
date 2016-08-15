@@ -88,6 +88,10 @@
 			s: 's',
 			ms: 'ms',
 			'µs': 'µs'
+		},
+		string: {
+			lowerChars: '',
+			upperChars: ''
 		}
 	};
 	var defaultFormat = {
@@ -651,6 +655,12 @@
 				locale.formatRules.number.SIsuffix.sort(function(s1, s2) {
 					return s2.multiple - s1.multiple;
 				});
+			}
+			if (rules.string && rules.string.lowerChars) {
+				locale.formatRules.string._lowerChars = new RegExp('[^' + rules.string.lowerChars.replace(/([\\\]\/-])/g, '\\$1') + ']+|.', 'g');
+			}
+			if (rules.string && rules.string.upperChars) {
+				locale.formatRules.string._upperChars = new RegExp('[^' + rules.string.upperChars.replace(/([\\\]\/-])/g, '\\$1') + ']+|.', 'g');
 			}
 		}
 	}

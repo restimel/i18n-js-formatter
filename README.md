@@ -8,7 +8,7 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
 
-## Version 0.1.5
+## Version 0.1.6
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 
@@ -156,6 +156,7 @@ The second possibility is to use the configuration method available in the libra
 * **formatRules**: {Object} rules for some output format depending of locales.
 					For each locale keys, an object contains the rules.
 	* **number**: {Object} rules for displaying numbers. Attributes are **thousandSeparator**, **decimalSeparator**, **exponentialSeparator**, **SIsuffix** (see formatter section for more details)
+	* **string**: {Object} rules for displaying string. Attributes are **lowerChars**, **upperChars** (see formatter section for more details)
 * **localeSet**:	{Object} define all options at one for defined locales. It replaces locales defined with options "locales".
 	* *key*:	{String} [Required] the locale to define.
 	* *name*:	{String} the locale pretty name.
@@ -243,35 +244,6 @@ It is possible to add several formatters and order them with the weight attribut
 
 By default weight is 100. If the weight is higher than another formatter, the formatter will be called before.
 
-#### i18n.getRules
-
-It retrieves the current formatting rules or the one specified by the first argument.
-
-	i18n.getRules('fr') =>	{
-								number: {
-									thousandSeparator: ' ',
-									decimalSeparator: ',',
-									exponentialSeprator: 'e'
-								}
-							}
-
-	// in locale (en)
-	i18n.getRules() =>	{
-							number: {
-								thousandSeparator: ',',
-								decimalSeparator: '.',
-								exponentialSeprator: 'e'
-							}
-						}
-
-See formatter section to get more details about Rules values
-
-#### sprintf support
-
-src/wrapperSprintf.js contains a simple method to handle Sprintf API as a formatter for i18n API.
-
-If _i18n_config.doNotLoadFormatter is set to true, the sprintf formatter is not automatically added to i18n but you can load the function "callSprintf" manually with the options you want.
-
 
 ### i18n.context()
 
@@ -314,6 +286,36 @@ Plurals translation of a single phrase. Singular and plural forms will get added
 		1: 'a cat',
 		default: '%s cats'
 	}, quantity);
+
+
+### i18n.getRules()
+
+It retrieves the current formatting rules or the one specified by the first argument.
+
+	i18n.getRules('fr') =>	{
+								number: {
+									thousandSeparator: ' ',
+									decimalSeparator: ',',
+									exponentialSeprator: 'e'
+								}
+							}
+
+	// in locale (en)
+	i18n.getRules() =>	{
+							number: {
+								thousandSeparator: ',',
+								decimalSeparator: '.',
+								exponentialSeprator: 'e'
+							}
+						}
+
+See formatter section to get more details about Rules values
+
+#### sprintf support
+
+src/wrapperSprintf.js contains a simple method to handle Sprintf API as a formatter for i18n API.
+
+If _i18n_config.doNotLoadFormatter is set to true, the sprintf formatter is not automatically added to i18n but you can load the function "callSprintf" manually with the options you want.
 
 
 ### i18n.configuration()
@@ -363,6 +365,7 @@ Change the way to use the library
 	_.setLocale('fr');
 	_('cat'); // returns "chat"
 
+
 ### i18n.setLocale()
 
 Set the current locale globally or in current scope.
@@ -375,6 +378,7 @@ Set the current locale globally or in current scope.
 	i18n.setLocale(); //equivalent to i18n.setLocale(navigator.language);
 
 Note: if you have put a storage system (cookie, localStorage), i18n.setLocale() will use the last locale used in the browser.
+
 
 ### getLocale()
 
@@ -389,6 +393,7 @@ Get the current locale from current scope or globally.
 	i18n.getLocale({key: true, name: true}); // {key: 'fr', name: 'Français'}
 	i18n.getLocale({data: 'hello'}); // 'salut'
 
+
 ### getLocales()
 
 Returns a whole catalog optionally based on current scope and locale.
@@ -400,12 +405,14 @@ Returns a whole catalog optionally based on current scope and locale.
 	i18n.getLocales({data: 'hello'}) // ['hello', 'salut', 'hallo']
 	i18n.getLocales({locale: true, name: true, data:'hello'}) // [{locale: 'en', name: 'English', data: 'hello'}, {locale: 'fr', name: 'Français', data: 'salut'}, {locale: 'de', name: 'Deutsch', data: 'hallo'}]
 
+
 ### clearData()
 
 Clear all dictionary data
 
 	i18n.clearData('fr'); // clear data of the french dictionary only
 	i18n.clearData(); // clear data of all dictionaries
+
 
 ### Load Data vs Load Dictionary
 
@@ -578,6 +585,7 @@ It is possible to retrieve the current loaded data with getData.
 	i18n.getData('en'); // returns all data of English language in data format
 	i18n.getData({locale: 'en', format: 'dictionary'}); // returns all data of English language in dictionary format
 
+
 ### addItem()
 
 It is possible to add new entry in the data.
@@ -587,6 +595,7 @@ It is possible to add new entry in the data.
 		fr: 'the French version'
 	});
 
+
 ### addCtxItem()
 
 Same as addItem but add a context to the sentence
@@ -595,6 +604,7 @@ Same as addItem but add a context to the sentence
 		en: 'the English version',
 		fr: 'the French version'
 	});
+
 
 ## Managing Errors
 
@@ -636,6 +646,7 @@ Here are code details:
 	* 7100: Translation is not possible due to an unsupported type (%s): %s (details: [typeof given argument, the argument])
 	* 7200: Formatter %s can not be added because it is not a function. (details: [formatter name])
 	* 8400 → 8599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'
+
 
 ## i18n formatter
 
@@ -723,6 +734,30 @@ The default escaping rule is "no" but it can be changed in configuration. This i
 		}
 	});
 	i18n('hey<script>alert("ho")</script>'); //hey&lt;script&gt;alert(&quot;ho&quot;)&lt;/script&gt;
+
+##### Conversion configuration
+
+To manage some conversion from lower case to upper case (and reciprocally), it is possible define how characters must be converted. This is useful for some language.
+
+	i18n.configuration({
+		formatRules: {
+			tr: {
+				string: {
+					lowerChars: 'iı',
+					upperChars: 'İI'
+				}
+			}
+		}
+	});
+
+Parameters are:
+
+* **lowerChars**: {String} Used to define the lower chars for this locale which must be converted to specific chars. Conversion values are taken from upperChars (characters must be in the same order). Example: i18n('%{case}s', 'BİRLEŞIK') => 'birleşik'
+	Default value: ''
+* **upperChars**: {String} Used to define the upper chars for this locale which must be converted to specific chars. Conversion values are taken from lowerChars (characters must be in the same order). Example: i18n('%{case}s', 'birleşik') => 'BİRLEŞIK'
+	Default value: ''
+
+Note: whithout these parameters the lower/upper conversion will change i←→I and not i←→İ and ı←→I
 
 #### number format (d, D, e, f, F, i)
 

@@ -21,6 +21,10 @@ describe('i18n', function() {
 			exponentialSeparator: 'e',
 			SIsuffix: defaultSIsuffix
 		},
+		string: {
+			lowerChars: '',
+			upperChars: ''
+		},
 		duration: {
 			y: 'y',
 			month: 'M',

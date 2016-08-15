@@ -109,6 +109,42 @@
 			return str;
 		}
 
+		function toLowerCase(str) {
+			var rules = getRules().string;
+
+			if (!rules.upperChars) {
+				return str.toLowerCase();
+			} else {
+				return str.replace(rules._upperChars, function(p) {
+					var idx = rules.upperChars.indexOf(p);
+
+					if (idx !== -1) {
+						return rules.lowerChars.charAt(idx);
+					} else {
+						return p.toLowerCase();
+					}
+				});
+			}
+		}
+
+		function toUpperCase(str) {
+			var rules = getRules().string;
+
+			if (!rules.lowerChars) {
+				return str.toUpperCase();
+			} else {
+				return str.replace(rules._lowerChars, function(p) {
+					var idx = rules.lowerChars.indexOf(p);
+
+					if (idx !== -1) {
+						return rules.upperChars.charAt(idx);
+					} else {
+						return p.toUpperCase();
+					}
+				});
+			}
+		}
+
 		function stringReplacement(value, variation) {
 			var escapeRule;
 
@@ -120,13 +156,13 @@
 
 			if (variation) {
 				if (variation.indexOf('case') !== -1) {
-					value = value.toLowerCase();
+					value = toLowerCase(value);
 				} else if (variation.indexOf('CASE') !== -1) {
-					value = value.toUpperCase();
+					value = toUpperCase(value);
 				} else if (variation.indexOf('Case') !== -1) {
-					value = value.charAt(0).toUpperCase() + value.slice(1).toLowerCase();
+					value = toUpperCase(value.charAt(0)) + toLowerCase(value.slice(1));
 				} else if (variation.indexOf('CasE') !== -1) {
-					value = value.charAt(0).toUpperCase() + value.slice(1);
+					value = toUpperCase(value.charAt(0)) + value.slice(1);
 				}
 
 				variation.forEach(function(v) {

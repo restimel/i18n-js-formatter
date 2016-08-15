@@ -219,6 +219,32 @@ describe('i18n-formatter', function() {
 				expect($$.parse('%{CasE}s', 'some Strings')).toBe('Some Strings');
 			});
 
+			it('should change the case of special characters', function() {
+				$$.configuration({
+					locales: ['en', 'fr', 'de', 'tr'],
+					formatRules: {
+						tr: {
+							string: {
+								lowerChars: 'iı',
+								upperChars: 'İI'
+							}
+						}
+					}
+				});
+
+				expect($$.parse('%{case}s', 'ΑΒΓΩ')).toBe('αβγω');
+				expect($$.parse('%{CASE}s', 'αβγω')).toBe('ΑΒΓΩ');
+				$$.setLocale('fr');
+				expect($$.parse('%{case}s', 'ÉÀÙÎÇŒéàùîçœ')).toBe('éàùîçœéàùîçœ');
+				expect($$.parse('%{CASE}s', 'ÉÀÙÎÇŒéàùîçœ')).toBe('ÉÀÙÎÇŒÉÀÙÎÇŒ');
+				$$.setLocale('de');
+				expect($$.parse('%{case}s', 'ßÜÖüö')).toBe('ßüöüö');
+				expect($$.parse('%{CASE}s', 'ßÜÖüö')).toBe('SSÜÖÜÖ');
+				$$.setLocale('tr');
+				expect($$.parse('%{case}s', 'iışğüçöaİIŞĞÜÇÖA')).toBe('iışğüçöaiışğüçöa');
+				expect($$.parse('%{CASE}s', 'iışğüçöaİIŞĞÜÇÖA')).toBe('İIŞĞÜÇÖAİIŞĞÜÇÖA');
+			});
+
 			it('should escape strings', function() {
 				var str = 'aBc ^"-_.!|~*\'()[]{}<>;,/?:@&=+$#\r\n\t\v\b\\n←→€';
 
