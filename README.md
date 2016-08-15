@@ -8,7 +8,7 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
 
-## Version 0.1.6
+## Version 0.2.0
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 

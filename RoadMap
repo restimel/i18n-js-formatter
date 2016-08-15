@@ -26,25 +26,27 @@ Version 0.2
 
 Version 0.3
 
-	* pretty duration: allow to exclude some units
-	* pretty date
 	* add plural translations
 		* i18n.n('singular', 'plural', quantity, other values)
 		* i18n.n({0: '0 text', default: 'other quantities'}, quantity, other values)
 		* i18n.n('default key sentence', quantity, other values)
 	* number: support percent, 0.1 → 10%
-	* create custom formatter
+	* number: support base conversion (binary, octal, hexa)
+	* pretty duration: allow to exclude some units
+	* pretty date
 	* improve demonstration page
+	* add info log (like for fallback language)
+
+Version 0.4
+	* create custom formatter
+	* create custom variation
+	* support fallback from error/warn/info (with custom function on error code)
 
 To plan
 	
-	* clone i18n instance to allow scope modification
-
-	* default formatting variation
-	* custom formatting variation
+	* clone i18n instance to allow scope modification (→ for version 1+)
 
 	* Formatter
-		* number Hexa/binaire/Octal
 		* pretty conversion (custom data)
 			✓ 1000 → 1k
 			* 1000s → 16min (as generic value)
