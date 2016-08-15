@@ -8,7 +8,7 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
 
-## Version 0.1.4
+## Version 0.1.5
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 
@@ -43,7 +43,7 @@ Format number depending on locale
 		//returns '1 234 567,8 phrases' (fr)
 		//returns '1.234.567,8 Sätze' (de)
 
-To give a context to help the translation (this should be done in version 0.2)
+Contextualize your sentence to make difference from same sentence or to give more context.
 
 	i18n.context('computer key', 'Give the correct key'); // should be translated in French 'Donnez la bonne touche'
 	i18n.context('door key', 'Give the correct key'); // should be translated in French 'Donnez la bonne clef'
@@ -168,21 +168,33 @@ The second possibility is to use the configuration method available in the libra
 
 Translates a single expression. Returns translated parsed and substituted string. If the translation is not found it returns the expression given.
 
+	// example 1:
 	// (locale == 'fr')
 	i18n('Hello'); // Salut
 
+	// example 2:
 	// give context (locale == 'fr')
-	i18n.context('phone greating', 'Hello'); // Allo
 	i18n({str: 'Hello', context: 'phone greating'}); // Allo
+	i18n.context('phone greating', 'Hello'); // Allo
 
+	// example 3:
 	// give an object (locale == 'fr')
 	i18n({
 		en: 'Hello',
 		fr: 'Salut'
 	}); // Salut
 
-	// passing specific locale (needed?) {currently not implemented}
+	// example 4:
+	// passing specific locale
 	i18n({str: 'Hello', locale: 'fr'}); // Salut
+
+When giving an object to match an existing sentence (example 2 or 4), you must specify the string property (which can be either "string" or "str"), otherwise it will try to find a sentence from this object (example 3).
+
+Properties:
+* **string** or **str**: the sentence to look for and translate
+* **context** or **ctx** or **c**: the context (see context section for more explanation).
+* **locale** or **lng**: force a specific locale (and not use the default one).
+
 
 ### i18n.parse()
 
@@ -206,6 +218,7 @@ By default, no formatter are loaded. You must load a formatter (with i18n.loadFo
 An inner formatter is provided but must be loaded.
 
 It is possible to add several formatter and they will be all called.
+
 
 #### i18n.loadFormatter
 
@@ -259,7 +272,8 @@ src/wrapperSprintf.js contains a simple method to handle Sprintf API as a format
 
 If _i18n_config.doNotLoadFormatter is set to true, the sprintf formatter is not automatically added to i18n but you can load the function "callSprintf" manually with the options you want.
 
-### i18n.context() [version 0.2]
+
+### i18n.context()
 
 Context allows to give more details to some strings and helps to translate it correctly.
 Some people also call it namespace.
@@ -276,11 +290,15 @@ The first argument is the context (this one won't be translated) and the second 
 
 	i18n.context('computer key', 'key %s', keyValue); // The result will be "key A" if keyValue is worth 'A'
 
-It is also possible to call it with method *c*. It's an alias of method context
+It is also possible to call it with method **c**. It's an alias of method context
 
 	i18n.c('minimum', 'min');
 
 The entry in dictionary are different from string without contextual.
+
+Note:
+Using method context (or c), is equivalent of calling i18n with obect containing property *context*.
+
 
 ### i18n.n() [version 0.3]
 
@@ -296,6 +314,7 @@ Plurals translation of a single phrase. Singular and plural forms will get added
 		1: 'a cat',
 		default: '%s cats'
 	}, quantity);
+
 
 ### i18n.configuration()
 
@@ -426,6 +445,32 @@ You can load it via configuration
 		dictionary: 'path/dictionary.json'
 	});
 
+##### context
+
+In dictionary contextual sentence are grouped inside the same context key. A context key is prefixed by "_ctx:"
+
+	dictionary: {
+		'_ctx:main panel': {
+			'close': {
+				en: 'close',
+				de: 'schließen',
+				fr: 'fermer'
+			},
+			'open': {
+				en: 'open',
+				de: 'öffnen',
+				fr: 'ouvrir'
+			}
+		},
+		'_ctx:range estimation': {
+			'close': {
+				en: 'close',
+				de: 'nah',
+				fr: 'proche'
+			}
+		}
+	}
+
 #### Data
 
 The data format is an object containning all locale keys which contains all the sentence and their translations.
@@ -489,6 +534,41 @@ It is also possible to load it language by language.
 		}
 	});
 
+##### context
+
+In data format contextual sentence are grouped inside the same context key. A context key is prefixed by "_ctx:"
+
+	data: {
+		'en': {
+			'_ctx:main panel':
+				'close': 'close',
+				'open': 'open'
+				},
+			'_ctx:range estimation': {
+				'close': 'close'
+			}
+		},
+		'de': {
+			'_ctx:main panel':
+				'close': 'schließen',
+				'open': 'öffnen'
+				},
+			'_ctx:range estimation': {
+				'close': 'nah'
+			}
+		},
+		'fr': {
+			'_ctx:main panel':
+				'close': 'fermer',
+				'open': 'ouvrir'
+				},
+			'_ctx:range estimation': {
+				'close': 'proche'
+			}
+		}
+	}
+
+
 ### getData()
 
 It is possible to retrieve the current loaded data with getData.
@@ -503,6 +583,15 @@ It is possible to retrieve the current loaded data with getData.
 It is possible to add new entry in the data.
 
 	i18n.addItem('new sentence to add', {
+		en: 'the English version',
+		fr: 'the French version'
+	});
+
+### addCtxItem()
+
+Same as addItem but add a context to the sentence
+
+	i18n.addCtxItem('Some context','new sentence to add', {
 		en: 'the English version',
 		fr: 'the French version'
 	});
@@ -542,6 +631,7 @@ Here are code details:
 	* 7012: data is in a wrong format (%s): %s (details: [type of data, the value received]) called if not possible to load data.
 	* 7013: data with key "%s" is in a wrong format (%s): %s (details: [locale key, type of data, the value received])
 	* 7014: data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s (details: [locale key, type of data, the value received])
+	* 7015: item "%s" for locale "%s" is %s instead of string: %s (details: [sentence, locale key, type of value, the value received])
 	* 7020: data received from "%s" is not in a valid JSON ("%s") (details: [the url sent, the response])
 	* 7100: Translation is not possible due to an unsupported type (%s): %s (details: [typeof given argument, the argument])
 	* 7200: Formatter %s can not be added because it is not a function. (details: [formatter name])

@@ -10,17 +10,14 @@ Version 0.1
 
 Version 0.2
 
-	* pretty date
 	✓ pretty duration (1000s → 16min 40s)
 		* allow to exclude some units
-	* add context for translation
-		* i18n.context('context', 'translation key', values)
-		* i18n.c('context', 'translation key', values)
+	✓ add context for translation
+		✓ i18n.context('context', 'translation key', values)
+		✓ i18n.c('context', 'translation key', values)
 	* string: check that special characters are correctly upperCase
-	* number: support percent, 0.1 → 10%
 	✓ add script for minification (with and without s_formatter)
 		* update documentation
-	* improve demonstration page
 	✓ escape values by default
 		✓ propose different escape kind
 			✓ HTML
@@ -30,10 +27,13 @@ Version 0.2
 
 Version 0.3
 
+	* pretty date
 	* add plural translations
 		* i18n.n('singular', 'plural', quantity, other values)
 		* i18n.n({0: '0 text', default: 'other quantities'}, quantity, other values)
+	* number: support percent, 0.1 → 10%
 	* create custom formatter
+	* improve demonstration page
 
 To plan
 	

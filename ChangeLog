@@ -2,22 +2,23 @@ Change log for i18n-js-formatter
 
 Version 0.2
     * %d si now displaying an int. %f formats all number. %F do not format numbers.
-	* inner-formatter
-		format duration
-		(on going) format date
-		huge number are not rounded
-	* (on going) set a context for keys
-	* escape string to avoid XSS or any issues while inserting strings into special context
+    * Allow contextual sentence
+    * inner-formatter
+        format duration
+        (on going) format date
+        huge number are not rounded
+    * (on going) set a context for keys
+    * escape string to avoid XSS or any issues while inserting strings into special context
 
 Version 0.1
-	* i18n configuration: set allowed locales, give them name, give them secondary fallback
-	* retrieve configuration
-	* load data (format dictionary & data)
-	* get data from specific locale or alll locales.
-	* load data from raw object, function, and ajax (synchronously & asynchrously)
-	* translate strings
-	* formatter
-		* wrapper to sprintf
-		* inner formatter
-			* format string
-			* format numbers
+    * i18n configuration: set allowed locales, give them name, give them secondary fallback
+    * retrieve configuration
+    * load data (format dictionary & data)
+    * get data from specific locale or alll locales.
+    * load data from raw object, function, and ajax (synchronously & asynchrously)
+    * translate strings
+    * formatter
+        * wrapper to sprintf
+        * inner formatter
+            * format string
+            * format numbers

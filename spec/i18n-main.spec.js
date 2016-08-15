@@ -494,6 +494,14 @@ describe('i18n', function() {
 							fr: 'chat',
 							de: 'Katze',
 							'fr-be': 'chat'
+						},
+						'_ctx:category abbrev': {
+							'cat': {
+								en: 'cat',
+								fr: 'cat',
+								de: 'Kat',
+								'fr-be': 'cat'
+							}
 						}
 					}
 				});
@@ -507,19 +515,31 @@ describe('i18n', function() {
 				expect($$.getData()).toEqual({
 					en: {
 						seventy: 'seventy',
-						cat: 'cat'
+						cat: 'cat',
+						'_ctx:category abbrev': {
+							cat: 'cat'
+						}
 					},
 					fr: {
 						seventy: 'soixante-dix',
-						cat: 'chat'
+						cat: 'chat',
+						'_ctx:category abbrev': {
+							cat: 'cat'
+						}
 					},
 					de: {
 						seventy: 'siebzig',
-						cat: 'Katze'
+						cat: 'Katze',
+						'_ctx:category abbrev': {
+							cat: 'Kat'
+						}
 					},
 					'fr-be': {
 						seventy: 'septante',
-						cat: 'chat'
+						cat: 'chat',
+						'_ctx:category abbrev': {
+							cat: 'cat'
+						}
 					}
 				});
 			});
@@ -527,17 +547,26 @@ describe('i18n', function() {
 			it('should get data of a language only', function() {
 				expect($$.getData('de')).toEqual({
 					seventy: 'siebzig',
-					cat: 'Katze'
+					cat: 'Katze',
+					'_ctx:category abbrev': {
+						cat: 'Kat'
+					}
 				});
 
 				expect($$.getData({key: 'de'})).toEqual({
 					seventy: 'siebzig',
-					cat: 'Katze'
+					cat: 'Katze',
+					'_ctx:category abbrev': {
+						cat: 'Kat'
+					}
 				});
 
 				expect($$.getData({locale: 'de'})).toEqual({
 					seventy: 'siebzig',
-					cat: 'Katze'
+					cat: 'Katze',
+					'_ctx:category abbrev': {
+						cat: 'Kat'
+					}
 				});
 			});
 
@@ -554,6 +583,14 @@ describe('i18n', function() {
 							fr: 'chat',
 							de: 'Katze',
 							'fr-be': 'chat'
+						},
+						'_ctx:category abbrev': {
+							'cat': {
+								en: 'cat',
+								fr: 'cat',
+								de: 'Kat',
+								'fr-be': 'cat'
+							}
 						}
 					});
 			});
@@ -565,6 +602,11 @@ describe('i18n', function() {
 					},
 					'cat': {
 						'fr-be': 'chat'
+					},
+					'_ctx:category abbrev': {
+						cat: {
+							'fr-be': 'cat'
+						}
 					}
 				});
 			});
@@ -574,15 +616,24 @@ describe('i18n', function() {
 				expect($$.getData()).toEqual({
 					en: {
 						seventy: 'seventy',
-						cat: 'cat'
+						cat: 'cat',
+						'_ctx:category abbrev': {
+							cat: 'cat'
+						}
 					},
 					fr: {
 						seventy: 'soixante-dix',
-						cat: 'chat'
+						cat: 'chat',
+						'_ctx:category abbrev': {
+							cat: 'cat'
+						}
 					},
 					de: {
 						seventy: 'siebzig',
-						cat: 'Katze'
+						cat: 'Katze',
+						'_ctx:category abbrev': {
+							cat: 'Kat'
+						}
 					},
 					fi: null
 				});
@@ -651,6 +702,14 @@ describe('i18n', function() {
 							fr: 'soixante-dix',
 							de: 'siebzig',
 							'fr-be': 'septante'
+						},
+						'_ctx:with ctx': {
+							seventy: {
+								en: 'seventy with ctx',
+								fr: 'soixante-dix avec ctx',
+								de: 'siebzig mit ctx',
+								'fr-be': 'septante avec ctx'
+							},
 						}
 					}
 				});
@@ -663,19 +722,32 @@ describe('i18n', function() {
 			it('should load raw dictionary', function() {
 				expect($$.getData()).toEqual({
 					en: {
-						seventy: 'seventy'
+						seventy: 'seventy',
+						'_ctx:with ctx': {
+							seventy: 'seventy with ctx'
+						}
 					},
 					fr: {
-						seventy: 'soixante-dix'
+						seventy: 'soixante-dix',
+						'_ctx:with ctx': {
+							seventy: 'soixante-dix avec ctx'
+						}
 					},
 					de: {
-						seventy: 'siebzig'
+						seventy: 'siebzig',
+						'_ctx:with ctx': {
+							seventy: 'siebzig mit ctx'
+						}
 					},
 					'fr-be': {
-						seventy: 'septante'
+						seventy: 'septante',
+						'_ctx:with ctx': {
+							seventy: 'septante avec ctx'
+						}
 					}
 				});
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+				expect($$.getLocales({data: 'seventy', dataCtx: 'with ctx'})).toEqual(['seventy with ctx', 'soixante-dix avec ctx', 'siebzig mit ctx', 'septante avec ctx']);
 
 				expect(this.logInfo).not.toHaveBeenCalled();
 				expect(this.logWarn).not.toHaveBeenCalled();
@@ -697,23 +769,85 @@ describe('i18n', function() {
 				expect($$.getData()).toEqual({
 					en: {
 						seventy: 'seventy',
-						cat: 'cat'
+						cat: 'cat',
+						'_ctx:with ctx': {
+							seventy: 'seventy with ctx'
+						}
 					},
 					fr: {
 						seventy: 'soixante-dix',
-						cat: 'chat'
+						cat: 'chat',
+						'_ctx:with ctx': {
+							seventy: 'soixante-dix avec ctx'
+						}
 					},
 					de: {
 						seventy: 'siebzig',
-						cat: 'Katze'
+						cat: 'Katze',
+						'_ctx:with ctx': {
+							seventy: 'siebzig mit ctx'
+						}
 					},
 					'fr-be': {
 						seventy: 'septante',
-						cat: 'chat'
+						cat: 'chat',
+						'_ctx:with ctx': {
+							seventy: 'septante avec ctx'
+						}
 					}
 				});
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
+
+				$$.configuration({
+					dictionary: {
+						'_ctx:with ctx': {
+							cat: {
+								en: 'cat with ctx',
+								fr: 'chat avec ctx',
+								de: 'Katze mit ctx',
+								'fr-be': 'chat avec ctx'
+							}
+						}
+					}
+				});
+
+				expect($$.getData()).toEqual({
+					en: {
+						seventy: 'seventy',
+						cat: 'cat',
+						'_ctx:with ctx': {
+							seventy: 'seventy with ctx',
+							cat: 'cat with ctx'
+						}
+					},
+					fr: {
+						seventy: 'soixante-dix',
+						cat: 'chat',
+						'_ctx:with ctx': {
+							seventy: 'soixante-dix avec ctx',
+							cat: 'chat avec ctx'
+						}
+					},
+					de: {
+						seventy: 'siebzig',
+						cat: 'Katze',
+						'_ctx:with ctx': {
+							seventy: 'siebzig mit ctx',
+							cat: 'Katze mit ctx'
+						}
+					},
+					'fr-be': {
+						seventy: 'septante',
+						cat: 'chat',
+						'_ctx:with ctx': {
+							seventy: 'septante avec ctx',
+							cat: 'chat avec ctx'
+						}
+					}
+				});
+				expect($$.getLocales({data: 'seventy', dataCtx: 'with ctx'})).toEqual(['seventy with ctx', 'soixante-dix avec ctx', 'siebzig mit ctx', 'septante avec ctx']);
+				expect($$.getLocales({data: 'cat', dataCtx: 'with ctx'})).toEqual(['cat with ctx', 'chat avec ctx', 'Katze mit ctx', 'chat avec ctx']);
 
 				expect(this.logInfo).not.toHaveBeenCalled();
 				expect(this.logWarn).not.toHaveBeenCalled();
@@ -788,16 +922,28 @@ describe('i18n', function() {
 				$$.configuration({
 					data: {
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:with ctx': {
+								seventy: 'seventy with ctx'
+							}
 						},
 						fr: {
-							seventy: 'soixante-dix'
+							seventy: 'soixante-dix',
+							'_ctx:with ctx': {
+								seventy: 'soixante-dix avec ctx'
+							}
 						},
 						de: {
-							seventy: 'siebzig'
+							seventy: 'siebzig',
+							'_ctx:with ctx': {
+								seventy: 'siebzig mit ctx'
+							}
 						},
 						'fr-be': {
-							seventy: 'septante'
+							seventy: 'septante',
+							'_ctx:with ctx': {
+								seventy: 'septante avec ctx'
+							}
 						}
 					}
 				});
@@ -810,19 +956,32 @@ describe('i18n', function() {
 			it('should load raw data', function() {
 				expect($$.getData()).toEqual({
 					en: {
-						seventy: 'seventy'
+						seventy: 'seventy',
+						'_ctx:with ctx': {
+							seventy: 'seventy with ctx'
+						}
 					},
 					fr: {
-						seventy: 'soixante-dix'
+						seventy: 'soixante-dix',
+						'_ctx:with ctx': {
+							seventy: 'soixante-dix avec ctx'
+						}
 					},
 					de: {
-						seventy: 'siebzig'
+						seventy: 'siebzig',
+						'_ctx:with ctx': {
+							seventy: 'siebzig mit ctx'
+						}
 					},
 					'fr-be': {
-						seventy: 'septante'
+						seventy: 'septante',
+						'_ctx:with ctx': {
+							seventy: 'septante avec ctx'
+						}
 					}
 				});
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
+				expect($$.getLocales({data: 'seventy', dataCtx: 'with ctx'})).toEqual(['seventy with ctx', 'soixante-dix avec ctx', 'siebzig mit ctx', 'septante avec ctx']);
 
 				expect(this.logInfo).not.toHaveBeenCalled();
 				expect(this.logWarn).not.toHaveBeenCalled();
@@ -833,16 +992,28 @@ describe('i18n', function() {
 				$$.configuration({
 					data: {
 						en: {
-							cat: 'cat'
+							cat: 'cat',
+							'_ctx:with ctx': {
+								cat: 'cat with ctx'
+							}
 						},
 						fr: {
-							cat: 'chat'
+							cat: 'chat',
+							'_ctx:with ctx': {
+								cat: 'chat avec ctx'
+							}
 						},
 						de: {
-							cat: 'Katze'
+							cat: 'Katze',
+							'_ctx:with ctx': {
+								cat: 'Katze mit ctx'
+							}
 						},
 						'fr-be': {
-							cat: 'chat'
+							cat: 'chat',
+							'_ctx:with ctx': {
+								cat: 'chat avec ctx'
+							}
 						}
 					}
 				});
@@ -850,23 +1021,42 @@ describe('i18n', function() {
 				expect($$.getData()).toEqual({
 					en: {
 						seventy: 'seventy',
-						cat: 'cat'
+						cat: 'cat',
+						'_ctx:with ctx': {
+							seventy: 'seventy with ctx',
+							cat: 'cat with ctx'
+						}
 					},
 					fr: {
 						seventy: 'soixante-dix',
-						cat: 'chat'
+						cat: 'chat',
+						'_ctx:with ctx': {
+							seventy: 'soixante-dix avec ctx',
+							cat: 'chat avec ctx'
+						}
 					},
 					de: {
 						seventy: 'siebzig',
-						cat: 'Katze'
+						cat: 'Katze',
+						'_ctx:with ctx': {
+							seventy: 'siebzig mit ctx',
+							cat: 'Katze mit ctx'
+						}
 					},
 					'fr-be': {
 						seventy: 'septante',
-						cat: 'chat'
+						cat: 'chat',
+						'_ctx:with ctx': {
+							seventy: 'septante avec ctx',
+							cat: 'chat avec ctx'
+						}
 					}
 				});
+
 				expect($$.getLocales({data: 'seventy'})).toEqual(['seventy', 'soixante-dix', 'siebzig', 'septante']);
 				expect($$.getLocales({data: 'cat'})).toEqual(['cat', 'chat', 'Katze', 'chat']);
+				expect($$.getLocales({data: 'seventy', dataCtx: 'with ctx'})).toEqual(['seventy with ctx', 'soixante-dix avec ctx', 'siebzig mit ctx', 'septante avec ctx']);
+				expect($$.getLocales({data: 'cat', dataCtx: 'with ctx'})).toEqual(['cat with ctx', 'chat avec ctx', 'Katze mit ctx', 'chat avec ctx']);
 
 				expect(this.logInfo).not.toHaveBeenCalled();
 				expect(this.logWarn).not.toHaveBeenCalled();
@@ -1182,29 +1372,61 @@ describe('i18n', function() {
 				beforeEach(function() {
 					var dico = JSON.stringify({
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						fr: {
-							seventy: 'soixante-dix'
+							seventy: 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						de: {
-							seventy: 'siebzig'
+							seventy: 'siebzig',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						'fr-be': {
-							seventy: 'septante'
+							seventy: 'septante',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						}
 					});
 					var dico_en = JSON.stringify({
-						en: {'seventy': 'seventy'}
+						en: {
+							'seventy': 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
+						}
 					});
 					var dico_fr = JSON.stringify({
-						fr: {'seventy': 'soixante-dix'}
+						fr: {
+							'seventy': 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
+						}
 					});
 					var dico_de = JSON.stringify({
-						de: {'seventy': 'siebzig'}
+						de: {
+							'seventy': 'siebzig',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
+						}
 					});
 					var dico_be = JSON.stringify({
-						'fr-be': {'seventy': 'septante'}
+						'fr-be': {
+							'seventy': 'septante',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
+						}
 					});
 
 					jasmine.Ajax.stubRequest('dictionary.json').andReturn({
@@ -1257,7 +1479,10 @@ describe('i18n', function() {
 
 					expect($$.getData()).toEqual({
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						fr: null,
 						de: null,
@@ -1268,10 +1493,16 @@ describe('i18n', function() {
 					expect(spy.calls.count()).toEqual(2);
 					expect($$.getData()).toEqual({
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						fr: {
-							seventy: 'soixante-dix'
+							seventy: 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						de: null,
 						'fr-be': null
@@ -1303,16 +1534,28 @@ describe('i18n', function() {
 
 					expect($$.getData()).toEqual({
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						fr: {
-							seventy: 'soixante-dix'
+							seventy: 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						de: {
-							seventy: 'siebzig'
+							seventy: 'siebzig',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						'fr-be': {
-							seventy: 'septante'
+							seventy: 'septante',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						}
 					});
 
@@ -1321,16 +1564,28 @@ describe('i18n', function() {
 					expect(spy.calls.count()).toEqual(2);
 					expect($$.getData()).toEqual({
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						fr: {
-							seventy: 'soixante-dix'
+							seventy: 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						de: {
-							seventy: 'siebzig'
+							seventy: 'siebzig',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						'fr-be': {
-							seventy: 'septante'
+							seventy: 'septante',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						}
 					});
 
@@ -1355,16 +1610,28 @@ describe('i18n', function() {
 
 					expect($$.getData()).toEqual({
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						fr: {
-							seventy: 'soixante-dix'
+							seventy: 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						de: {
-							seventy: 'siebzig'
+							seventy: 'siebzig',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						'fr-be': {
-							seventy: 'septante'
+							seventy: 'septante',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						}
 					});
 
@@ -1373,16 +1640,28 @@ describe('i18n', function() {
 					expect(spy.calls.count()).toEqual(2);
 					expect($$.getData()).toEqual({
 						en: {
-							seventy: 'seventy'
+							seventy: 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						fr: {
-							seventy: 'soixante-dix'
+							seventy: 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						de: {
-							seventy: 'siebzig'
+							seventy: 'siebzig',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						},
 						'fr-be': {
-							seventy: 'septante'
+							seventy: 'septante',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}
 						}
 					});
 
@@ -1461,10 +1740,22 @@ describe('i18n', function() {
 				it('should retrieve all data from function', function() {
 					var spy = jasmine.createSpy('onLocaleReady');
 					var spyDico = jasmine.createSpy('data').and.returnValue({
-						en: {'seventy': 'seventy'},
-						fr: {'seventy': 'soixante-dix'},
-						de: {'seventy': 'siebzig'},
-						'fr-be': {'seventy': 'septante'}
+						en: {'seventy': 'seventy',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}},
+						fr: {'seventy': 'soixante-dix',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}},
+						de: {'seventy': 'siebzig',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}},
+						'fr-be': {'seventy': 'septante',
+							'_ctx:abr': {
+								'min': 'minimum'
+							}}
 					});
 					$$.configuration({
 						defaultLocale: 'en',
@@ -1641,6 +1932,80 @@ describe('i18n', function() {
 				expect(this.logError).not.toHaveBeenCalled();
 			});
 		});
+
+		describe('addCtxItem()', function() {
+			afterEach(function() {
+				$$.clearData();
+			});
+
+			it('should add a new entry', function() {
+				$$.addCtxItem('keyboard', 'a key', {
+					en: 'a key',
+					fr: 'une touche',
+					de: 'eine Taste',
+					'fr-be': 'une touche 1fois'
+				});
+
+				expect($$.getLocales({data: 'a key', dataCtx: 'keyboard'})).toEqual(['a key', 'une touche', 'eine Taste', 'une touche 1fois']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			it('should replace a previous entry', function() {
+				$$.addCtxItem('keyboard', 'a key', {
+					en: 'anything',
+					fr: 'anything',
+					de: 'anything',
+					'fr-be': 'anything'
+				});
+
+				$$.addCtxItem('keyboard', 'a key', {
+					en: 'a key',
+					fr: 'une touche',
+					de: 'eine Taste',
+					'fr-be': 'une touche 1fois'
+				});
+
+				expect($$.getLocales({data: 'a key', dataCtx: 'keyboard'})).toEqual(['a key', 'une touche', 'eine Taste', 'une touche 1fois']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+
+			it('should not override different context', function() {
+				$$.addItem('a key', {
+					en: 'a key',
+					fr: 'un indice',
+					de: 'ein Anzeichen',
+					'fr-be': 'une solution'
+				});
+
+				$$.addCtxItem('door', 'a key', {
+					en: 'a key',
+					fr: 'une clef',
+					de: 'ein Schlüssel',
+					'fr-be': 'une clef 1fois'
+				});
+
+				$$.addCtxItem('keyboard', 'a key', {
+					en: 'a key',
+					fr: 'une touche',
+					de: 'eine Taste',
+					'fr-be': 'une touche 1fois'
+				});
+
+				expect($$.getLocales({data: 'a key', dataCtx: 'keyboard'})).toEqual(['a key', 'une touche', 'eine Taste', 'une touche 1fois']);
+				expect($$.getLocales({data: 'a key', dataCtx: 'door'})).toEqual(['a key', 'une clef', 'ein Schlüssel', 'une clef 1fois']);
+				expect($$.getLocales({data: 'a key'})).toEqual(['a key', 'un indice', 'ein Anzeichen', 'une solution']);
+
+				expect(this.logInfo).not.toHaveBeenCalled();
+				expect(this.logWarn).not.toHaveBeenCalled();
+				expect(this.logError).not.toHaveBeenCalled();
+			});
+		});
 	});
 
 	describe('basic translations', function() {
@@ -1660,6 +2025,13 @@ describe('i18n', function() {
 					cat: {
 						en: 'cat',
 						fr: 'chat'
+					},
+					'_ctx:test': {
+						seventy: {
+							en: 'anything wrong',
+							fr: 'autre chose de faux',
+							'fr-be': 'ne doit pas être appelé'
+						}
 					}
 				},
 				secondary: {
@@ -1719,6 +2091,43 @@ describe('i18n', function() {
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		it('should read sentence from object', function() {
+			var obj;
+
+			$$.setLocale('fr-be');
+			obj = {
+				str: 'seventy'
+			};
+			expect($$(obj)).toBe('septante');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			this.logWarn.calls.reset();
+			obj = {
+				string: 'seventy'
+			};
+			expect($$(obj)).toBe('septante');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			this.logWarn.calls.reset();
+			obj = {
+				str: 'seventy',
+				locale: 'fr'
+			};
+			expect($$(obj)).toBe('soixante-dix');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			this.logWarn.calls.reset();
+			obj = {
+				str: 'seventy',
+				lng: 'fr'
+			};
+			expect($$(obj)).toBe('soixante-dix');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
@@ -1785,14 +2194,36 @@ describe('i18n', function() {
 			$$.configuration({
 				locales: ['en', 'fr', 'fr-be'],
 				dictionary: {
-					seventy: {
-						en: 'seventy',
-						fr: 'soixante-dix',
-						'fr-be': 'septante'
+					'_ctx:number': {
+						seventy: {
+							en: 'seventy',
+							fr: 'soixante-dix',
+							'fr-be': 'septante'
+						}
 					},
 					cat: {
 						en: 'cat',
 						fr: 'chat'
+					},
+					close: {
+						en: 'close',
+						fr: 'fermer'
+					},
+					'_ctx:range': {
+						close: {
+							en: 'close',
+							fr: 'proche'
+						},
+						far: {
+							en: 'far',
+							fr: 'loin'
+						}
+					},
+					'_ctx:game': {
+						close: {
+							en: 'close',
+							fr: 'à côté'
+						}
 					}
 				},
 				secondary: {
@@ -1811,30 +2242,41 @@ describe('i18n', function() {
 			$$.clearData();
 		});
 
-		xit('should translate the key', function() {
+		it('should translate the key', function() {
 			expect($$.context('number', 'seventy')).toBe('seventy');
 			expect($$.c('number', 'seventy')).toBe('seventy');
-			$$.setLocale('fr');
-			expect($$.context('number', 'seventy')).toBe('soixante-dix');
-			expect($$.c('number', 'seventy')).toBe('soixante-dix');
 			$$.setLocale('fr-be');
 			expect($$.context('number', 'seventy')).toBe('septante');
 			expect($$.c('number', 'seventy')).toBe('septante');
+			$$.setLocale('fr');
+			expect($$.context('number', 'seventy')).toBe('soixante-dix');
+			expect($$.c('number', 'seventy')).toBe('soixante-dix');
+			expect($$.context('range', 'far')).toBe('loin');
+			expect($$.c('range', 'far')).toBe('loin');
+			expect($$.context('game', 'close')).toBe('à côté');
+			expect($$.c('game', 'close')).toBe('à côté');
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logWarn).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});
 
-		xit('should fallback the translation', function() {
+		it('should fallback the translation', function() {
 			$$.setLocale('fr-be');
 
-			expect($$.context('animal', 'cat')).toBe('chat');
-			expect($$.c('animal', 'cat')).toBe('chat');
+			expect($$.context('range', 'close')).toBe('proche');
+			expect($$.c('range', 'close')).toBe('proche');
 			expect(this.logWarn).not.toHaveBeenCalled();
 
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		it('should not translate unknown strings', function() {
+			$$.setLocale('fr-be');
+
 			var string = 'unknown';
-			expect($$.context('animal', string)).toBe(string);
+			expect($$.context('number', string)).toBe(string);
 			expect(this.logWarn).toHaveBeenCalled();
 			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
 
@@ -1843,6 +2285,58 @@ describe('i18n', function() {
 			expect($$.c('unknown', string)).toBe(string);
 			expect(this.logWarn).toHaveBeenCalled();
 			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
+
+			this.logWarn.calls.reset();
+			string = 'close';
+			expect($$.c('unknown', string)).toBe(string);
+			expect(this.logWarn).toHaveBeenCalled();
+			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
+
+			this.logWarn.calls.reset();
+			string = 'seventy';
+			expect($$.c('range', string)).toBe(string);
+			expect(this.logWarn).toHaveBeenCalled();
+			expect(this.logWarn).toHaveBeenCalledWith(4100, jasmine.any(String), [string, 'fr-be']);
+
+			expect(this.logInfo).not.toHaveBeenCalled();
+			expect(this.logError).not.toHaveBeenCalled();
+		});
+
+		it('should read sentence from object', function() {
+			var obj;
+
+			$$.setLocale('fr-be');
+			obj = {
+				str: 'seventy',
+				context: 'number'
+			};
+			expect($$(obj)).toBe('septante');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			this.logWarn.calls.reset();
+			obj = {
+				string: 'close',
+				ctx: 'range'
+			};
+			expect($$(obj)).toBe('proche');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			this.logWarn.calls.reset();
+			obj = {
+				string: 'close',
+				c: 'game'
+			};
+			expect($$(obj)).toBe('à côté');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
+			this.logWarn.calls.reset();
+			obj = {
+				str: 'seventy',
+				ctx: 'number',
+				locale: 'fr'
+			};
+			expect($$(obj)).toBe('soixante-dix');
+			expect(this.logWarn).not.toHaveBeenCalled();
 
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();

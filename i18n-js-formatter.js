@@ -40,6 +40,7 @@
 		7012: 'data is in a wrong format (%s): %s',
 		7013: 'data with key "%s" is in a wrong format (%s): %s',
 		7014: 'data for key "%s" can not be loaded due to wrong format (%s while object is expected): %s',
+		7015: 'item "%s" for locale "%s" is %s instead of string: %s',
 		7020: 'data recieved from "%s" is not in a valid JSON ("%s")',
 		7030: 'The secondaries fallback create a circular loop (%s).',
 		7100: 'Translation is not possible due to an unsupported type (%s): %s',
@@ -95,19 +96,43 @@
 		}
 	};
 
+	var checkCtx = /^_ctx:/;
+
 	/* status variables */
 	var statusVariables;
 	_reset();
 
 	/* API methods */
 
+	/**
+	 * translate given sentence
+	 *
+	 * @param sentence {string|object} the sentence to translate
+	 * @param ...values {Any} values given to parse function to replace wildcards in sentence
+	 */
 	function i18n(sentence) {
-		var text = _translation(sentence);
+		var text = _translation(undefined, sentence);
 		var args = Array.prototype.slice.call(arguments, 1);
 
 		text = _parse.apply(this, [text].concat(args));
 		return text;
 	}
+
+	/**
+	 * translate contextual sentence
+	 *
+	 * @param context {string} the context of the sentence
+	 * @param sentence {string} the sentence to translate
+	 * @param ...values {Any} values given to parse function to replace wildcards in sentence
+	 */
+	i18n.context = function(context, sentence) {
+		var text = _translation(context, sentence);
+		var args = Array.prototype.slice.call(arguments, 1);
+
+		text = _parse.apply(this, [text].concat(args));
+		return text;
+	};
+	i18n.c = i18n.context;
 
 	/**
 	 * Configure the i18n
@@ -251,6 +276,8 @@
 	 * @param [options.name] {Boolean} if true, the locale's name will be returned
 	 * @param [options.secondary] {Boolean} if true, the locale's key fallback will be returned
 	 * @param [options.data] {String} if defined, the locale's translation will be returned
+	 * @param [options.dataCtx] {String} if defined, specify the context of the data to return.
+	 									 /!\ it cannot be set without options data.
 	 * @return [String|Object] If only one option is given, it return the value of this option
 	 *						   If several options are given, it return an object with the key/value of wanted options.
 	 */
@@ -265,6 +292,8 @@
 	 * @param [options.name] {Boolean} if true, the locales' name will be returned
 	 * @param [options.secondary] {Boolean} if true, the locales' key fallback will be returned
 	 * @param [options.data] {String} if defined, the locales' translation will be returned
+	 * @param [options.dataCtx] {String} if defined, specify the context of the data to return.
+	 									 /!\ it cannot be set without options data.
 	 * @return [String[]|Object[]] If only one option is given, it return the value list of this option
 	 *							   If several options are given, it return a list of object with the key/value of wanted options.
 	 */
@@ -298,14 +327,36 @@
 			_getCatalog().forEach(function(sentence) {
 				rslt[sentence] = {};
 
-				if (dico && dico[sentence]) {
-					rslt[sentence][key] = dico[sentence];
+				if (checkCtx.test(sentence)) {
+					if (dico && dico[sentence]) {
+						_each(dico[sentence], function(value, sentenceKey) {
+							if (!rslt[sentence][sentenceKey]) {
+								rslt[sentence][sentenceKey] = {};
+							}
+							rslt[sentence][sentenceKey][key] = value;
+						});
+					} else {
+						statusVariables.localeKeys.forEach(function(key) {
+							if (statusVariables.data[key] && statusVariables.data[key][sentence]) {
+								_each(statusVariables.data[key][sentence], function(value, sentenceKey) {
+									if (!rslt[sentence][sentenceKey]) {
+										rslt[sentence][sentenceKey] = {};
+									}
+									rslt[sentence][sentenceKey][key] = value;
+								});
+							}
+						});
+					}
 				} else {
-					statusVariables.localeKeys.forEach(function(key) {
-						if (statusVariables.data[key] && statusVariables.data[key][sentence]) {
-							rslt[sentence][key] = statusVariables.data[key][sentence];
-						}
-					});
+					if (dico && dico[sentence]) {
+						rslt[sentence][key] = dico[sentence];
+					} else {
+						statusVariables.localeKeys.forEach(function(key) {
+							if (statusVariables.data[key] && statusVariables.data[key][sentence]) {
+								rslt[sentence][key] = statusVariables.data[key][sentence];
+							}
+						});
+					}
 				}
 			});
 		} else {
@@ -327,6 +378,17 @@
 	 */
 	i18n.addItem = function(sentenceKey, values) {
 		_addItem(values, sentenceKey);
+	};
+
+	/**
+	 * Add an item to data
+	 *
+	 * @param context {String} a contextual for the sentence
+	 * @param sentenceKey {String} the sentence which need to be translated
+	 * @param values {String{}} the translation corresponding of each keys
+	 */
+	i18n.addCtxItem = function(context, sentenceKey, values) {
+		_addCtxItem(context, values, sentenceKey);
 	};
 
 	/**
@@ -735,11 +797,15 @@
 	}
 
 	function _getLocale(locale, options) {
-		var result, lastResult, nb;
+		var result, lastResult, nb, ctx;
 		options || (options = {key: true});
 
 		if (!locale) {
 			return;
+		}
+
+		if (options.dataCtx) {
+			ctx = '_ctx:' + options.dataCtx;
 		}
 
 		result = {};
@@ -747,8 +813,14 @@
 		_each(options, function(value, attribute) {
 			if (value) {
 				switch (attribute) {
+					case 'dataCtx':
+						return;
 					case 'data':
-						lastResult = statusVariables.data[locale.key] && statusVariables.data[locale.key][value];
+						if (ctx) {
+							lastResult = statusVariables.data[locale.key] && statusVariables.data[locale.key][ctx] && statusVariables.data[locale.key][ctx][value];
+						} else {
+							lastResult = statusVariables.data[locale.key] && statusVariables.data[locale.key][value];
+						}
 						break;
 					case 'localeKey':
 					case 'locale':
@@ -994,8 +1066,49 @@
 
 		_each(dico, function(value, sentenceKey) {
 			var obj = {};
-			obj[key] = value;
+
+			if (checkCtx.test(sentenceKey)) {
+				_each(value, function(v, sk) {
+					if (!obj[sk]) {
+						obj[sk] = {};
+					}
+					obj[sk][key] = v;
+				});
+			} else {
+				obj[key] = value;
+			}
 			_addItem(obj, sentenceKey);
+		});
+	}
+
+	function _addCtxItem(ctxSentence, values, sentenceKey) {
+		if (typeof values !== 'object') {
+			_error(7011, [typeof values, values]);
+			return;
+		}
+
+		ctxSentence = '_ctx:' + ctxSentence;
+
+		_each(values, function(value, key) {
+			var dico = statusVariables.data[key];
+
+			if (typeof value !== 'string') {
+				_error(7015, [sentenceKey, key, typeof value, value]);
+				return;
+			}
+			if (!dico) {
+				if (dico === null) {
+					dico = statusVariables.data[key] = {};
+				} else {
+					return;
+				}
+			}
+
+			if (!dico[ctxSentence]) {
+				dico[ctxSentence] = {};
+			}
+
+			dico[ctxSentence][sentenceKey] = value;
 		});
 	}
 
@@ -1005,15 +1118,24 @@
 			return;
 		}
 
+		if (checkCtx.test(sentenceKey)) {
+			_each(values, _addCtxItem.bind(this, sentenceKey.slice(5)))
+			return;
+		}
+
 		_each(values, function(value, key) {
 			var dico = statusVariables.data[key];
 
-			if (dico === null) {
-				dico = statusVariables.data[key] = {};
-			}
-
-			if (!dico) {
+			if (typeof value !== 'string') {
+				_error(7015, [sentenceKey, key, typeof value, value]);
 				return;
+			}
+			if (!dico) {
+				if (dico === null) {
+					dico = statusVariables.data[key] = {};
+				} else {
+					return;
+				}
 			}
 
 			dico[sentenceKey] = value;
@@ -1086,7 +1208,7 @@
 	 * Translations
 	 */
 
-	function _translation(sentenceKey, key, origKey) {
+	function _translation(context, sentenceKey, key, origKey) {
 		var sentence;
 
 		key = key || statusVariables.currentLocale.key;
@@ -1094,10 +1216,10 @@
 
 		switch(typeof sentenceKey) {
 			case 'string':
-				sentence = _translationString(sentenceKey, key, origKey);
+				sentence = _translationString(context, sentenceKey, key, origKey);
 				break;
 			case 'object':
-				sentence = _translationObject(sentenceKey, key, origKey);
+				sentence = _translationObject(context, sentenceKey, key, origKey);
 				break;
 			default:
 				sentence = '';
@@ -1107,33 +1229,45 @@
 		return sentence;
 	}
 
-	function _translationString(sentenceKey, key, origKey) {
-		var ldata, sentence;
+	function _translationString(context, sentenceKey, key, origKey) {
+		var ldata, sentence, ctx;
 
 		ldata = statusVariables.data[key];
-		sentence = ldata && ldata[sentenceKey];
+		if (context) {
+			ctx = '_ctx:' + context;
+			sentence = ldata && ldata[ctx] && ldata[ctx][sentenceKey];
+		} else {
+			sentence = ldata && ldata[sentenceKey];
+		}
 
-		sentence = _translationFallback(sentenceKey, key, origKey, sentence, _translationIssueString);
+		sentence = _translationFallback(context, sentenceKey, key, origKey, sentence, _translationIssueString);
 
 		return sentence;
 	}
 
-	function _translationIssueString(sentenceKey, origKey) {
+	function _translationIssueString(context, sentenceKey, origKey) {
 		_warning(4100, [sentenceKey, origKey]);
 		return sentenceKey;
 	}
 
-	function _translationObject(sentenceObject, key, origKey) {
-		var sentence;
+	function _translationObject(context, sentenceObject, key, origKey) {
+		var sentence, ctx, str, lng;
+
+		if (sentenceObject.str || sentenceObject.string) {
+			ctx = sentenceObject.c || sentenceObject.ctx || sentenceObject.context;
+			str = sentenceObject.str || sentenceObject.string;
+			lng = _formatLocaleKey(sentenceObject.locale || sentenceObject.lng) || key;
+			return _translationString(ctx, str, lng, origKey);
+		}
 
 		sentence = sentenceObject[key];
 
-		sentence = _translationFallback(sentenceObject, key, origKey, sentence, _translationIssueObject);
+		sentence = _translationFallback(context, sentenceObject, key, origKey, sentence, _translationIssueObject);
 
 		return sentence;
 	}
 
-	function _translationIssueObject(sentenceKey, origKey) {
+	function _translationIssueObject(context, sentenceKey, origKey) {
 		var json;
 
 		try {
@@ -1146,15 +1280,15 @@
 		return '';
 	}
 
-	function _translationFallback(sentenceKey, key, origKey, sentence, notTranslated) {
+	function _translationFallback(context, sentenceKey, key, origKey, sentence, notTranslated) {
 		var secondary;
 
 		if (typeof sentence !== 'string') {
 			secondary = statusVariables.locales[key].secondary;
 			if (secondary) {
-				sentence = _translation(sentenceKey, secondary, origKey);
+				sentence = _translation(context, sentenceKey, secondary, origKey);
 			} else {
-				sentence = notTranslated(sentenceKey, origKey);
+				sentence = notTranslated(context, sentenceKey, origKey);
 			}
 		}
 
