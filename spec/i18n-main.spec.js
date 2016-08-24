@@ -2131,6 +2131,15 @@ describe('i18n', function() {
 			expect($$(obj)).toBe('soixante-dix');
 			expect(this.logWarn).not.toHaveBeenCalled();
 
+			this.logWarn.calls.reset();
+			obj = {
+				str: 'another string',
+				lng: 'fr',
+				parse: true
+			};
+			expect($$(obj)).toBe('another string');
+			expect(this.logWarn).not.toHaveBeenCalled();
+
 			expect(this.logInfo).not.toHaveBeenCalled();
 			expect(this.logError).not.toHaveBeenCalled();
 		});

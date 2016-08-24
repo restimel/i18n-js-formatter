@@ -17,7 +17,7 @@
 (function() {
 	'use strict';
 
-	var version = '0.0.2';
+	var version = '0.2.1';
 
 	/*
 	 * 0 → 999: reserved for future usage
@@ -119,6 +119,10 @@
 		var args = Array.prototype.slice.call(arguments, 1);
 
 		text = _parse.apply(this, [text].concat(args));
+		if (statusVariables._currentLocale) {
+			statusVariables.currentLocale = statusVariables._currentLocale;
+			statusVariables._currentLocale = null;
+		}
 		return text;
 	}
 
@@ -1261,12 +1265,20 @@
 	}
 
 	function _translationObject(context, sentenceObject, key, origKey) {
-		var sentence, ctx, str, lng;
+		var sentence, ctx, str, lng, slng;
 
 		if (sentenceObject.str || sentenceObject.string) {
 			ctx = sentenceObject.c || sentenceObject.ctx || sentenceObject.context;
 			str = sentenceObject.str || sentenceObject.string;
-			lng = _formatLocaleKey(sentenceObject.locale || sentenceObject.lng) || key;
+			slng = sentenceObject.locale || sentenceObject.lng;
+			lng = _formatLocaleKey(slng) || key;
+			if (slng) {
+				statusVariables._currentLocale = statusVariables.currentLocale;
+				statusVariables.currentLocale = statusVariables.locales[lng];
+			}
+			if (sentenceObject.parse) {
+				return str;
+			}
 			return _translationString(ctx, str, lng, origKey);
 		}
 

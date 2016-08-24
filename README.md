@@ -8,7 +8,7 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
 
-## Version 0.2.0
+## Version 0.2.1
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 
@@ -24,7 +24,7 @@ configuration:
 
 	i18n.configuration({
 		locales: ['en', 'fr'],
-		dictonary: 'dictionary.json'
+		dictionary: 'dictionary.json'
 	});
 
 Changing locale:
@@ -194,6 +194,7 @@ When giving an object to match an existing sentence (example 2 or 4), you must s
 Properties:
 * **string** or **str**: the sentence to look for and translate
 * **context** or **ctx** or **c**: the context (see context section for more explanation).
+* **parse**: if true, it does not translate the string (see parse section for more explanation)
 * **locale** or **lng**: force a specific locale (and not use the default one).
 
 

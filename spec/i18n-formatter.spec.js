@@ -839,5 +839,16 @@ describe('i18n-formatter', function() {
 			expect($$('42%(1)P success', 'foo')).toBe('42%(1)P success');
 			expect($$('42%|s', 'foo')).toBe('42%|s');
 		});
+
+		it('should convert from object', function() {
+			expect($$({
+				str: '%i cats',
+				lng: 'fr'
+			}, 1234)).toBe('1 234 chats');
+
+			expect($$({
+				str: '%i cats'
+			}, 1234)).toBe('1,234 cats');
+		});
 	});
 });
