@@ -34,7 +34,7 @@ Version 0.3
 	* number: support base conversion (binary, octal, hexa)
 	* pretty duration: allow to exclude some units
 	* pretty date
-	* improve demonstration page
+	✓ improve demonstration page
 	* add info log (like for fallback language)
 
 Version 0.4

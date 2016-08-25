@@ -6,9 +6,9 @@ Formatter can be extended with your own formatters.
 
 It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
-You can try it at: https://restimel.github.io/i18n-js-formatter/demo/demo.html
+You can play with the API at: https://restimel.github.io/i18n-js-formatter/demo/index.html
 
-## Version 0.2.1
+## Version 0.2.2
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 

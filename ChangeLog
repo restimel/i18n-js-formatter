@@ -3,6 +3,7 @@ Change log for i18n-js-formatter
 Version 0.3
     * fix formatter when changing locale temporary by object
     * add parse option with object argument
+    * demonstration page has been improved
 
 Version 0.2
     * %d si now displaying an int. %f formats all number. %F do not format numbers.

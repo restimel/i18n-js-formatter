@@ -1,0 +1,160 @@
+body {
+	margin: 0;
+}
+
+input {
+	font-size: 18px;
+}
+
+select {
+	height: 30px;
+	padding: 5px;
+}
+
+.btn-action {
+	cursor: pointer;
+}
+
+.argument:before {
+	content: ', ';
+}
+
+.log-kind-info {
+	background-color: rgba(110, 110, 230, 0.5);
+}
+
+.log-kind-warn {
+	background-color: rgba(250, 240, 60, 0.5);
+}
+
+.log-kind-error {
+	background-color: rgba(250, 75, 75, 0.5);
+}
+
+.tab-header {
+	height: 50px;
+	background-color: #005;
+	width: 100%;
+	margin: 0;
+}
+
+.tab-header button {
+	color: white;
+	border: none;
+	background-color: transparent;
+	cursor: pointer;
+	font-size: 25px;
+	padding-top: 10px;
+	margin-left: 20px;
+	width: 200px;
+}
+
+.tab-header button:hover {
+	font-weight: bold;
+}
+
+.tab-header button.active {
+	color: yellow;
+	border-bottom:	1px solid;
+}
+
+.global-locale-selector {
+	float: right;
+	cursor: pointer;
+	margin: 0.5em;
+	color: rgb(150,200,255);
+}
+
+.global-locale-selector.read {
+	border: 2px solid rgb(170,220,255);
+	border-radius: 1em;
+	padding: 0.3em;
+}
+
+.global-locale-selector.read:hover {
+	background-color: rgba(100, 200, 200, 0.7);
+}
+
+.main-content {
+	padding: 15px;
+}
+
+.input-error {
+	border: 1px solid red;
+}
+
+.preset-formatter {
+	display: inline-block;
+	margin: 1em;
+}
+
+.result {
+	margin-top: 0.5em;
+	padding: 0.5em;
+	background-color: #d5ecf5;
+}
+
+.result > .output {
+	font-size: 1.2em;
+	margin-top: 0.4em;
+	margin-bottom: 0.4em;
+}
+
+.result > .logs > div {
+	background-color: none;
+}
+
+.result > legend {
+	font-size: 0.65em;
+}
+
+.result .options {
+	margin-top: 0.7em;
+}
+
+.result .locale-selector {
+	float: right;
+	cursor: pointer;
+	font-size: 0.8em;
+}
+
+.result .locale-selector.read {
+	border: 1px solid black;
+	border-radius: 1em;
+	padding: 0.3em;
+}
+
+.result .locale-selector.read:hover {
+	background-color: rgba(200, 200, 100, 0.5);
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+table tr {
+	height: 30px;
+}
+
+table.translations tr.header {
+	background-color: #227;
+	color: #FFF;
+	font-weight: bold;
+	text-align: center;
+}
+
+table tr:nth-child(odd) {background: #CCC}
+table tr:nth-child(even) {background: #FFF}
+
+table.translations input {
+	width: 99%;
+}
+
+table .editable {
+	cursor: pointer;
+}
+
+.information {
+	font-size: 0.6em;
+}

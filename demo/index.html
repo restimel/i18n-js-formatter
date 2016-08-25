@@ -1,0 +1,33 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>i18n-formatter demonstration</title>
+    <link rel="stylesheet" href="css/font-awesome.min.css">
+    <link rel="stylesheet" href="css/demo.css">
+  </head>
+  <body>
+    <div id="content"><progress></progress>Loading...</div>
+    <script type="text/javascript">
+    var _i18n_config = {
+      localeSet: [{
+        key: 'en',
+        name: 'English'
+      },
+      {
+        key: 'fr',
+        name: 'Français'
+      }],
+
+      dictionary: 'dictionary_demo.json'
+    };
+    </script>
+    <script src="lib/i18n-js-formatter.full.min.js"></script>
+    <script src="lib/react-0.14.7.min.js"></script>
+    <script src="lib/react-0.14.7-dom.min.js"></script>
+    <script src="lib/babel-core-5.8.23-browser.min.js"></script>
+    <script src="lib/marked.min.js"></script>
+    <script type="text/babel" src="script/demo.js"></script>
+  </body>
+</html>

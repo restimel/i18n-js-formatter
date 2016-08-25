@@ -1,0 +1,90 @@
+{
+  "%i error": {
+    "en": "%i error",
+    "fr": "%i error"
+  },
+  "%i info": {
+    "en": "%i info",
+    "fr": "%i info"
+  },
+  "%i warn": {
+    "en": "%i warn",
+    "fr": "%i warn"
+  },
+  "Add an argument": {
+    "en": "Add an argument",
+    "fr": "Ajouter un argument"
+  },
+  "context": {
+    "en": "context",
+    "fr": "contexte"
+  },
+  "Do not translate the string": {
+    "en": "Do not translate the string",
+    "fr": "Ne pas traduire la chaîne"
+  },
+  "info:": {
+    "en": "info:",
+    "fr": "info :"
+  },
+  "Preset example:": {
+    "en": "Preset example:",
+    "fr": "Example préconfiguré :"
+  },
+  "Result": {
+    "en": "Result",
+    "fr": "Résultat"
+  },
+  "sentence": {
+    "en": "sentence",
+    "fr": "phrase"
+  },
+  "Set application language": {
+    "en": "Set application language",
+    "fr": "Langue de l'application"
+  },
+  "Set result language": {
+    "en": "Set result language",
+    "fr": "Langue du résultat"
+  },
+  "These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view).": {
+    "en": "These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view).",
+    "fr": "Ces données sont celles utilisées par cette application. Si vous les changez, vous pouvez observer l'impact sur les pages (changer ces donées ne rafraîchit pas la vue)."
+  },
+  "This content is still not done :(": {
+    "en": "This content is still not done :(",
+    "fr": "Cette page n'a pas encore été réalisée :("
+  },
+  "_ctx:menu item": {
+    "Formatting": {
+      "en": "Formatting",
+      "fr": "Formattage"
+    },
+    "Contextual": {
+      "en": "Contextual",
+      "fr": "Contextuel"
+    },
+    "Dictionary": {
+      "en": "Dictionary",
+      "fr": "Dictionnaire"
+    }
+  },
+  "_ctx:preset item": {
+    "Number with suffix": {
+      "en": "Number with suffix",
+      "fr": "Nombre avec suffixe"
+    },
+    "Huge Number": {
+      "en": "Huge Number",
+      "fr": "Très gors nombre"
+    },
+    "Duration": {
+      "en": "Duration",
+      "fr": "Durée"
+    },
+    "Multiple arguments": {
+      "en": "Multiple arguments",
+      "fr": "Arguments multiple"
+    }
+  }
+}
