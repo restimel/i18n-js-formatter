@@ -1,3 +1,6 @@
 [submodule "demo/lib/sprintf"]
 	path = demo/lib/sprintf
 	url = https://github.com/alexei/sprintf.js.git
+[submodule "demo/utils/i18n-js-parser"]
+	path = demo/utils/i18n-js-parser
+	url = https://github.com/restimel/i18n-js-parser.git
