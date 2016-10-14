@@ -175,8 +175,8 @@ Translates a single expression. Returns translated parsed and substituted string
 
 	// example 2:
 	// give context (locale == 'fr')
-	i18n({str: 'Hello', context: 'phone greating'}); // Allo
-	i18n.context('phone greating', 'Hello'); // Allo
+	i18n({str: 'Hello', context: 'phone greeting'}); // Allo
+	i18n.context('phone greeting', 'Hello'); // Allo
 
 	// example 3:
 	// give an object (locale == 'fr')
