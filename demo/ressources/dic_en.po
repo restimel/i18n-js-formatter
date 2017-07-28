@@ -1,0 +1,138 @@
+#: ./../../script/demo.js
+msgid "%i error"
+msgstr "dfsf"
+
+#: ./../../script/demo.js
+msgid "%i warn"
+msgstr "%i wran!"
+
+#: ./../../script/demo.js
+msgid "%i info"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Time to load: %t"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "%{CasE}s: %{esc:html}s | if you do not escape it you get \"%(2){esc:raw}s\"."
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t."
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Please enter a valid JS code. (string must be surrounded by ' or \")"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Add an argument"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Do not translate the string"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Result"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Set result language"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "info: %s"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Preset example:"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "context"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "sentence"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view)."
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "This content is still not done :("
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "Set application language"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "menu item"
+msgid " Formatting"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "menu item"
+msgid " Data"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "menu item"
+msgid " Contextual"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "menu item"
+msgid " Dictionary"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "preset item"
+msgid " Number with suffix"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "preset item"
+msgid " Huge Number"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "preset item"
+msgid " Duration"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "preset item"
+msgid " Multiple arguments"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "preset item"
+msgid " Argument is an object"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "test1"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "test2"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "test"
+msgid "test3"
+msgstr ""
+
+#: ./../../script/demo.js
+msgid "test4"
+msgstr ""
+
+#: ./../../script/demo.js
+msgctxt "test '{"
+msgid "test5"
+msgstr ""

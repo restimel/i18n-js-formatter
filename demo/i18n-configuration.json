@@ -15,10 +15,20 @@
 	"templates": {
 		"item": "\"@KEY~esc@\": {@context{CONTEXT}@ @label[LABELS](,)@}",
 		"context": "\"context\":\"@CONTEXT~esc@\",",
-		"label": "\"@LNG@\":\"@LABEL~esc@\""
+		"label": "\"@LNG@\":\"@LABEL~esc@\"",
+		"po": "toto\n@PO[fr]@"
 	},
 	"output": [{
-		"path": "./ressources/dictionary.json",
-		"format": "{@item[ITEMS](,)@}"
+		"path": "./ressources/dic.json",
+		"format": "DICTIONARY[fr]"
+	}, {
+		"path": "./ressources/dic2.json",
+		"format": "DATA[en]"
+	}, {
+		"path": "./ressources/dic_en.po",
+		"format": "PO[en]"
+	}, {
+		"path": "./ressources/dic_fr.po",
+		"format": "@po@"
 	}]
 }

@@ -60,6 +60,19 @@ i18n.configuration({
 var LIST_HEADER = [];
 var PRESET_FORMAT_TEST = [];
 
+/* For test purpose only
+
+i18n({str: 'test1'});
+i18n({string: 'test2'});
+i18n({ctx: 'test', string: 'test3'});
+i18n({en: 'notest', fr:'string'});
+i18n({str: 'notest', parse:true});
+i18n({ctx: 'test', string: 'notest', parse:true});
+i18n({str: 'test4', parse:false});
+i18n({ctx: 'test \'{', string: 'test5', parse:null});
+
+*/
+
 function init() {
     LIST_HEADER = [
     {

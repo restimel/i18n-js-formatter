@@ -26,6 +26,6 @@ if ! type "node" >& /dev/null; then
   exit 1
 fi
 
-node main.js --verbose --port 8001 ../../i18n-configuration.json
+node main.js --port 8001 ../../i18n-configuration.json
 
 cd -

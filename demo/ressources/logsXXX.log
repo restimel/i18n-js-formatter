@@ -1,0 +1,355 @@
+[1476739155231] - Starting...
+[1476739155439] -  parse File "./../../index.html"
+[1476739155511] -  parse File "./../../lib/babel-core-5.8.23-browser.min.js"
+[1476739155527] -  parse File "./../../lib/complete.ly.1.0.1.min.js"
+[1476739155529] -  parse File "./../../lib/i18n-js-formatter.full.min.js"
+[1476739155530] -  parse File "./../../lib/marked.min.js"
+[1476739155531] -  parse File "./../../lib/react-0.14.7-dom.min.js"
+[1476739155535] -  parse File "./../../lib/react-0.14.7.min.js"
+[1476739155538] -  parse File "./../../script/autoCompleteJS.js"
+[1476739155538] -  parse File "./../../script/demo.js"
+[1476739155549] -  parse File "./../../lib/sprintf/gruntfile.js"
+[1476739155550] -  parse File "./../../lib/sprintf/dist/sprintf.min.js"
+[1476739155550] -  parse File "./../../lib/sprintf/dist/angular-sprintf.min.js"
+[1476739155550] -  parse File "./../../lib/sprintf/src/angular-sprintf.js"
+[1476739155551] -  parse File "./../../lib/sprintf/src/sprintf.js"
+[1476739155551] -  parse File "./../../lib/sprintf/test/test.js"
+[1476739155563] - start adapting file: ../../ressources/parsed.json
+[1476739155568] - file "../../ressources/parsed.json": 32 items with JSON parsing DICTIONARY_LIST
+[1476739155573] - [../../ressources/parsed.json] key: %i error
+[1476739155574] - [../../ressources/parsed.json][%i error] context: undefined
+[1476739155589] - Raw data: Add new item
+{
+	"key": "%i error",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155590] - [../../ressources/parsed.json] key: %i warn
+[1476739155591] - [../../ressources/parsed.json][%i warn] context: undefined
+[1476739155592] - Raw data: Add new item
+{
+	"key": "%i warn",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155592] - [../../ressources/parsed.json] key: %i info
+[1476739155592] - [../../ressources/parsed.json][%i info] context: undefined
+[1476739155593] - Raw data: Add new item
+{
+	"key": "%i info",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155593] - [../../ressources/parsed.json] key: Time to load: %t
+[1476739155593] - [../../ressources/parsed.json][Time to load: %t] context: undefined
+[1476739155594] - Raw data: Add new item
+{
+	"key": "Time to load: %t",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155594] - [../../ressources/parsed.json] key: %{CasE}s: %{esc:html}s | if you do not escape it you get "%(2){esc:raw}s".
+[1476739155594] - [../../ressources/parsed.json][%{CasE}s: %{esc:html}s | if you do not escape it you get "%(2){esc:raw}s".] context: undefined
+[1476739155595] - Raw data: Add new item
+{
+	"key": "%{CasE}s: %{esc:html}s | if you do not escape it you get \"%(2){esc:raw}s\".",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155595] - [../../ressources/parsed.json] key: Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t.
+[1476739155595] - [../../ressources/parsed.json][Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t.] context: undefined
+[1476739155595] - Raw data: Add new item
+{
+	"key": "Client %(id)F: %(firstname){Case}s %(familyname){Case}s is waiting for %(waiting){min:min}t.",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155596] - [../../ressources/parsed.json] key: Please enter a valid JS code. (string must be surrounded by ' or ")
+[1476739155596] - [../../ressources/parsed.json][Please enter a valid JS code. (string must be surrounded by ' or ")] context: undefined
+[1476739155597] - Raw data: Add new item
+{
+	"key": "Please enter a valid JS code. (string must be surrounded by ' or \")",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155598] - [../../ressources/parsed.json] key: Add an argument
+[1476739155598] - [../../ressources/parsed.json][Add an argument] context: undefined
+[1476739155598] - Raw data: Add new item
+{
+	"key": "Add an argument",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155598] - [../../ressources/parsed.json] key: Do not translate the string
+[1476739155599] - [../../ressources/parsed.json][Do not translate the string] context: undefined
+[1476739155599] - Raw data: Add new item
+{
+	"key": "Do not translate the string",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155599] - [../../ressources/parsed.json] key: Result
+[1476739155599] - [../../ressources/parsed.json][Result] context: undefined
+[1476739155600] - Raw data: Add new item
+{
+	"key": "Result",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155600] - [../../ressources/parsed.json] key: Set result language
+[1476739155600] - [../../ressources/parsed.json][Set result language] context: undefined
+[1476739155601] - Raw data: Add new item
+{
+	"key": "Set result language",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155601] - [../../ressources/parsed.json] key: info: %s
+[1476739155601] - [../../ressources/parsed.json][info: %s] context: undefined
+[1476739155602] - Raw data: Add new item
+{
+	"key": "info: %s",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155602] - [../../ressources/parsed.json] key: Preset example:
+[1476739155602] - [../../ressources/parsed.json][Preset example:] context: undefined
+[1476739155603] - Raw data: Add new item
+{
+	"key": "Preset example:",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155603] - [../../ressources/parsed.json] key: context
+[1476739155603] - [../../ressources/parsed.json][context] context: undefined
+[1476739155603] - Raw data: Add new item
+{
+	"key": "context",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155603] - [../../ressources/parsed.json] key: sentence
+[1476739155604] - [../../ressources/parsed.json][sentence] context: undefined
+[1476739155604] - Raw data: Add new item
+{
+	"key": "sentence",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155604] - [../../ressources/parsed.json] key: These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view).
+[1476739155604] - [../../ressources/parsed.json][These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view).] context: undefined
+[1476739155605] - Raw data: Add new item
+{
+	"key": "These data are the one used in this application. If you change them you can see the difference directly in this page (changing these data does not refresh the view).",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155605] - [../../ressources/parsed.json] key: This content is still not done :(
+[1476739155605] - [../../ressources/parsed.json][This content is still not done :(] context: undefined
+[1476739155606] - Raw data: Add new item
+{
+	"key": "This content is still not done :(",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155606] - [../../ressources/parsed.json] key: Set application language
+[1476739155607] - [../../ressources/parsed.json][Set application language] context: undefined
+[1476739155607] - Raw data: Add new item
+{
+	"key": "Set application language",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155608] - [../../ressources/parsed.json] key:  Formatting
+[1476739155608] - [../../ressources/parsed.json][ Formatting] context: menu item
+[1476739155608] - Raw data: Add new item
+{
+	"key": " Formatting",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "menu item"
+}
+[1476739155609] - [../../ressources/parsed.json] key:  Data
+[1476739155609] - [../../ressources/parsed.json][ Data] context: menu item
+[1476739155609] - Raw data: Add new item
+{
+	"key": " Data",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "menu item"
+}
+[1476739155609] - [../../ressources/parsed.json] key:  Contextual
+[1476739155609] - [../../ressources/parsed.json][ Contextual] context: menu item
+[1476739155610] - Raw data: Add new item
+{
+	"key": " Contextual",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "menu item"
+}
+[1476739155610] - [../../ressources/parsed.json] key:  Dictionary
+[1476739155610] - [../../ressources/parsed.json][ Dictionary] context: menu item
+[1476739155611] - Raw data: Add new item
+{
+	"key": " Dictionary",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "menu item"
+}
+[1476739155611] - [../../ressources/parsed.json] key:  Number with suffix
+[1476739155611] - [../../ressources/parsed.json][ Number with suffix] context: preset item
+[1476739155611] - Raw data: Add new item
+{
+	"key": " Number with suffix",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "preset item"
+}
+[1476739155612] - [../../ressources/parsed.json] key:  Huge Number
+[1476739155612] - [../../ressources/parsed.json][ Huge Number] context: preset item
+[1476739155612] - Raw data: Add new item
+{
+	"key": " Huge Number",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "preset item"
+}
+[1476739155612] - [../../ressources/parsed.json] key:  Duration
+[1476739155612] - [../../ressources/parsed.json][ Duration] context: preset item
+[1476739155613] - Raw data: Add new item
+{
+	"key": " Duration",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "preset item"
+}
+[1476739155613] - [../../ressources/parsed.json] key:  Multiple arguments
+[1476739155613] - [../../ressources/parsed.json][ Multiple arguments] context: preset item
+[1476739155613] - Raw data: Add new item
+{
+	"key": " Multiple arguments",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "preset item"
+}
+[1476739155614] - [../../ressources/parsed.json] key:  Argument is an object
+[1476739155614] - [../../ressources/parsed.json][ Argument is an object] context: preset item
+[1476739155614] - Raw data: Add new item
+{
+	"key": " Argument is an object",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "preset item"
+}
+[1476739155614] - [../../ressources/parsed.json] key: test1
+[1476739155615] - [../../ressources/parsed.json][test1] context: undefined
+[1476739155615] - Raw data: Add new item
+{
+	"key": "test1",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155617] - [../../ressources/parsed.json] key: test2
+[1476739155618] - [../../ressources/parsed.json][test2] context: undefined
+[1476739155619] - Raw data: Add new item
+{
+	"key": "test2",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155619] - [../../ressources/parsed.json] key: test3
+[1476739155619] - [../../ressources/parsed.json][test3] context: test
+[1476739155619] - Raw data: Add new item
+{
+	"key": "test3",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "test"
+}
+[1476739155620] - [../../ressources/parsed.json] key: test4
+[1476739155620] - [../../ressources/parsed.json][test4] context: undefined
+[1476739155620] - Raw data: Add new item
+{
+	"key": "test4",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	]
+}
+[1476739155620] - [../../ressources/parsed.json] key: test5
+[1476739155621] - [../../ressources/parsed.json][test5] context: test '{
+[1476739155621] - Raw data: Add new item
+{
+	"key": "test5",
+	"labels": {},
+	"files": [
+		"./../../script/demo.js"
+	],
+	"context": "test '{"
+}
+[1476739155702] - raw file "../../ressources/rawDictionary.json" has been written
+[1476739175238] - write file "../../ressources/dic.json" with format "DICTIONARY[fr]"
+[1476739175242] - write file "../../ressources/dic2.json" with format "DATA[en]"
+[1476739175245] - write file "../../ressources/dic_en.po" with format "PO[en]"
+[1476739175246] - TODO PO files
+[1476739175250] - write file "../../ressources/dic_fr.po" with format "@po@"
