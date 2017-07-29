@@ -2356,6 +2356,69 @@ describe('i18n', function() {
 		});
 	});
 
+	describe('.html()', function() {
+		beforeEach(function() {
+			$$.configuration({
+				locales: ['en', 'fr', 'fr-be'],
+				dictionary: {
+					'Hello!': {
+						en: 'Hello!',
+						fr: 'Salut !'
+					},
+					'cats': {
+						en: 'cats',
+						fr: 'chats'
+					},
+					'some issues': {
+						en: 'some issues',
+						fr: 'quelques problèmes'
+					}
+				},
+				secondary: {
+					'fr-be': 'fr'
+				},
+				defaultLocale: 'en'
+			});
+
+			$$.setLocale('fr');
+
+			this.el = document.createElement('div');
+			this.el.innerHTML = '<section class="section1"><header data-i18n="Hello!">default</header><details><summary data-i18n="cats">default</summary><p class="test1">do not change</p><p class="test2" data-i18n="some issues">default</p></details></section><section class="section2"><span data-i18n="Hello!">default</span></section>';
+		});
+
+		afterEach(function() {
+			$$.clearData();
+			$$._reset();
+		});
+
+		it('should replace all translated nodes', function() {
+			$$.html(this.el.querySelector('.section1'));
+
+			console.log(this.el.innerHTML)
+			expect(this.el.querySelector('header').textContent).toBe('Salut !');
+			expect(this.el.querySelector('summary').textContent).toBe('chats');
+			expect(this.el.querySelector('.test1').textContent).toBe('do not change');
+			expect(this.el.querySelector('.test2').textContent).toBe('quelques problèmes');
+			expect(this.el.querySelector('.section2 span').textContent).toBe('default');
+		});
+
+		it('should replace from several nodes', function() {
+			$$.html(this.el.querySelectorAll('section'));
+
+			expect(this.el.querySelector('header').textContent).toBe('Salut !');
+			expect(this.el.querySelector('summary').textContent).toBe('chats');
+			expect(this.el.querySelector('.test1').textContent).toBe('do not change');
+			expect(this.el.querySelector('.test2').textContent).toBe('quelques problèmes');
+			expect(this.el.querySelector('.section2 span').textContent).toBe('Salut !');
+		});
+
+		it('should ignore not HTML node values', function() {
+			expect(function() {
+				$$.html([{}, true, 42, null, undefined, '']);
+			}).not.toThrow();
+		});
+	});
+
 	describe('basic formatter', function() {
 		beforeEach(function() {
 			this.logInfo = jasmine.createSpy('logInfo');

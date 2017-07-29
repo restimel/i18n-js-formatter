@@ -8,7 +8,7 @@ It can be used in any JavaScript application (web, worker, NodeJS, ...).
 
 You can play with the API at: https://restimel.github.io/i18n-js-formatter/demo/index.html
 
-## Version 0.2.2
+## Version 0.2.3
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 
@@ -317,6 +317,36 @@ See formatter section to get more details about Rules values
 src/wrapperSprintf.js contains a simple method to handle Sprintf API as a formatter for i18n API.
 
 If _i18n_config.doNotLoadFormatter is set to true, the sprintf formatter is not automatically added to i18n but you can load the function "callSprintf" manually with the options you want.
+
+
+### i18n.html()
+
+Change text of all HTML nodes which have a `data-i18n` attribute. It uses it as key and replace the text content by the translation.
+
+This feature allows to change language without rerendering everything. This also helps when using HTML template library.
+
+Usage:
+The first argument is the root node to look for all nodes which have a data-i18n atrribute. If no argument is given, the root node is `document`.
+
+	<section>
+		<header data-i18n="hello"></header>
+		<p>not changed text</p>
+		<p data-i18n="a text"></p>
+	</section>
+
+After using `i18n.html(document.querySelector('section'))` it renders like (translated in french):
+
+	<section>
+		<header data-i18n="hello">salut</header>
+		<p>not changed text</p>
+		<p data-i18n="a text">un texte</p>
+	</section>
+
+Be careful, this feature may remove any child nodes. The data-i18n attribute should be located on leaf nodes to avoid any lose.
+
+This feature requires that browser supports dataset API.
+
+Currently, it supports only static strings (no formating).
 
 
 ### i18n.configuration()

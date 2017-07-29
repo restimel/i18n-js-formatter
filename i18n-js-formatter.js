@@ -17,7 +17,7 @@
 (function() {
 	'use strict';
 
-	var version = '0.2.2';
+	var version = '0.2.3';
 
 	/*
 	 * 0 → 999: reserved for future usage
@@ -460,6 +460,32 @@
 		}
 
 		return (statusVariables.locales[key] && statusVariables.locales[key].formatRules) || {};
+	};
+
+	/**
+	 * Convert strings which are in HTML nodes
+	 *
+	 * @param selector {Node|Node[]} the root nodes from which we have to fin data-i18n attribute
+	 */
+	i18n.html = function(selector) {
+		if (!(selector instanceof NodeList) && !(selector instanceof Array)) {
+			selector = [selector];
+		}
+
+		selector.forEach(function(rootEl) {
+			if (typeof rootEl === 'undefined' || rootEl === null) {
+				rootEl = self.document;
+			}
+			if (typeof rootEl.querySelectorAll !== 'function') {
+				return;
+			}
+
+			var els = rootEl.querySelectorAll('[data-i18n]');
+			els.forEach(function(el) {
+				var key = el.dataset.i18n;
+				el.textContent = i18n(key);
+			});
+		});
 	};
 
 	/**
