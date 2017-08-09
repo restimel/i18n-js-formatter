@@ -45,6 +45,7 @@
 		7030: 'The secondaries fallback create a circular loop (%s).',
 		7100: 'Translation is not possible due to an unsupported type (%s): %s',
 		7200: 'Formatter %s can not be added because it is not a function.',
+		7300: 'Browser does not support feature "%s".',
 		8401: 'Unauthorized request: %s',
 		8403: 'Request forbidden: %s',
 		8404: 'Page not found: %s',
@@ -472,7 +473,8 @@
 			selector = [selector];
 		}
 
-		selector.forEach(function(rootEl) {
+		for (var idxRoot = 0; idxRoot < selector.length; idxRoot++) {
+			var rootEl = selector[idxRoot];
 			if (typeof rootEl === 'undefined' || rootEl === null) {
 				rootEl = self.document;
 			}
@@ -481,11 +483,17 @@
 			}
 
 			var els = rootEl.querySelectorAll('[data-i18n]');
-			els.forEach(function(el) {
+			var nbEl = els.length;
+			for (var i = 0; i < nbEl; i++) {
+				var el = els[i];
+				if (!el.dataset) {
+					_error(7300, ['dataset']);
+					return;
+				}
 				var key = el.dataset.i18n;
 				el.textContent = i18n(key);
-			});
-		});
+			}
+		}
 	};
 
 	/**

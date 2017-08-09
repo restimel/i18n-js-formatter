@@ -47,6 +47,10 @@ Translates a single expression. Returns translated parsed and substituted string
 	// passing specific locale
 	i18n({str: 'Hello', locale: 'fr'}); // Salut
 
+	// example 5:
+	// using ES6 syntax (locale == 'fr')
+	i18n`Hello`; // Salut
+
 When giving an object to match an existing sentence (example 2 or 4), you must specify the string property (which can be either "string" or "str"), otherwise it will try to find a sentence from this object (example 3).
 
 Properties:
@@ -55,6 +59,8 @@ Properties:
 * **parse**: if true, it does not translate the string (see parse section for more explanation)
 * **locale** or **lng**: force a specific locale (and not use the default one).
 
+Example 5 which use ES6 backquote string, will match the equivalent string of 'Hello'.
+__It is not supported yet__
 
 ## i18n.parse()
 

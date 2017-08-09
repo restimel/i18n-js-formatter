@@ -676,6 +676,7 @@ Here are code details:
 	* 7020: data received from "%s" is not in a valid JSON ("%s") (details: [the url sent, the response])
 	* 7100: Translation is not possible due to an unsupported type (%s): %s (details: [typeof given argument, the argument])
 	* 7200: Formatter %s can not be added because it is not a function. (details: [formatter name])
+	* 7300: Browser does not support feature "%s". (details: [name of the unsupported feature])
 	* 8400 → 8599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'
 
 
