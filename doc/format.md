@@ -6,8 +6,7 @@
   * [Data](#data)
     * [context](#context-1)
 
-[Back to menu](menu.md)
-[Back to main page](../README.md)
+[Back to menu](index.md) | [Back to main page](../README.md)
 
 
 ## Load Data vs Load Dictionary
@@ -171,3 +170,5 @@ In data format contextual sentence are grouped inside the same context key. A co
 		}
 	}
 
+
+[Back to menu](index.md) | [Back to main page](../README.md)

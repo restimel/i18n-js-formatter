@@ -12,11 +12,10 @@
   * [date format (T)](#date-format-t)
     * [strftime format](#strftime-format)
     * [Textual configuration](#textual-format)
-  * [duration format (t)](#duration-format-t)
+  * [duration format (t)](#mduration-format-t)
     * [Textual configuration](#textual-format-1)
 
-[Back to menu](menu.md)
-[Back to main page](../README.md)
+[Back to menu](index.md) | [Back to main page](../README.md)
 
 
 A formatter is provided with the i18n-js-formatter library but as many wants to use their own formatters (like sprintf), this formatter is not loaded by default.
@@ -406,3 +405,6 @@ Parameters are:
 * **d**: days unit
 * **month**: months unit
 * **y**: years unit
+
+
+[Back to menu](index.md) | [Back to main page](../README.md)

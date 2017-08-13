@@ -17,8 +17,7 @@
 * [i18n.addItem()](#i18nadditem)
 * [i18n.addCtxItem()](#i18naddctxitem)
 
-[Back to menu](menu.md)
-[Back to main page](../README.md)
+[Back to menu](index.md) | [Back to main page](../README.md)
 
 ## i18n()
 
@@ -336,3 +335,5 @@ Same as addItem but add a context to the sentence
 		fr: 'the French version'
 	});
 
+
+[Back to menu](index.md) | [Back to main page](../README.md)

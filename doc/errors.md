@@ -3,8 +3,7 @@
 * [Managing Errors](#managing-errors)
 * [Codes](#codes)
 
-[Back to menu](menu.md)
-[Back to main page](../README.md)
+[Back to menu](index.md) | [Back to main page](../README.md)
 
 
 ## Managing Errors
@@ -53,3 +52,6 @@ Here are code details:
 	* 7200: Formatter %s can not be added because it is not a function. (details: [formatter name])
 	* 7300: Browser does not support feature "%s". (details: [name of the unsupported feature])
 	* 8400 → 8599: http request issue (details: [the url sent]). It uses the http code prefixed by '2'
+
+
+[Back to menu](index.md) | [Back to main page](../README.md)
