@@ -33,6 +33,7 @@
 		4100: 'The sentence "%s" is not translated for language "%s".',
 		4101: 'It is not possible to translate object (%s) to language "%s".',
 		4200: 'Formatter "%s" has thrown an issue: %s',
+		4300: 'Feature "%s" is not available.',
 
 		/* errors */
 		7010: 'dictionary is in a wrong format (%s): %s',
@@ -469,17 +470,30 @@
 	 * @param selector {Node|Node[]} the root nodes from which we have to fin data-i18n attribute
 	 */
 	i18n.html = function(selector) {
-		if (!(selector instanceof NodeList) && !(selector instanceof Array)) {
+		if (!selector) {
+			selector = [self.document];
+		} else if (!(selector instanceof NodeList) && !(selector instanceof Array)) {
 			selector = [selector];
+		}
+
+		if (self.document && typeof self.document.querySelectorAll !== 'function') {
+			_error(7300, ['querySelectorAll']);
+			return false;
+		}
+		if (self.document && self.document.body && !self.document.body.dataset) {
+			_error(7300, ['dataset']);
+			return false;
 		}
 
 		for (var idxRoot = 0; idxRoot < selector.length; idxRoot++) {
 			var rootEl = selector[idxRoot];
-			if (typeof rootEl === 'undefined' || rootEl === null) {
+
+			if (!rootEl) {
 				rootEl = self.document;
 			}
 			if (typeof rootEl.querySelectorAll !== 'function') {
-				return;
+				_warning(4300, ['querySelectorAll']);
+				continue;
 			}
 
 			var els = rootEl.querySelectorAll('[data-i18n]');
@@ -487,8 +501,8 @@
 			for (var i = 0; i < nbEl; i++) {
 				var el = els[i];
 				if (!el.dataset) {
-					_error(7300, ['dataset']);
-					return;
+					_warning(4300, ['dataset']);
+					continue;
 				}
 				var key = el.dataset.i18n;
 				el.textContent = i18n(key);

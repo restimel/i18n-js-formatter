@@ -4,16 +4,16 @@
   * [Summary](#summary)
   * [Usage](#usage)
   * [special character](#special-character)
-  * [string format (s)](#string-format-s)
-    *[Default configuration](#default-configuration)
-    *[Conversion configuration](#conversion-configuration)
-  * [number format (d, D, e, f, F, i)](#number-format-d-d-e-f-f-i)
-    * [Separator configuration](#separator-configuration)
-  * [date format (T)](#date-format-t)
-    * [strftime format](#strftime-format)
-    * [Textual configuration](#textual-format)
-  * [duration format (t)](#mduration-format-t)
-    * [Textual configuration](#textual-format-1)
+* [string format (s)](#string-format-s)
+  * [Default configuration](#default-configuration)
+  * [Conversion configuration](#conversion-configuration)
+* [number format (d, D, e, f, F, i)](#number-format-d-d-e-f-f-i)
+  * [Separator configuration](#separator-configuration)
+* [date format (T)](#date-format-t)
+  * [strftime format](#strftime-format)
+  * [Textual configuration](#textual-configuration)
+* [duration format (t)](#duration-format-t)
+  * [Textual configuration](#textual-configuration-1)
 
 [Back to menu](index.md) | [Back to main page](../README.md)
 
@@ -24,6 +24,8 @@ To load it, you must include the script "script/s_formatter.js".
 If you have set _i18n_config.doNotLoadFormatter to true, then you should load it into the i18n manager explicitely:
 
 	i18n.loadFormatter(s_formatter);
+
+Watch [loadFormatter method](API.md#i18nloadformatter) for more information.
 
 ## formatter usage
 
@@ -51,14 +53,14 @@ A formatting tag starts with a '%' and ends with a character to indicates the ki
 
 It is possible to give more information to format it better. The full syntax is **%(position){variation}k**
 
-* *(position)*: [optional]
-	If position is a number, it reads the value of the given arguments (starting at 1). Example: i18n('%(2)s %(1)s', 'alpha', 'bravo') => 'bravo alpha'
-	If position is a string, it reads the property value of the first argument. Example: i18n('%(foo)s %(bar)s', {foo: 'alpha', bar: 'bravo'}) => 'alpha bravo'
-	By default, it refers to the N argument where N is the number of formatting replacement. i18n('%s %s', 'a', 'b') is equivalent to i18n('%(1)s %(2)s', 'a', 'b')
-* *{variation}*: [optional]
+* **(position)**: [optional]
+  * *number*: When position is a number (only digits), it reads the value of the given arguments (starting at 1). Example: i18n('%(2)s %(1)s', 'alpha', 'bravo') => 'bravo alpha'
+  * *string*: When position is a string, it reads the _property value_ of the first argument. Example: i18n('%(foo)s %(bar)s', {foo: 'alpha', bar: 'bravo'}) => 'alpha bravo'
+  * When position is not provided, it refers to the N argument where N is the number of formatting replacement. i18n('%s %s', 'a', 'b') is equivalent to i18n('%(1)s %(2)s', 'a', 'b')
+* **{variation}**: [optional]
 	Depending to the output format, it allows to change the display (see below for more details). For example, i18n('%{.2}F', 1.2345) => '1.23'
 	Many rules can be added, they must be separated by comma. For example, i18n('%{p2, .2, d2}F', 1.2345) => '01.23'
-* *k*: the kind of out output, it defines how the output must be interpreted.
+* **k**: the kind of output, it defines how the output must be interpreted.
 	It is composed with a single letter.
 
 ### special character
@@ -67,7 +69,7 @@ It is possible to give more information to format it better. The full syntax is 
 
 Note: if the format does not follow `%(position){variation}k` then it is not necessary to "escape" the '%'.
 
-### string format (s)
+## string format (s)
 
 It converts the value to string.
 The kind character is "*s*".
@@ -90,7 +92,7 @@ Possible variations:
 	* **uric**: alias of urlc.
 	* **no**, **raw**: do not escape the string.
 
-#### Default configuration
+### Default configuration
 
 The default escaping rule is "no" but it can be changed in configuration. This is the default rule which is applied if no escape rule are given.
 
@@ -127,7 +129,7 @@ Parameters are:
 
 Note: whithout these parameters the lower/upper conversion will change i←→I and not i←→İ and ı←→I
 
-### number format (d, D, e, f, F, i)
+## number format (d, D, e, f, F, i)
 
 It converts the value to number.
 The kind character can be either **d**, **D**, **e**, **f**, **F**, **i**.
@@ -147,7 +149,7 @@ Possible variations:
 * **pN**: (N must be a number) The integer part must have at least N digits. It adds 0 before digits to have the right number of digits. Example: i18n('%{p3}F', 12) => '012'
 * **dN**: (N must be a number) The decimal part must have at least N digits. It adds 0 after digits to have the right number of digits. Example: i18n('%{d3}F', 1.2) => '1.20'
 
-#### Separator configuration
+### Separator configuration
 
 To manage some parameters it is possible to change some separator depending on the locale.
 
@@ -219,7 +221,7 @@ S values can be:
 The formating token are the same recognized by strftime (cf bellow to have the full details).
 **f:%"S"**: (S must be a string) format the output. This is the same as f:"S" except that token are not preceded by %. Example: i18n('%{f:%"M:s"}T', 1453130145000) => '15:45' (it is not possible to have the same result as with %{f:"%Mmin %ss"}T )
 
-#### strftime format
+### strftime format
 
 Examples are based on date 2016/01/03 02:34:56 PM (which was on Sunday).
 
@@ -279,7 +281,7 @@ Examples are based on date 2016/01/03 02:34:56 PM (which was on Sunday).
 | %X | preferred time | - | - |
 | %c | preferred date and time | - | - |
 
-#### Textual configuration
+### Textual configuration
 
 To manage some parameters it is possible to change textual values depending on the locale.
 
@@ -355,7 +357,7 @@ Be careful number of months is always computed on 30 days which is not obviously
 In the same way number of years is computed on 365 days which is wrong for bissextil years.
 
 
-#### Textual configuration
+### Textual configuration
 
 To manage some parameters it is possible to change textual values depending on the locale.
 

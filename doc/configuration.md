@@ -10,10 +10,10 @@
 
 There are 2 ways to configure the library.
 
-The first way is to define an object with wanted options (cf below) in variable _i18n_config before running the i18n-js-formatter script.
+The first way is to define an object with wanted options ([see next section](#list-of-configuration-options)) in variable _i18n_config before running the i18n-js-formatter script.
 For some options, this is the only way to set them.
 
-The second possibility is to use the configuration method available in the library API (cf section bellow).
+The second possibility is to use the [configuration method](API.md#i18nconfigurationoptions) available in the library API.
 
 ### list of configuration options
 

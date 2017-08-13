@@ -40,6 +40,7 @@ Here are code details:
 	* 4100: The sentence "%s" is not translated for language "%s". (details: [sentence without translation, current locale])
 	* 4101: It is not possible to translate object (%s) to language "%s". (details: [object stringified, current locale, the object])
 	* 4200: 'Formatter "%s" has thrown an issue: %s' (details: [formatter name, detail thrown by formatter])
+	* 4300: Feature "%s" is not available. (details: [name of the unavailabled feature])
 * 7000 → 9999: error
 	* 7010: dictionary is in a wrong format (%s): %s (details: [type of dictionary, the value received]) called if not possible to load dictionary.
 	* 7011: item is in a wrong format (%s while object is expected): %s (details: [type of dictionary, the value received])
