@@ -14,6 +14,7 @@
   * [Textual configuration](#textual-configuration)
 * [duration format (t)](#duration-format-t)
   * [Textual configuration](#textual-configuration-1)
+* [Adding its own rules](#adding-its-own-rules)
 
 [Back to menu](index.md) | [Back to main page](../README.md)
 
@@ -23,7 +24,9 @@ A formatter is provided with the i18n-js-formatter library but as many wants to 
 To load it, you must include the script "script/s_formatter.js".
 If you have set _i18n_config.doNotLoadFormatter to true, then you should load it into the i18n manager explicitely:
 
-	i18n.loadFormatter(s_formatter);
+```javascript
+i18n.loadFormatter(s_formatter);
+```
 
 Watch [loadFormatter method](API.md#i18nloadformatter) for more information.
 
@@ -34,12 +37,12 @@ Watch [loadFormatter method](API.md#i18nloadformatter) for more information.
 | Code | output | result in English with example: '98765.43' |
 |:----:| ------ | ------ |
 | %% | % | - |
-| %f | locale formatted number | 98,765.43 |
+| %f | locale formatted float number | 98,765.43 |
 | %D | locale formatted number with suffix | 98.765k |
 | %d | locale formatted integer number | 98,765 |
 | %e | locale formatted number in scientific notation | 9.877e+4 |
 | %i | locale formatted integer number | 98,765 |
-| %F | raw number | 98765.43 |
+| %F | raw number (no formatting) | 98765.43 |
 | %s | string | 98765.43 |
 | %t | duration | 1min 38s 765ms 430µs |
 | %T | date | 1/1/1970 00:01:39 AM |
@@ -96,29 +99,33 @@ Possible variations:
 
 The default escaping rule is "no" but it can be changed in configuration. This is the default rule which is applied if no escape rule are given.
 
-	i18n.configuration({
-		defaultFormat: {
-			string: {
-				escape: 'html'
-			}
+```javascript
+i18n.configuration({
+	defaultFormat: {
+		string: {
+			escape: 'html'
 		}
-	});
-	i18n('hey<script>alert("ho")</script>'); //hey&lt;script&gt;alert(&quot;ho&quot;)&lt;/script&gt;
+	}
+});
+i18n('hey<script>alert("ho")</script>'); //hey&lt;script&gt;alert(&quot;ho&quot;)&lt;/script&gt;
+```
 
 #### Conversion configuration
 
 To manage some conversion from lower case to upper case (and reciprocally), it is possible define how characters must be converted. This is useful for some language.
 
-	i18n.configuration({
-		formatRules: {
-			tr: {
-				string: {
-					lowerChars: 'iı',
-					upperChars: 'İI'
-				}
+```javascript
+i18n.configuration({
+	formatRules: {
+		tr: {
+			string: {
+				lowerChars: 'iı',
+				upperChars: 'İI'
 			}
 		}
-	});
+	}
+});
+```
 
 Parameters are:
 
@@ -153,30 +160,34 @@ Possible variations:
 
 To manage some parameters it is possible to change some separator depending on the locale.
 
-	i18n.configuration({
-		formatRules: {
-			en: {
-				number: {
-					thousandSeparator: ',',
-					decimalSeparator: '.'
-				}
+```javascript
+i18n.configuration({
+	formatRules: {
+		en: {
+			number: {
+				thousandSeparator: ',',
+				decimalSeparator: '.'
 			}
 		}
-	});
+	}
+});
+```
 
 It is also possible to use the LocaleSet parameter.
 
-	i18n.configuration({
-		LocaleSet: [{
-			key: 'en',
-			formatRules: {
-				number: {
-					thousandSeparator: ',',
-					decimalSeparator: '.'
-				}
+```javascript
+i18n.configuration({
+	LocaleSet: [{
+		key: 'en',
+		formatRules: {
+			number: {
+				thousandSeparator: ',',
+				decimalSeparator: '.'
 			}
 		}
-	});
+	}
+});
+```
 
 Parameters are:
 
@@ -285,30 +296,34 @@ Examples are based on date 2016/01/03 02:34:56 PM (which was on Sunday).
 
 To manage some parameters it is possible to change textual values depending on the locale.
 
-	i18n.configuration({
-		formatRules: {
-			en: {
-				date: {
-					months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-					shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-				}
+```javascript
+i18n.configuration({
+	formatRules: {
+		en: {
+			date: {
+				months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+				shortMonths: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 			}
 		}
-	});
+	}
+});
+```
 
 It is also possible to use the LocaleSet parameter.
 
-	i18n.configuration({
-		LocaleSet: [{
-			key: 'en',
-			formatRules: {
-				date: {
-					days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
-					shortDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-				}
+```javascript
+i18n.configuration({
+	LocaleSet: [{
+		key: 'en',
+		formatRules: {
+			date: {
+				days: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+				shortDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 			}
 		}
-	});
+	}
+});
+```
 
 Parameters are:
 
@@ -361,42 +376,46 @@ In the same way number of years is computed on 365 days which is wrong for bisse
 
 To manage some parameters it is possible to change textual values depending on the locale.
 
-	i18n.configuration({
-		formatRules: {
-			en: {
-				duration: {
-					µs: 'µs',
-					ms: 'ms',
-					s: 's',
-					min: 'min',
-					h: 'h',
-					d: 'd',
-					month: 'M',
-					y: 'y'
-				}
+```javascript
+i18n.configuration({
+	formatRules: {
+		en: {
+			duration: {
+				µs: 'µs',
+				ms: 'ms',
+				s: 's',
+				min: 'min',
+				h: 'h',
+				d: 'd',
+				month: 'M',
+				y: 'y'
 			}
 		}
-	});
+	}
+});
+```
 
 It is also possible to use the LocaleSet parameter.
 
-	i18n.configuration({
-		LocaleSet: [{
-			key: 'en',
-			formatRules: {
-				duration: {
-					µs: 'µs',
-					ms: 'ms',
-					s: 's',
-					min: 'min',
-					h: 'h',
-					d: 'd',
-					month: 'M',
-					y: 'y'
-				}
+```javascript
+i18n.configuration({
+	LocaleSet: [{
+		key: 'en',
+		formatRules: {
+			duration: {
+				µs: 'µs',
+				ms: 'ms',
+				s: 's',
+				min: 'min',
+				h: 'h',
+				d: 'd',
+				month: 'M',
+				y: 'y'
 			}
 		}
-	});
+	}
+});
+```
 
 Parameters are:
 
@@ -408,5 +427,9 @@ Parameters are:
 * **month**: months unit
 * **y**: years unit
 
+
+## Adding its own rules
+
+__TODO expected in 0.4__
 
 [Back to menu](index.md) | [Back to main page](../README.md)
