@@ -2394,7 +2394,6 @@ describe('i18n', function() {
 		it('should replace all translated nodes', function() {
 			$$.html(this.el.querySelector('.section1'));
 
-			console.log(this.el.innerHTML)
 			expect(this.el.querySelector('header').textContent).toBe('Salut !');
 			expect(this.el.querySelector('summary').textContent).toBe('chats');
 			expect(this.el.querySelector('.test1').textContent).toBe('do not change');

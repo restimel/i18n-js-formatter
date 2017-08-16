@@ -4,6 +4,8 @@
   * [Summary](#summary)
   * [Usage](#usage)
   * [special character](#special-character)
+* [Adding its own rules](#adding-its-own-rules)
+  * [i18n.addRule(str, function)](i18naddrulestr-function)
 * [string format (s)](#string-format-s)
   * [Default configuration](#default-configuration)
   * [Conversion configuration](#conversion-configuration)
@@ -14,7 +16,6 @@
   * [Textual configuration](#textual-configuration)
 * [duration format (t)](#duration-format-t)
   * [Textual configuration](#textual-configuration-1)
-* [Adding its own rules](#adding-its-own-rules)
 
 [Back to menu](index.md) | [Back to main page](../README.md)
 
@@ -33,6 +34,8 @@ Watch [loadFormatter method](API.md#i18nloadformatter) for more information.
 ## formatter usage
 
 ### Summary
+
+Here there are the default tags supported by i18n-js-formmater. It is possible to [add your own](#adding-its-own-rules).
 
 | Code | output | result in English with example: '98765.43' |
 |:----:| ------ | ------ |
@@ -71,6 +74,42 @@ It is possible to give more information to format it better. The full syntax is 
 **%%** it displays a single %.
 
 Note: if the format does not follow `%(position){variation}k` then it is not necessary to "escape" the '%'.
+
+
+## Adding its own rules
+
+You can add any tags. This will replace the tags by the string you provide. If you use a tag that is already defined, it replaces it by yours.
+
+### i18n.addRule(str[], function)
+__TODO expected in 0.4__
+
+The first argument should be an array of strings of 1 character. This will be the *tags* used.
+
+The second argument is the function which is called when any tag given in the first argument will be found in the string to format. The function is called in the i18n context (inside the function `this` refers to i18n).
+
+The argument given to this callback function is one object with these attributes:
+
+* **tag**: the tag which have triggered this function.
+* **parameters**: the list of variation to apply.
+* **value**: the value which should be formatted.
+
+#### Examples:
+
+```javascript
+i18n.addRule(['K'], function(data) {
+	return data.value;
+});
+
+i18n('%K', 'foo');
+```
+```javascript
+i18n.addRule(['K'], function(data) {
+	this.formatRules
+	return data.value;
+});
+
+i18n('%K', 'foo');
+```
 
 ## string format (s)
 
@@ -428,8 +467,5 @@ Parameters are:
 * **y**: years unit
 
 
-## Adding its own rules
-
-__TODO expected in 0.4__
 
 [Back to menu](index.md) | [Back to main page](../README.md)

@@ -80,7 +80,6 @@ Option properties:
 * **locale** or **lng**: force a specific locale (and not use the default one).
 
 ### i18n\`str\`
-__It is not fully supported yet__
 
 i18n can be used as ES6 templates
 
@@ -93,14 +92,16 @@ i18n`Hello`; // Salut
 The dictionary will look for 'Hello'.
 
 ```javascript
-// ES6 templates
+// ES6 template litterals
 // (locale == 'fr')
-i18n`Hello ${'Restimel'}%s.` // Salut Restimel.
+i18n`Hello ${'Charly'}%s.` // Salut Charly.
 ```
 
-The string which will be translated will be 'Hello %s.'. The string 'restimel' will be given as first argument in formatter.
+The string which will be translated will be 'Hello %s.'. The string 'Charly' will be given as first argument in formatter.
 
 To work properly, you must have a formatter and add '%s' (or any other markers) which will be replaced by your formatter.
+
+Note: with template litterals it is not possible to specify position of markers (like `%(2)s`).
 
 ### Formatting
 
@@ -108,8 +109,8 @@ The formatters are also called on each translation string:
 
 ```javascript
 i18n.setLocale('fr');
-i18n('Hello %s', 'Restimel'); // Salut Restimel
-i18n('Hello %(name)s', { name: 'Restimel' }); // Salut Restimel
+i18n('Hello %s', 'Charly'); // Salut Charly
+i18n('Hello %(name)s', { name: 'Charly' }); // Salut Charly
 ```
 
 **WARNING**: Depending of what you download, there may be no formatter loaded. You can load your own with [i18n.loadFormatter()](#i18nloadformatter).
@@ -122,8 +123,8 @@ It formats a string without translating it.
 #### Example:
 
 ```javascript
-i18n.parse('Hello %s', 'Restimel'); // Hello Restimel
-i18n.parse('Hello %(name)s', { name: 'Restimel' }); // Hello Restimel
+i18n.parse('Hello %s', 'Charly'); // Hello Charly
+i18n.parse('Hello %(name)s', { name: 'Charly' }); // Hello Charly
 ```
 
 _Note_: calling directly i18n.parse will not prompt warning log if the key string is not in data dictionary.

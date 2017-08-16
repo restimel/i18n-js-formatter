@@ -1,6 +1,6 @@
 # i18n JS formatter
 
-A simple translation module with dynamic json storage which helps to format strings quickly and easily.
+A simple translation module with dynamic json storage which helps to format strings quickly and easily. It works with template litterals strings.
 
 Formatter can be extended with your own formatters.
 
@@ -24,50 +24,65 @@ Watch following links for more information:
 * [Dictionary and Data format](doc/format.md)
 * [Formatter API](doc/formatter.md)
 
-## quick usage example
+## Quick usage examples
 
 configuration:
 
-	i18n.configuration({
-		locales: ['en', 'fr'],
-		dictionary: 'dictionary.json'
-	});
+```javascript
+i18n.configuration({
+	locales: ['en', 'fr'],
+	dictionary: 'dictionary.json'
+});
+```
 
 Changing locale:
 
-	i18n.setLocale('fr');
+```javascript
+i18n.setLocale('fr');
+```
 
 Using strings which have to be translated
 
-	i18n('hello'); //returns 'salut'
-	i18n('Hello %s!', 'Jim'); //returns 'Salut Jim!'
+```javascript
+i18n('hello'); //returns 'salut'
+i18n('Hello %s!', 'Jim'); //returns 'Salut Jim!'
+i18n`Hello ${'Kate'}%s!`; //returns 'Salut Kate!'
+```
 
 Format number depending on locale
 
-	i18n('%f sentences', 1234567.8);
-		//returns '1,234,567.8 sentences' (en)
-		//returns '1 234 567,8 phrases' (fr)
-		//returns '1.234.567,8 Sätze' (de)
+```javascript
+i18n('%f sentences', 1234567.8);
+	//returns '1,234,567.8 sentences' (en)
+	//returns '1 234 567,8 phrases' (fr)
+	//returns '1.234.567,8 Sätze' (de)
+```
 
 Contextualize your sentence to make difference from same sentence or to give more context.
 
-	i18n.context('computer key', 'Give the correct key'); // should be translated in French 'Donnez la bonne touche'
-	i18n.context('door key', 'Give the correct key'); // should be translated in French 'Donnez la bonne clef'
+```javascript
+i18n.context('computer key', 'Give the correct key'); // should be translated in French 'Donnez la bonne touche'
+i18n.context('door key', 'Give the correct key'); // should be translated in French 'Donnez la bonne clef'
 
-	i18n.context('time unit: minute', 'min');
-	i18n.context('abbreviation: minimum', 'min');
+i18n.context('time unit: minute', 'min');
+i18n.context('abbreviation: minimum', 'min');
+```
 
-To give plural translations (this should be done in version 0.3)
+To give plural translations (this should be done in version 0.4)
 
-	i18n.n('a cat', '%s cats', 1); // in German: 'eine Katze'
-	i18n.n('a cat', '%s cats', 3); // in German: '3 Katzen'
+```javascript
+i18n.n('a cat', '%s cats', 1); // in German: 'eine Katze'
+i18n.n('a cat', '%s cats', 3); // in German: '3 Katzen'
+```
 
 To escape string easily depending on context (mainly to avoid user entries to create unexpected issues)
 
-	i18n('quotes: %{esc:html}s', 'I <b>cannot</b> hack your site');
-		// in English: 'quotes: I &lt;b&gt;cannot&lt;/b&gt; hack your site'
-	i18n('http://my_site.com/?search=%{esc:uric}s&limit=10', 'foo bar&baz=42');
-		// returns 'http://my_site.com/?search=foo%20bar%26baz%3D42&limit=10'
+```javascript
+i18n('quotes: %{esc:html}s', 'I <b>cannot</b> hack your site');
+	// in English: 'quotes: I &lt;b&gt;cannot&lt;/b&gt; hack your site'
+i18n('http://my_site.com/?search=%{esc:uric}s&limit=10', 'foo bar&baz=42');
+	// returns 'http://my_site.com/?search=foo%20bar%26baz%3D42&limit=10'
+```
 
 
 ## Parsing
@@ -103,7 +118,7 @@ Run tests with mainTest.html (located in the root folder) to assert it works wel
 
 Please note that some tests may fail depending of browsers. Mainly depending of support of locale string conversion (uppercase, lowercase) where some locale were not fully supported.
 
-## Version 0.2.3
+## Version 0.3.0
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 

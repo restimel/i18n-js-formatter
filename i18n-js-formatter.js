@@ -17,7 +17,7 @@
 (function() {
 	'use strict';
 
-	var version = '0.2.3';
+	var version = '0.3.0';
 
 	/*
 	 * 0 → 999: reserved for future usage
@@ -118,7 +118,13 @@
 	 */
 	function i18n(sentence) {
 		var text = _translation(undefined, sentence);
-		var args = Array.prototype.slice.call(arguments, 1);
+		var args;
+
+		if (sentence instanceof Array && arguments[1] instanceof Array) {
+			args = arguments[1];
+		} else {
+			args = Array.prototype.slice.call(arguments, 1);
+		}
 
 		text = _parse.apply(this, [text].concat(args));
 		if (statusVariables._currentLocale) {
@@ -1282,7 +1288,11 @@
 				sentence = _translationString(context, sentenceKey, key, origKey);
 				break;
 			case 'object':
-				sentence = _translationObject(context, sentenceKey, key, origKey);
+				if (sentenceKey instanceof Array) {
+					sentence = _translationString(context, sentenceKey.join(''), key, origKey);
+				} else {
+					sentence = _translationObject(context, sentenceKey, key, origKey);
+				}
 				break;
 			default:
 				sentence = '';
