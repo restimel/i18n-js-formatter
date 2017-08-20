@@ -4,8 +4,10 @@
   * [Summary](#summary)
   * [Usage](#usage)
   * [special character](#special-character)
-* [Adding its own rules](#adding-its-own-rules)
-  * [i18n.addRule(str, function)](i18naddrulestr-function)
+* [Adding your own rules](#adding-your-own-rules)
+  * [i18n.addRule(str, function)](#i18naddrulestr-function)
+  * [Default format](#default-format)
+  * [Format rules](#format-rules)
 * [string format (s)](#string-format-s)
   * [Default configuration](#default-configuration)
   * [Conversion configuration](#conversion-configuration)
@@ -35,7 +37,7 @@ Watch [loadFormatter method](API.md#i18nloadformatter) for more information.
 
 ### Summary
 
-Here there are the default tags supported by i18n-js-formmater. It is possible to [add your own](#adding-its-own-rules).
+Here there are the default tags supported by i18n-js-formmater. It is possible to [add your own](#adding-your-own-rules).
 
 | Code | output | result in English with example: '98765.43' |
 |:----:| ------ | ------ |
@@ -76,17 +78,19 @@ It is possible to give more information to format it better. The full syntax is 
 Note: if the format does not follow `%(position){variation}k` then it is not necessary to "escape" the '%'.
 
 
-## Adding its own rules
+## Adding your own rules
 
 You can add any tags. This will replace the tags by the string you provide. If you use a tag that is already defined, it replaces it by yours.
 
 ### i18n.addRule(str, function)
 
-The first argument should be a string or an array of strings of 1 character. This indicates *tags* that will be registered.
+This syntax is also supported: **i18n.addRule(str[], function)**
 
-The second argument is the function which is called when any tag given in the first argument will be found in the string to format. The function is called in the i18n context (inside the function `this` refers to i18n).
+The first argument should be a string or a string array of 1 character. This arguments indicates *tags* that will be registered (each character will be a tag).
 
-The argument given to this callback function is one object with these attributes:
+The second argument is the function which is called when any tags given in the first argument will be found in the string to format. The function is called in the i18n context (inside the function `this` refers to i18n).
+
+The argument given to the callback function is an object with these attributes:
 
 * **value** _(string)_: the value which should be formatted.
 * **variation** _(string[])_: the list of variation to apply.
@@ -145,6 +149,49 @@ i18n.addRule('$', function(data) {
 
 i18n('I give %$ to %s', 'Jimmy'); // I give a lot of money to Jimmy
 ```
+
+### Default format
+
+Default format set some global configuration which apply whatever the locale.
+New rules can be added with `configuration`.
+
+```javascript
+i18n.configuration({
+	defaultFormat: {
+		test: {
+			debug: true
+		}
+	}
+});
+
+i18n.addRule('?', function(data) {
+	var value = data.value;
+	return data.defaultFormat.test.debug ? typeof value : value;
+});
+i18n('%?', 42); // number
+
+```
+
+
+### Format rules
+
+To manage some parameters it is possible to add or change values depending on the locale.
+
+```javascript
+i18n.configuration({
+	formatRules: {
+		en: {
+			phone: 'ddd-ddd-dddd'
+		},
+		fr: {
+			phone: 'dd dd dd dd dd'
+		}
+	}
+});
+```
+
+It is also possible to use the [LocaleSet](configuration.md#list-of-configuration-options) parameter.
+
 
 ## string format (s)
 
