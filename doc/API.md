@@ -170,7 +170,7 @@ _Note_: Using method context (or c), is equivalent of calling i18n with object c
 
 
 ## i18n.n()
-__will be available in version 0.4, syntax may be change at this time__
+__will be available in version 0.5, syntax may be change at this time__
 
 Plurals translation of a single phrase. Singular and plural forms will get added to locales if unknown. Returns translated parsed and substituted string based on `count` parameter.
 

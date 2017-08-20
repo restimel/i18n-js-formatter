@@ -37,7 +37,7 @@
   },
   "Preset example:": {
     "en": "Preset example:",
-    "fr": "Example préconfiguré :"
+    "fr": "Exemple préconfiguré :"
   },
   "Result": {
     "en": "Result",
@@ -93,6 +93,10 @@
     "Multiple arguments": {
       "en": "Multiple arguments",
       "fr": "Arguments multiples"
+    },
+    "Argument is an object": {
+      "en": "Argument is an object",
+      "fr": "L'argument est un objet"
     }
   }
 }

@@ -30,7 +30,7 @@ configuration:
 
 ```javascript
 i18n.configuration({
-	locales: ['en', 'fr'],
+	locales: ['en', 'fr', 'de'],
 	dictionary: 'dictionary.json'
 });
 ```
@@ -68,7 +68,7 @@ i18n.context('time unit: minute', 'min');
 i18n.context('abbreviation: minimum', 'min');
 ```
 
-To give plural translations (this should be done in version 0.4)
+To give plural translations (this should be done in version 0.5)
 
 ```javascript
 i18n.n('a cat', '%s cats', 1); // in German: 'eine Katze'
@@ -84,6 +84,18 @@ i18n('http://my_site.com/?search=%{esc:uric}s&limit=10', 'foo bar&baz=42');
 	// returns 'http://my_site.com/?search=foo%20bar%26baz%3D42&limit=10'
 ```
 
+You can create your own formatting rules.
+
+```javascript
+i18n.addRule('*', function(data) {
+	return data.value.replace(/./g, '*');
+});
+i18n.addRule('l', function(data) {
+	return data.value.length;
+});
+
+i18n('password is %* (length: %(1)l)', 'secret'); // in French: 'le mot de passe est ****** (longueur: 6)'
+```
 
 ## Parsing
 
@@ -118,7 +130,7 @@ Run tests with mainTest.html (located in the root folder) to assert it works wel
 
 Please note that some tests may fail depending of browsers. Mainly depending of support of locale string conversion (uppercase, lowercase) where some locale were not fully supported.
 
-## Version 0.3.0
+## Version 0.4.0
 
 *If you want you can help me to improve it. Fork the project and pull request your change.*
 

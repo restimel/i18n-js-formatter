@@ -51,6 +51,9 @@ describe('i18n-formatter', function() {
 				error: this.logError
 			},
 			formatRules: {
+				en: {
+					phone: 'ddd-ddd-dddd'
+				},
 				fr: {
 					number: {
 						thousandSeparator: ' ',
@@ -66,7 +69,9 @@ describe('i18n-formatter', function() {
 						d: 'j',
 						month: 'M',
 						y: 'an'
-					}
+					},
+					phone: 'dd dd dd dd dd'
+
 				},
 				'fr-be': {
 					number: {
@@ -182,6 +187,118 @@ describe('i18n-formatter', function() {
 				},
 				bar: 'obj3'
 			})).toBe('obj.foo2');
+		});
+
+		describe('custom rules', function() {
+			it('should add single rule', function() {
+				$$.addRule('*', function(data) {
+					return data.value.replace(/./g, '*');
+				});
+
+				expect($$.parse('password is %*', 'secret'))
+					.toBe('password is ******');
+
+				$$.addRule(['l'], function(data) {
+					return data.value.length;
+				});
+
+				expect($$.parse('password is %* (length: %l)', 'secret', 'wlength'))
+					.toBe('password is ****** (length: 7)');
+				expect($$.parse('password is %* (length: %(1)l)', 'secret'))
+					.toBe('password is ****** (length: 6)');
+			});
+
+			it('should add several tag at once', function() {
+				$$.addRule('rR', function(data) {
+					return data.value.length;
+				});
+
+				expect($$.parse('%r and %R', 'foo', 'longer')).toBe('3 and 6');
+			});
+
+			it('should read variations and format rules', function() {
+				$$.addRule('p', function(data) {
+					var phoneFormat = data.formatRules.phone;
+					var variation = data.variation;
+					var value = data.value;
+
+					var i = 0;
+					var str = phoneFormat.replace(/d/g, function() {
+						return value[i++];
+					});
+
+					if (variation.indexOf('+') !== -1) {
+						var prefix = '+';
+						if (data.locale === 'fr') {
+							str = str.slice(1);
+							prefix += '33 ';
+						} else {
+							prefix += '1 ';
+						}
+						str = prefix + str;
+					}
+
+					return str;
+				});
+
+				// us
+				expect($$.parse('my phone number %p', '0123456789'))
+					.toBe('my phone number 012-345-6789');
+				expect($$.parse('my phone number %{+}p', '0123456789'))
+					.toBe('my phone number +1 012-345-6789');
+
+				$$.setLocale('fr');
+				expect($$.parse('my phone number %p', '0123456789'))
+					.toBe('my phone number 01 23 45 67 89');
+				expect($$.parse('my phone number %{+}p', '0123456789'))
+					.toBe('my phone number +33 1 23 45 67 89');
+
+				$$.setLocale('fr-be');
+				expect($$.parse('my phone number %p', '0123456789'))
+					.toBe('my phone number 01 23 45 67 89');
+			});
+
+			xit('should read tag and default rules', function() {
+				$$.addRule(['€', '$', '¤'], function(data) {
+					var rule = data.defaultFormat;
+					var tag = data.tag;
+					var value = data.value;
+					var currency = 'coins';
+
+					if (tag === '€') {
+						currency = 'euros';
+					} else if (tag === '$') {
+						currency = 'dollars';
+					}
+
+					if (rule === 'formatted') {
+						value = this.parse('$i', value);
+					}
+
+					value = value + ' ' + currency;
+
+					return value;
+				});
+
+				expect($$.parse('%¤: %€ and %$', 1500, 900, 600))
+					.toBe('1500 coins: 900 euros and 600 dollars');
+
+				$$.setDefault({
+					nb: 'formatted'
+				});
+
+				expect($$.parse('%¤: %€ and %$', 1500, 900, 600))
+					.toBe('1,500 coins: 900 euros and 600 dollars');
+			});
+
+			it('should not consume value', function() {
+				$$.addRule('$', function(data) {
+					data.noValue();
+					return 'a lot of money';
+				});
+
+				expect($$('I give %$ to %s', 'Jimmy')).toBe('I give a lot of money to Jimmy');
+			});
 		});
 
 		describe('string formatting', function() {

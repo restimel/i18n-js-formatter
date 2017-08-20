@@ -17,7 +17,7 @@
 (function() {
 	'use strict';
 
-	var version = '0.3.0';
+	var version = '0.4.0';
 
 	/*
 	 * 0 → 999: reserved for future usage
@@ -240,7 +240,7 @@
 		}
 
 		if (statusVariables.useDfltLocale && statusVariables.localeKeys.length) {
-			statusVariables.currentLocale = statusVariables.locales[_getDefaultKey()];
+			_prepareLocale(_getDefaultKey());
 		}
 
 		if (needLoading && statusVariables.lazyLoading) {
@@ -273,7 +273,7 @@
 			key = false;
 			saveChanged = false;
 		} else {
-			statusVariables.currentLocale = statusVariables.locales[key];
+			_prepareLocale(key);
 			_loadCurrentLocale();
 		}
 
@@ -598,6 +598,28 @@
 				_resetDataKey(key);
 			}
 		});
+	}
+
+	function _prepareLocale(key) {
+		var stv = statusVariables.locales[key];
+		var currentStv = {
+			formatRules: {}
+		};
+		_each(stv, function(v, k) {
+			if (k === 'formatRules') {
+				currentStv.formatRules = _extend({}, v);
+			} else {
+				currentStv[k] = v;
+			}
+		});
+
+		var list = [];
+		while (stv.secondary && list.indexOf(stv.secondary) === -1) {
+			list.push(stv.secondary)
+			stv = statusVariables.locales[stv.secondary];
+			currentStv.formatRules = _extend(stv.formatRules, currentStv.formatRules, true);
+		}
+		statusVariables.currentLocale = currentStv;
 	}
 
 	function _configureLocaleSet(options) {
@@ -995,6 +1017,10 @@
 		statusVariables.formatter.sort(function(a, b) {
 			return b.w - a.w;
 		});
+
+		if (typeof formatter.loaded === 'function') {
+			formatter.loaded(i18n);
+		}
 	}
 
 	function _parse(text) {
@@ -1333,7 +1359,7 @@
 			lng = _formatLocaleKey(slng) || key;
 			if (slng) {
 				statusVariables._currentLocale = statusVariables.currentLocale;
-				statusVariables.currentLocale = statusVariables.locales[lng];
+				_prepareLocale(lng);
 			}
 			if (sentenceObject.parse) {
 				return str;
@@ -1454,13 +1480,20 @@
 		return typeof value === 'undefined' ? dfltValue : value;
 	}
 
-	function _extend(origObj, extendObj) {
+	function _extend(origObj, extendObj, doNotModify) {
+		if (doNotModify) {
+			origObj = _extend({}, origObj);
+		}
 		_each(extendObj, function(value, key) {
 			if (typeof value !== 'object') {
 				origObj[key] = value;
 			} else {
 				if (value instanceof Array) {
 					origObj[key] = [];
+				} else
+				if (value instanceof RegExp) {
+					origObj[key] = value;
+					return;
 				} else
 				if (typeof origObj[key] !== 'object') {
 					origObj[key] = {};
@@ -1476,7 +1509,7 @@
 	function _each(object, iteratee, context) {
 		var x, f;
 
-		if (typeof context === 'object') {
+		if (typeof context !== 'undefined') {
 			f = iteratee.bind(context);
 		} else {
 			f = iteratee;

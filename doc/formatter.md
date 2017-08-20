@@ -80,35 +80,70 @@ Note: if the format does not follow `%(position){variation}k` then it is not nec
 
 You can add any tags. This will replace the tags by the string you provide. If you use a tag that is already defined, it replaces it by yours.
 
-### i18n.addRule(str[], function)
-__TODO expected in 0.4__
+### i18n.addRule(str, function)
 
-The first argument should be an array of strings of 1 character. This will be the *tags* used.
+The first argument should be a string or an array of strings of 1 character. This indicates *tags* that will be registered.
 
 The second argument is the function which is called when any tag given in the first argument will be found in the string to format. The function is called in the i18n context (inside the function `this` refers to i18n).
 
 The argument given to this callback function is one object with these attributes:
 
-* **tag**: the tag which have triggered this function.
-* **parameters**: the list of variation to apply.
-* **value**: the value which should be formatted.
+* **value** _(string)_: the value which should be formatted.
+* **variation** _(string[])_: the list of variation to apply.
+* **tag** _(string)_: the tag which have triggered this function.
+* **formatRules** _(object)_: object containing rules of the current locale.
+* **defaultFormat** _(object)_: object containing configuration rules (not depending of locales), like the default escaping rules to apply.
+* **locale** _(string)_: current locale.
+* **noValue** _(function)_: Call this function when the tag consumes no values (otherwise other tag will miss their values).
 
 #### Examples:
 
 ```javascript
-i18n.addRule(['K'], function(data) {
-	return data.value;
+i18n.addRule('2', function(data) {
+	return data.value * 2;
 });
 
-i18n('%K', 'foo');
+i18n('%2', '7'); // 14
 ```
+registering several tag at once:
 ```javascript
-i18n.addRule(['K'], function(data) {
-	this.formatRules
-	return data.value;
+// (locale == 'fr')
+i18n.addRule('lL', function(data) {
+	return data.value.length;
 });
 
-i18n('%K', 'foo');
+i18n('%l and %L', 'foo', 'longer'); // 3 et 6
+```
+
+Reading format rules
+```javascript
+/*  (locale == 'fr')
+    (formatRules: {fr: {
+	    phone: 'dd dd dd dd dd'
+	}})
+*/
+i18n.addRule('p', function(data) {
+	var phoneFormat = data.formatRules.phone;
+	var value = data.value;
+
+	var i = 0;
+	return phoneFormat.replace(/d/g, function() {
+		return value[i++];
+	});
+});
+
+i18n('my phone number %p', '0123456789'); // mon numéro de téléphone 01 23 45 67 89
+// Please note that formating phone number should be more about which country the number comes from than the locale of the user.
+```
+Using tags without values:
+```javascript
+// (locale == 'en')
+i18n.addRule('$', function(data) {
+	data.noValue();
+	return 'a lot of money';
+});
+
+i18n('I give %$ to %s', 'Jimmy'); // I give a lot of money to Jimmy
 ```
 
 ## string format (s)
